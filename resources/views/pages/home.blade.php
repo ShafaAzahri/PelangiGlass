@@ -141,19 +141,20 @@
     </section>
 
     <!-- 3. SERVICES (matching Home.tsx Services exactly) -->
+    <!-- 3. SERVICES (matching Home.tsx Services & Screenshot exactly) -->
     <section id="layanan" class="py-24 bg-slate-50">
         <div class="max-w-6xl mx-auto px-6">
             <div class="flex items-end justify-between mb-14 flex-wrap gap-4">
                 <div>
-                    <div class="text-xs font-semibold tracking-[0.2em] uppercase mb-3 text-blue-600">
-                        Layanan
+                    <div class="text-xs font-semibold tracking-[0.2em] uppercase mb-3 text-blue-600" style="font-family: 'Plus Jakarta Sans', sans-serif;">
+                        LAYANAN
                     </div>
-                    <h2 class="uppercase text-slate-900" style="font-family: 'Plus Jakarta Sans', sans-serif; font-size: clamp(1.8rem, 4vw, 3rem); font-weight: 800; lineHeight: 1.05;">
-                        Semua Kebutuhan<br />Kaca Mobil Anda
+                    <h2 class="uppercase text-slate-900" style="font-family: 'Plus Jakarta Sans', sans-serif; font-size: clamp(1.8rem, 4vw, 3rem); font-weight: 800; line-height: 1.05;">
+                        SEMUA KEBUTUHAN<br />KACA MOBIL ANDA
                     </h2>
                 </div>
-                <a href="{{ url('/servis') }}" class="inline-flex items-center gap-2 text-sm font-medium transition-all text-blue-600 hover:opacity-80 no-underline" style="font-family: 'Plus Jakarta Sans', sans-serif;">
-                    Lihat Semua Paket Servis <i data-lucide="arrow-right" class="w-4 h-4"></i>
+                <a href="{{ url('/servis') }}" class="inline-flex items-center gap-2 text-sm font-medium transition-all text-blue-600 hover:text-blue-700 hover:opacity-80 no-underline" style="font-family: 'Plus Jakarta Sans', sans-serif;">
+                    Lihat Semua Paket Servis <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
                 </a>
             </div>
 
@@ -194,11 +195,11 @@
                 @endphp
 
                 @foreach($homeServices as $s)
-                    <div class="rounded-2xl overflow-hidden group cursor-pointer transition-all duration-300 bg-white border border-slate-200 shadow-xs hover:border-blue-300 hover:-translate-y-1">
-                        <div class="overflow-hidden" style="height: 180px;">
+                    <div class="rounded-2xl overflow-hidden group cursor-pointer transition-all duration-300 bg-white border border-slate-200 shadow-xs hover:border-blue-300 hover:-translate-y-1 flex flex-col">
+                        <div class="overflow-hidden w-full" style="height: 180px;">
                             <img src="{{ $s['img'] }}" alt="{{ $s['title'] }}" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105">
                         </div>
-                        <div class="p-5">
+                        <div class="p-5 flex flex-col flex-1">
                             <h3 class="font-bold uppercase mb-2 text-slate-900" style="font-family: 'Plus Jakarta Sans', sans-serif; font-size: 1.15rem; letter-spacing: 0.03em;">
                                 {{ $s['title'] }}
                             </h3>
@@ -218,10 +219,10 @@
             <!-- Header -->
             <div class="text-center mb-4">
                 <div class="text-xs font-semibold tracking-[0.2em] uppercase mb-3 text-blue-600" style="font-family: 'Plus Jakarta Sans', sans-serif;">
-                    Keunggulan
+                    KEUNGGULAN
                 </div>
-                <h2 class="uppercase mb-3 text-slate-900" style="font-family: 'Plus Jakarta Sans', sans-serif; font-size: clamp(1.8rem, 4vw, 3rem); font-weight: 800; lineHeight: 1.05;">
-                    Kenapa Harus <span class="text-blue-600">Pilih Kami?</span>
+                <h2 class="uppercase mb-3 text-slate-900" style="font-family: 'Plus Jakarta Sans', sans-serif; font-size: clamp(1.8rem, 4vw, 3rem); font-weight: 800; line-height: 1.05;">
+                    KENAPA HARUS <span class="text-blue-600">PILIH KAMI?</span>
                 </h2>
                 <div class="mb-12"></div>
             </div>
