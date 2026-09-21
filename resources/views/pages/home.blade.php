@@ -331,7 +331,7 @@
         </div>
     </section>
 
-    <!-- 5. GALLERY (matching Home.tsx Gallery exactly) -->
+    <!-- 5. GALLERY (matching Home.tsx Gallery with continuous lift marquee) -->
     <section id="galeri" class="py-24" style="background: #f1f5f9;" x-data="{
         active: 'Semua',
         galleryCats: ['Semua', 'Kaca Depan', 'Film Kaca', 'Aksesoris', 'Workshop'],
@@ -347,8 +347,100 @@
             { cat: 'Workshop', img: 'https://images.unsplash.com/photo-1615906655593-ad0386982a0f?w=600&auto=format' },
             { cat: 'Kaca Depan', img: 'https://images.unsplash.com/photo-1761014586544-53fe5e1f1e25?w=600&auto=format' },
         ],
+        isPaused: false,
+        speed: 0.85,
+        pos: 0,
+        resumeTimer: null,
+        rafId: null,
+        isDown: false,
+        startX: 0,
+        startScroll: 0,
+        getDisplayItems() {
+            const filtered = this.active === 'Semua' 
+                ? this.items 
+                : this.items.filter(item => item.cat === this.active);
+            let list = filtered;
+            while (list.length < 8) {
+                list = [...list, ...filtered];
+            }
+            return [...list, ...list];
+        },
+        setCategory(cat) {
+            this.active = cat;
+            this.pos = 0;
+            if (this.$refs.track) {
+                this.$refs.track.scrollLeft = 0;
+            }
+        },
+        init() {
+            const track = this.$refs.track;
+            if (!track) return;
+            this.pos = track.scrollLeft;
+
+            const step = () => {
+                if (!this.isPaused && !this.isDown && track) {
+                    this.pos += this.speed;
+                    const half = track.scrollWidth / 2;
+                    if (half > 0 && this.pos >= half) {
+                        this.pos -= half;
+                        track.scrollLeft = this.pos;
+                    } else {
+                        track.scrollLeft = this.pos;
+                    }
+                }
+                this.rafId = requestAnimationFrame(step);
+            };
+            this.rafId = requestAnimationFrame(step);
+        },
+        onScroll() {
+            if ((this.isPaused || this.isDown) && this.$refs.track) {
+                this.pos = this.$refs.track.scrollLeft;
+            }
+        },
         scroll(dir) {
-            this.$refs.track.scrollBy({ left: dir === 'right' ? 312 : -312, behavior: 'smooth' });
+            this.isPaused = true;
+            const amount = dir === 'right' ? 320 : -320;
+            if (this.$refs.track) {
+                this.$refs.track.scrollBy({ left: amount, behavior: 'smooth' });
+                setTimeout(() => {
+                    if (this.$refs.track) {
+                        this.pos = this.$refs.track.scrollLeft;
+                        const half = this.$refs.track.scrollWidth / 2;
+                        if (half > 0) {
+                            if (this.pos >= half) this.pos -= half;
+                            if (this.pos < 0) this.pos += half;
+                            this.$refs.track.scrollLeft = this.pos;
+                        }
+                    }
+                }, 400);
+            }
+            clearTimeout(this.resumeTimer);
+            this.resumeTimer = setTimeout(() => {
+                this.isPaused = false;
+            }, 2500);
+        },
+        onMouseDown(e) {
+            this.isDown = true;
+            this.isPaused = true;
+            this.startX = e.pageX - this.$refs.track.offsetLeft;
+            this.startScroll = this.$refs.track.scrollLeft;
+        },
+        onMouseMove(e) {
+            if (!this.isDown) return;
+            e.preventDefault();
+            const x = e.pageX - this.$refs.track.offsetLeft;
+            const walk = (x - this.startX) * 1.5;
+            this.$refs.track.scrollLeft = this.startScroll - walk;
+            this.pos = this.$refs.track.scrollLeft;
+        },
+        onMouseUp() {
+            if (this.isDown) {
+                this.isDown = false;
+                clearTimeout(this.resumeTimer);
+                this.resumeTimer = setTimeout(() => {
+                    this.isPaused = false;
+                }, 1500);
+            }
         }
     }">
         <div class="max-w-6xl mx-auto px-6">
@@ -357,15 +449,15 @@
                     <div class="text-xs font-semibold tracking-[0.2em] uppercase mb-3" style="color: #2563eb;">
                         Galeri
                     </div>
-                    <h2 class="uppercase" style="font-family: 'Plus Jakarta Sans', sans-serif; font-size: clamp(1.8rem, 4vw, 3rem); font-weight: 800; lineHeight: 1.05; color: #0f172a;">
+                    <h2 class="uppercase" style="font-family: 'Plus Jakarta Sans', sans-serif; font-size: clamp(1.8rem, 4vw, 3rem); font-weight: 800; line-height: 1.05; color: #0f172a;">
                         Hasil Pengerjaan Kami
                     </h2>
                 </div>
                 <div class="hidden sm:flex gap-2">
-                    <button @click="scroll('left')" class="w-10 h-10 rounded-full flex items-center justify-center transition-all cursor-pointer bg-white border border-slate-200 text-slate-500 hover:bg-blue-600 hover:text-white hover:border-blue-600">
+                    <button @click="scroll('left')" class="w-10 h-10 rounded-full flex items-center justify-center transition-all cursor-pointer bg-white border border-slate-200 text-slate-500 hover:bg-blue-600 hover:text-white hover:border-blue-600" aria-label="Sebelumnya">
                         <i data-lucide="chevron-left" class="w-4 h-4"></i>
                     </button>
-                    <button @click="scroll('right')" class="w-10 h-10 rounded-full flex items-center justify-center transition-all cursor-pointer bg-white border border-slate-200 text-slate-500 hover:bg-blue-600 hover:text-white hover:border-blue-600">
+                    <button @click="scroll('right')" class="w-10 h-10 rounded-full flex items-center justify-center transition-all cursor-pointer bg-white border border-slate-200 text-slate-500 hover:bg-blue-600 hover:text-white hover:border-blue-600" aria-label="Berikutnya">
                         <i data-lucide="chevron-right" class="w-4 h-4"></i>
                     </button>
                 </div>
@@ -374,17 +466,30 @@
             <!-- Filter tabs -->
             <div class="flex flex-wrap gap-2.5 mb-8">
                 <template x-for="c in galleryCats" :key="c">
-                    <button @click="active = c" class="px-5 py-2 rounded-full text-xs font-semibold uppercase tracking-wider transition-all cursor-pointer" :style="active === c ? 'background: #2563eb; color: #ffffff; border: 1px solid #2563eb; box-shadow: 0 2px 8px rgba(37,99,235,0.25);' : 'background: #ffffff; color: #64748b; border: 1px solid #e2e8f0;'" style="font-family: 'Plus Jakarta Sans', sans-serif;" x-text="c"></button>
+                    <button @click="setCategory(c)" class="px-5 py-2 rounded-full text-xs font-semibold uppercase tracking-wider transition-all cursor-pointer" :style="active === c ? 'background: #2563eb; color: #ffffff; border: 1px solid #2563eb; box-shadow: 0 2px 8px rgba(37,99,235,0.25);' : 'background: #ffffff; color: #64748b; border: 1px solid #e2e8f0;'" style="font-family: 'Plus Jakarta Sans', sans-serif;" x-text="c"></button>
                 </template>
             </div>
         </div>
 
-        <!-- Horizontal scroll strip -->
-        <div x-ref="track" class="flex gap-3 cursor-grab select-none no-scrollbar px-6" style="overflow-x: auto; scroll-behavior: smooth;">
-            <template x-for="(g, i) in items" :key="i">
-                <div x-show="active === 'Semua' || active === g.cat" class="relative flex-none rounded-2xl overflow-hidden group" style="width: 300px; height: 400px; box-shadow: 0 2px 10px rgba(15,23,42,0.1);">
-                    <img :src="g.img" :alt="g.cat" draggable="false" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105">
-                    <div class="absolute inset-0 flex items-end p-4" style="background: linear-gradient(to top, rgba(15,23,42,0.65) 0%, transparent 55%);">
+        <!-- Horizontal scroll strip with continuous motion -->
+        <div 
+            x-ref="track" 
+            class="flex gap-3 cursor-grab active:cursor-grabbing select-none no-scrollbar px-6" 
+            style="overflow-x: auto; scroll-behavior: auto;"
+            @mouseenter="isPaused = true"
+            @mouseleave="if (!isDown) isPaused = false"
+            @touchstart="isPaused = true"
+            @touchend="clearTimeout(resumeTimer); resumeTimer = setTimeout(() => isPaused = false, 1500)"
+            @mousedown="onMouseDown($event)"
+            @mousemove="onMouseMove($event)"
+            @mouseup="onMouseUp()"
+            @mouseleave.self="onMouseUp()"
+            @scroll="onScroll()"
+        >
+            <template x-for="(g, i) in getDisplayItems()" :key="i">
+                <div class="relative flex-none rounded-2xl overflow-hidden group" style="width: 300px; height: 400px; box-shadow: 0 2px 10px rgba(15,23,42,0.1);">
+                    <img :src="g.img" :alt="g.cat" draggable="false" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105 pointer-events-none">
+                    <div class="absolute inset-0 flex items-end p-4 pointer-events-none" style="background: linear-gradient(to top, rgba(15,23,42,0.65) 0%, transparent 55%);">
                         <span class="text-xs font-semibold uppercase tracking-wider text-white" style="font-family: 'Plus Jakarta Sans', sans-serif;" x-text="g.cat"></span>
                     </div>
                 </div>
@@ -392,10 +497,85 @@
         </div>
     </section>
 
-    <!-- 6. TESTIMONIALS (matching Home.tsx Testimonials exactly) -->
+    <!-- 6. TESTIMONIALS (matching Home.tsx Testimonials with continuous lift marquee) -->
     <section class="py-24 overflow-hidden" style="background: #0f172a;" x-data="{
+        isPaused: false,
+        speed: 0.65,
+        pos: 0,
+        resumeTimer: null,
+        rafId: null,
+        isDown: false,
+        startX: 0,
+        startScroll: 0,
+        init() {
+            const track = this.$refs.testitrack;
+            if (!track) return;
+            this.pos = track.scrollLeft;
+
+            const step = () => {
+                if (!this.isPaused && !this.isDown && track) {
+                    this.pos += this.speed;
+                    const half = track.scrollWidth / 2;
+                    if (half > 0 && this.pos >= half) {
+                        this.pos -= half;
+                        track.scrollLeft = this.pos;
+                    } else {
+                        track.scrollLeft = this.pos;
+                    }
+                }
+                this.rafId = requestAnimationFrame(step);
+            };
+            this.rafId = requestAnimationFrame(step);
+        },
+        onScroll() {
+            if ((this.isPaused || this.isDown) && this.$refs.testitrack) {
+                this.pos = this.$refs.testitrack.scrollLeft;
+            }
+        },
         scroll(dir) {
-            this.$refs.testitrack.scrollBy({ left: dir * 420, behavior: 'smooth' });
+            this.isPaused = true;
+            const amount = dir * 420;
+            if (this.$refs.testitrack) {
+                this.$refs.testitrack.scrollBy({ left: amount, behavior: 'smooth' });
+                setTimeout(() => {
+                    if (this.$refs.testitrack) {
+                        this.pos = this.$refs.testitrack.scrollLeft;
+                        const half = this.$refs.testitrack.scrollWidth / 2;
+                        if (half > 0) {
+                            if (this.pos >= half) this.pos -= half;
+                            if (this.pos < 0) this.pos += half;
+                            this.$refs.testitrack.scrollLeft = this.pos;
+                        }
+                    }
+                }, 400);
+            }
+            clearTimeout(this.resumeTimer);
+            this.resumeTimer = setTimeout(() => {
+                this.isPaused = false;
+            }, 2500);
+        },
+        onMouseDown(e) {
+            this.isDown = true;
+            this.isPaused = true;
+            this.startX = e.pageX - this.$refs.testitrack.offsetLeft;
+            this.startScroll = this.$refs.testitrack.scrollLeft;
+        },
+        onMouseMove(e) {
+            if (!this.isDown) return;
+            e.preventDefault();
+            const x = e.pageX - this.$refs.testitrack.offsetLeft;
+            const walk = (x - this.startX) * 1.5;
+            this.$refs.testitrack.scrollLeft = this.startScroll - walk;
+            this.pos = this.$refs.testitrack.scrollLeft;
+        },
+        onMouseUp() {
+            if (this.isDown) {
+                this.isDown = false;
+                clearTimeout(this.resumeTimer);
+                this.resumeTimer = setTimeout(() => {
+                    this.isPaused = false;
+                }, 1500);
+            }
         }
     }">
         <div class="max-w-6xl mx-auto px-6">
@@ -404,7 +584,7 @@
                     <div class="text-xs font-semibold tracking-[0.2em] uppercase mb-3" style="color: #3b82f6;">
                         Testimoni Pelanggan
                     </div>
-                    <h2 class="text-white uppercase" style="font-family: 'Plus Jakarta Sans', sans-serif; font-size: clamp(1.8rem, 4vw, 3rem); font-weight: 800; lineHeight: 1.05;">
+                    <h2 class="text-white uppercase" style="font-family: 'Plus Jakarta Sans', sans-serif; font-size: clamp(1.8rem, 4vw, 3rem); font-weight: 800; line-height: 1.05;">
                         Kata Mereka<br />Yang Sudah Percaya
                     </h2>
                 </div>
@@ -493,9 +673,22 @@
             ];
         @endphp
 
-        <div x-ref="testitrack" class="flex gap-5 px-6 pb-4 cursor-grab select-none no-scrollbar" style="overflow-x: auto; scroll-snap-type: x mandatory;">
-            @foreach($testimonialsList as $t)
-                <div data-card class="shrink-0 rounded-2xl p-7 sm:p-8 flex flex-col justify-between" style="width: min(400px, 84vw); scroll-snap-align: start; background: #1e293b; border: 1px solid rgba(255,255,255,0.08);">
+        <div 
+            x-ref="testitrack" 
+            class="flex gap-5 px-6 pb-4 cursor-grab active:cursor-grabbing select-none no-scrollbar" 
+            style="overflow-x: auto; scroll-behavior: auto;"
+            @mouseenter="isPaused = true"
+            @mouseleave="if (!isDown) isPaused = false"
+            @touchstart="isPaused = true"
+            @touchend="clearTimeout(resumeTimer); resumeTimer = setTimeout(() => isPaused = false, 1500)"
+            @mousedown="onMouseDown($event)"
+            @mousemove="onMouseMove($event)"
+            @mouseup="onMouseUp()"
+            @mouseleave.self="onMouseUp()"
+            @scroll="onScroll()"
+        >
+            @foreach(array_merge($testimonialsList, $testimonialsList) as $t)
+                <div data-card class="shrink-0 rounded-2xl p-7 sm:p-8 flex flex-col justify-between" style="width: min(400px, 84vw); background: #1e293b; border: 1px solid rgba(255,255,255,0.08);">
                     <div>
                         <!-- Header card: Stars & Quote -->
                         <div class="flex items-center justify-between mb-4">
