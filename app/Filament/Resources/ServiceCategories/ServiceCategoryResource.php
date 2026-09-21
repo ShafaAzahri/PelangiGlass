@@ -26,7 +26,7 @@ class ServiceCategoryResource extends Resource
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedWrench;
 
-    protected static ?string $navigationGroup = 'Katalog & Servis';
+    protected static string|\UnitEnum|null $navigationGroup = 'Katalog & Servis';
 
     protected static ?string $navigationLabel = 'Kategori Layanan';
 

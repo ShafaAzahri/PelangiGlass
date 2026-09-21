@@ -10,22 +10,53 @@ use BackedEnum;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
+use Filament\Forms\Components\Textarea;
+use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\Toggle;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
+use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Columns\ToggleColumn;
 use Filament\Tables\Table;
 
 class FaqResource extends Resource
 {
     protected static ?string $model = Faq::class;
 
-    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
+    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedQuestionMarkCircle;
+
+    protected static string|\UnitEnum|null $navigationGroup = 'Interaksi Pelanggan';
+
+    protected static ?string $navigationLabel = 'FAQ (Tanya Jawab)';
+
+    protected static ?string $modelLabel = 'FAQ';
+
+    protected static ?string $pluralModelLabel = 'FAQ (Tanya Jawab)';
+
+    protected static ?int $navigationSort = 2;
 
     public static function form(Schema $schema): Schema
     {
         return $schema
             ->components([
-                //
+                TextInput::make('question')
+                    ->label('Pertanyaan')
+                    ->required()
+                    ->maxLength(255)
+                    ->columnSpanFull(),
+                Textarea::make('answer')
+                    ->label('Jawaban')
+                    ->required()
+                    ->rows(4)
+                    ->columnSpanFull(),
+                Toggle::make('is_active')
+                    ->label('Aktif')
+                    ->default(true),
+                TextInput::make('sort_order')
+                    ->label('Urutan')
+                    ->numeric()
+                    ->default(0),
             ]);
     }
 
@@ -33,10 +64,19 @@ class FaqResource extends Resource
     {
         return $table
             ->columns([
-                //
-            ])
-            ->filters([
-                //
+                TextColumn::make('question')
+                    ->label('Pertanyaan')
+                    ->searchable()
+                    ->sortable()
+                    ->limit(60),
+                TextColumn::make('answer')
+                    ->label('Jawaban')
+                    ->limit(80),
+                ToggleColumn::make('is_active')
+                    ->label('Aktif'),
+                TextColumn::make('sort_order')
+                    ->label('Urutan')
+                    ->sortable(),
             ])
             ->recordActions([
                 EditAction::make(),
