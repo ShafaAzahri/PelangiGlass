@@ -15,12 +15,15 @@ use Filament\Forms\Components\Placeholder;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Resources\Resource;
+use Filament\Schemas\Components\Grid;
+use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Columns\ImageColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Columns\ToggleColumn;
 use Filament\Tables\Table;
+use Illuminate\Support\HtmlString;
 
 class HeroBannerResource extends Resource
 {
@@ -28,7 +31,7 @@ class HeroBannerResource extends Resource
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedSparkles;
 
-    protected static string|\UnitEnum|null $navigationGroup = 'Pengaturan Sistem';
+    protected static string|\UnitEnum|null $navigationGroup = 'Konten & Media';
 
     protected static ?string $navigationLabel = 'Banner Beranda';
 
@@ -41,54 +44,77 @@ class HeroBannerResource extends Resource
     public static function form(Schema $schema): Schema
     {
         return $schema
+            ->columns(['lg' => 3, 'default' => 1])
             ->components([
-                TextInput::make('title')
-                    ->label('Judul Utama Banner')
-                    ->maxLength(255),
-                TextInput::make('subtitle')
-                    ->label('Subjudul / Narasi')
-                    ->maxLength(255),
-                Placeholder::make('current_image_preview')
-                    ->label('Preview Gambar Banner Saat Ini')
-                    ->content(function (?HeroBanner $record) {
-                        if (! $record || empty($record->image_url)) {
-                            return new \Illuminate\Support\HtmlString('<span class="text-xs text-gray-400">Belum ada gambar yang terpasang</span>');
-                        }
-                        $url = e($record->image_url);
-                        return new \Illuminate\Support\HtmlString("
-                            <div class='flex items-center gap-4 p-3 bg-gray-50 dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 max-w-xl'>
-                                <img src='{$url}' alt='Preview Banner' class='h-20 w-36 object-cover rounded-lg shadow-sm border border-gray-300 dark:border-gray-600' />
-                                <div class='text-xs space-y-1'>
-                                    <div class='font-semibold text-gray-800 dark:text-gray-200'>Banner aktif saat ini</div>
-                                    <div class='text-gray-500 dark:text-gray-400 text-[11px] truncate max-w-xs'>{$url}</div>
-                                    <div class='text-emerald-600 dark:text-emerald-400 text-[11px] font-medium'>✓ Terpasang. Kosongkan upload di bawah jika tidak ingin mengganti.</div>
-                                </div>
-                            </div>
-                        ");
-                    })
-                    ->visible(fn (?HeroBanner $record) => $record !== null && !empty($record->image_url)),
-                FileUpload::make('image_path')
-                    ->label('Upload File Gambar Banner')
-                    ->image()
-                    ->directory('banners')
-                    ->required(fn (string $operation, ?HeroBanner $record) => $operation === 'create' && empty($record?->image_path))
-                    ->dehydrated(fn ($state) => filled($state))
-                    ->helperText('Format: JPG/PNG/WEBP. Kosongkan jika tidak ingin mengubah gambar banner yang sudah ada.'),
-                TextInput::make('button_text')
-                    ->label('Teks Tombol CTA')
-                    ->placeholder('Contoh: Konsultasi Sekarang')
-                    ->maxLength(100),
-                TextInput::make('button_url')
-                    ->label('Link URL Tujuan Tombol')
-                    ->placeholder('Contoh: /#kontak atau https://wa.me/...')
-                    ->maxLength(255),
-                Toggle::make('is_active')
-                    ->label('Aktif')
-                    ->default(true),
-                TextInput::make('sort_order')
-                    ->label('Urutan')
-                    ->numeric()
-                    ->default(0),
+                Section::make('Informasi Teks Banner')
+                    ->description('Teks judul, deskripsi, dan tombol CTA')
+                    ->icon(Heroicon::OutlinedDocumentText)
+                    ->columnSpan(['lg' => 2, 'default' => 1])
+                    ->schema([
+                        TextInput::make('title')
+                            ->label('Judul Utama Banner')
+                            ->placeholder('Contoh: Spesialis Kaca Mobil Terpercaya')
+                            ->maxLength(255)
+                            ->columnSpanFull(),
+                        TextInput::make('subtitle')
+                            ->label('Subjudul / Narasi Pendukung')
+                            ->placeholder('Contoh: Pelayanan cepat, rapi, dan bergaransi resmi sejak 1992')
+                            ->maxLength(255)
+                            ->columnSpanFull(),
+                        Grid::make(2)->schema([
+                            TextInput::make('button_text')
+                                ->label('Teks Tombol CTA')
+                                ->placeholder('Contoh: Konsultasi Sekarang')
+                                ->maxLength(100),
+                            TextInput::make('button_url')
+                                ->label('Link URL Tujuan')
+                                ->placeholder('Contoh: /#kontak atau https://wa.me/...')
+                                ->maxLength(255),
+                        ]),
+                    ]),
+
+                Section::make('Gambar & Status')
+                    ->description('File visual banner dan urutan tampil')
+                    ->icon(Heroicon::OutlinedPhoto)
+                    ->columnSpan(['lg' => 1, 'default' => 1])
+                    ->schema([
+                        Placeholder::make('current_image_preview')
+                            ->label('Preview Banner Aktif')
+                            ->content(function (?HeroBanner $record): ?HtmlString {
+                                if (! $record || empty($record->image_url)) {
+                                    return null;
+                                }
+                                $url = e($record->image_url);
+                                return new HtmlString("
+                                    <div style='display: flex; align-items: center; gap: 12px; padding: 10px; background: rgba(30, 41, 59, 0.7); border: 1px solid rgba(255, 255, 255, 0.12); border-radius: 10px; margin-bottom: 8px;'>
+                                        <img src='{$url}' alt='Banner' style='width: 90px; height: 50px; min-width: 90px; object-fit: cover; border-radius: 6px; border: 1px solid rgba(255, 255, 255, 0.2); display: block;' />
+                                        <div style='font-size: 11px; line-height: 1.35; overflow: hidden;'>
+                                            <div style='font-weight: 600; color: #f8fafc; margin-bottom: 2px;'>Banner Terpasang</div>
+                                            <div style='color: #22c55e; font-weight: 500;'>✓ Aktif di beranda</div>
+                                        </div>
+                                    </div>
+                                ");
+                            })
+                            ->visible(fn (?HeroBanner $record) => $record !== null && !empty($record->image_url)),
+                        FileUpload::make('image_path')
+                            ->label('Upload / Ganti Gambar')
+                            ->image()
+                            ->disk('public')
+                            ->directory('banners')
+                            ->imagePreviewHeight('160')
+                            ->required(fn (string $operation, ?HeroBanner $record) => $operation === 'create' && empty($record?->image_path))
+                            ->dehydrated(fn ($state) => filled($state))
+                            ->helperText('Format JPG/PNG/WebP. Kosongkan jika tidak ingin mengubah banner.'),
+                        Grid::make(2)->schema([
+                            Toggle::make('is_active')
+                                ->label('Aktif')
+                                ->default(true),
+                            TextInput::make('sort_order')
+                                ->label('Urutan')
+                                ->numeric()
+                                ->default(0),
+                        ]),
+                    ]),
             ]);
     }
 

@@ -21,6 +21,8 @@ use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Resources\Resource;
+use Filament\Schemas\Components\Grid;
+use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Columns\ImageColumn;
@@ -51,82 +53,105 @@ class ProductResource extends Resource
     public static function form(Schema $schema): Schema
     {
         return $schema
+            ->columns(['lg' => 3, 'default' => 1])
             ->components([
-                Select::make('category_id')
-                    ->label('Kategori')
-                    ->relationship('category', 'name')
-                    ->required()
-                    ->searchable()
-                    ->preload(),
-                TextInput::make('name')
-                    ->label('Nama Produk')
-                    ->required()
-                    ->maxLength(200)
-                    ->live(onBlur: true)
-                    ->afterStateUpdated(fn ($set, ?string $state) => $set('slug', Str::slug($state))),
-                TextInput::make('slug')
-                    ->label('Slug URL')
-                    ->required()
-                    ->unique(ignoreRecord: true)
-                    ->maxLength(220),
-                Select::make('badge')
-                    ->label('Badge / Status Promo')
-                    ->options(ProductBadge::class),
-                TextInput::make('vehicle_compatibility')
-                    ->label('Kesesuaian Tipe Mobil')
-                    ->placeholder('Contoh: Toyota Avanza 2019–2024 / Semua Mobil')
-                    ->maxLength(255),
-                TextInput::make('estimated_price')
-                    ->label('Harga Estimasi (Rp)')
-                    ->numeric()
-                    ->prefix('Rp')
-                    ->placeholder('Kosongkan bila sistem menampilkan "Tanya Estimasi via WA"'),
-                Textarea::make('short_description')
-                    ->label('Deskripsi Singkat')
-                    ->rows(2)
-                    ->columnSpanFull(),
-                RichEditor::make('full_description')
-                    ->label('Deskripsi Lengkap / Spesifikasi')
-                    ->columnSpanFull(),
-                Placeholder::make('current_main_image_preview')
-                    ->label('Preview Foto Utama')
-                    ->content(function (?Product $record): ?HtmlString {
-                        if (!$record || empty($record->image_url)) {
-                            return null;
-                        }
-                        $url = e($record->image_url);
-                        return new HtmlString("
-                            <div class='flex items-center gap-4 p-3 bg-gray-50 dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 max-w-xl'>
-                                <img src='{$url}' alt='Preview Foto Produk' class='h-20 w-28 object-cover rounded-lg shadow-sm border border-gray-300 dark:border-gray-600' />
-                                <div class='text-xs space-y-1'>
-                                    <div class='font-semibold text-gray-800 dark:text-gray-200'>Foto utama aktif saat ini</div>
-                                    <div class='text-gray-500 dark:text-gray-400 text-[11px] truncate max-w-xs'>{$url}</div>
-                                    <div class='text-emerald-600 dark:text-emerald-400 text-[11px] font-medium'>✓ Terpasang. Kosongkan upload jika tidak ingin mengganti.</div>
-                                </div>
-                            </div>
-                        ");
-                    })
-                    ->visible(fn (?Product $record) => $record !== null && !empty($record->image_url)),
-                FileUpload::make('main_image')
-                    ->label('Upload Foto Utama Baru')
-                    ->image()
-                    ->directory('products')
-                    ->dehydrated(fn ($state) => filled($state))
-                    ->helperText('Kosongkan upload ini jika tidak ingin mengubah foto yang sudah ada.'),
-                FileUpload::make('gallery_images')
-                    ->label('Galeri Foto Tambahan')
-                    ->multiple()
-                    ->reorderable()
-                    ->image()
-                    ->directory('products/gallery')
-                    ->dehydrated(fn ($state) => filled($state)),
-                Toggle::make('is_active')
-                    ->label('Aktif / Tampilkan di Web')
-                    ->default(true),
-                TextInput::make('sort_order')
-                    ->label('Urutan Tampilan')
-                    ->numeric()
-                    ->default(0),
+                Section::make('Informasi Produk')
+                    ->description('Nama, kategori, kesesuaian mobil, dan harga')
+                    ->icon(Heroicon::OutlinedShoppingBag)
+                    ->columnSpan(['lg' => 2, 'default' => 1])
+                    ->schema([
+                        TextInput::make('name')
+                            ->label('Nama Produk')
+                            ->placeholder('Contoh: Kaca Film V-KOOL VK 40')
+                            ->required()
+                            ->maxLength(200)
+                            ->live(onBlur: true)
+                            ->afterStateUpdated(fn ($set, ?string $state) => $set('slug', Str::slug($state))),
+                        Grid::make(2)->schema([
+                            Select::make('category_id')
+                                ->label('Kategori')
+                                ->relationship('category', 'name')
+                                ->required()
+                                ->searchable()
+                                ->preload(),
+                            TextInput::make('slug')
+                                ->label('Slug URL')
+                                ->required()
+                                ->unique(ignoreRecord: true)
+                                ->maxLength(220),
+                        ]),
+                        Grid::make(3)->schema([
+                            Select::make('badge')
+                                ->label('Badge / Status')
+                                ->options(ProductBadge::class),
+                            TextInput::make('vehicle_compatibility')
+                                ->label('Kesesuaian Mobil')
+                                ->placeholder('Contoh: Toyota Avanza / Semua Mobil')
+                                ->maxLength(255),
+                            TextInput::make('estimated_price')
+                                ->label('Harga Estimasi (Rp)')
+                                ->numeric()
+                                ->prefix('Rp')
+                                ->placeholder('Opsional (WA)'),
+                        ]),
+                        Textarea::make('short_description')
+                            ->label('Deskripsi Singkat')
+                            ->placeholder('Spesifikasi ringkas produk...')
+                            ->rows(3)
+                            ->columnSpanFull(),
+                        RichEditor::make('full_description')
+                            ->label('Deskripsi Lengkap / Spesifikasi Detail')
+                            ->columnSpanFull(),
+                    ]),
+
+                Section::make('Foto & Tampilan')
+                    ->description('Foto utama, galeri produk, dan status')
+                    ->icon(Heroicon::OutlinedPhoto)
+                    ->columnSpan(['lg' => 1, 'default' => 1])
+                    ->schema([
+                        Placeholder::make('current_main_image_preview')
+                            ->label('Foto Utama Aktif')
+                            ->content(function (?Product $record): ?HtmlString {
+                                if (!$record || empty($record->image_url)) {
+                                    return null;
+                                }
+                                $url = e($record->image_url);
+                                return new HtmlString("
+                                    <div style='display: flex; align-items: center; gap: 12px; padding: 10px; background: rgba(30, 41, 59, 0.7); border: 1px solid rgba(255, 255, 255, 0.12); border-radius: 10px; margin-bottom: 8px;'>
+                                        <img src='{$url}' alt='Produk' style='width: 72px; height: 54px; min-width: 72px; object-fit: cover; border-radius: 6px; border: 1px solid rgba(255, 255, 255, 0.2); display: block;' />
+                                        <div style='font-size: 11px; line-height: 1.35; overflow: hidden;'>
+                                            <div style='font-weight: 600; color: #f8fafc; margin-bottom: 2px;'>Foto Utama Terpasang</div>
+                                            <div style='color: #22c55e; font-weight: 500;'>✓ Aktif di website</div>
+                                        </div>
+                                    </div>
+                                ");
+                            })
+                            ->visible(fn (?Product $record) => $record !== null && !empty($record->image_url)),
+                        FileUpload::make('main_image')
+                            ->label('Upload / Ganti Foto Utama')
+                            ->image()
+                            ->disk('public')
+                            ->directory('products')
+                            ->imagePreviewHeight('180')
+                            ->dehydrated(fn ($state) => filled($state))
+                            ->helperText('Kosongkan upload ini jika tidak ingin mengubah foto utama.'),
+                        FileUpload::make('gallery_images')
+                            ->label('Galeri Foto Tambahan')
+                            ->multiple()
+                            ->reorderable()
+                            ->image()
+                            ->disk('public')
+                            ->directory('products/gallery')
+                            ->imagePreviewHeight('120')
+                            ->dehydrated(fn ($state) => filled($state)),
+                        Toggle::make('is_active')
+                            ->label('Aktif / Tampilkan di Web')
+                            ->default(true),
+                        TextInput::make('sort_order')
+                            ->label('Urutan Tampilan')
+                            ->numeric()
+                            ->default(0),
+                    ]),
             ]);
     }
 
