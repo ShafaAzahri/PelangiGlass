@@ -5,8 +5,14 @@
     <!-- 1. HERO SLIDER (matching Home.tsx Hero exactly) -->
     <section id="beranda" class="relative overflow-hidden pt-[76px] md:pt-[88px]" style="background: #0a0f1a;" x-data="{
         slides: [
-            { img: '{{ asset('banner1.png') }}', alt: 'Kaca Mobil Jernih Perjalanan Lebih Aman' },
-            { img: '{{ asset('banner2.png') }}', alt: 'Pelangi Glass Banner 2' }
+            @if(isset($banners) && $banners->count() > 0)
+                @foreach($banners as $b)
+                    { img: '{{ asset(ltrim($b->image_path, '/')) }}', alt: '{{ addslashes($b->title ?? 'Pelangi Glass Banner') }}' },
+                @endforeach
+            @else
+                { img: '{{ asset('banner1.png') }}', alt: 'Kaca Mobil Jernih Perjalanan Lebih Aman' },
+                { img: '{{ asset('banner2.png') }}', alt: 'Pelangi Glass Banner 2' }
+            @endif
         ],
         current: 0,
         timer: null,
