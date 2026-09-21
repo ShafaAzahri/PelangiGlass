@@ -40,24 +40,40 @@ class SettingResource extends Resource
     {
         return $schema
             ->components([
-                TextInput::make('key')
-                    ->label('Kunci Pengaturan (Key)')
-                    ->required()
-                    ->maxLength(100)
-                    ->disabled(fn (?Setting $record) => $record !== null),
-                Select::make('group')
-                    ->label('Grup Pengaturan')
+                Select::make('key')
+                    ->label('Nama Pengaturan')
                     ->options([
-                        'general' => 'Umum / Profil',
+                        'site_name' => 'Nama Bengkel / Website',
+                        'tagline' => 'Slogan / Tagline',
+                        'phone' => 'Nomor Telepon Kantor',
+                        'whatsapp' => 'Nomor WhatsApp Resmi',
+                        'address' => 'Alamat Lengkap Workshop',
+                        'operational_hours' => 'Jam Buka (Senin – Jumat)',
+                        'operational_hours_weekend' => 'Jam Buka (Sabtu & Minggu)',
+                        'instagram' => 'Akun Instagram',
+                        'facebook' => 'Halaman Facebook',
+                        'youtube' => 'Channel YouTube',
+                        'google_maps_embed' => 'Link Peta Google Maps',
+                        'years_experience' => 'Lama Pengalaman Workshop',
+                    ])
+                    ->required()
+                    ->disabled(fn (?Setting $record) => $record !== null)
+                    ->helperText(fn (?Setting $record) => $record ? Setting::humanDescription($record->key) : 'Pilih pengaturan yang ingin dikonfigurasi.'),
+                Select::make('group')
+                    ->label('Kategori Pengaturan')
+                    ->options([
+                        'general' => 'Profil Bengkel',
                         'contact' => 'Kontak & WhatsApp',
-                        'operational' => 'Jam Operasional',
+                        'operational' => 'Jam Buka',
                         'social' => 'Media Sosial',
                     ])
                     ->required(),
                 Textarea::make('value')
-                    ->label('Nilai Pengaturan (Value)')
+                    ->label('Isi / Teks Pengaturan')
+                    ->placeholder('Masukkan isi pengaturan di sini...')
                     ->rows(3)
-                    ->columnSpanFull(),
+                    ->columnSpanFull()
+                    ->helperText('Perubahan teks ini akan otomatis tampil di bagian terkait pada website utama.'),
             ]);
     }
 
@@ -66,30 +82,41 @@ class SettingResource extends Resource
         return $table
             ->columns([
                 TextColumn::make('key')
-                    ->label('Kunci (Key)')
+                    ->label('Nama Pengaturan')
+                    ->formatStateUsing(fn (string $state): string => Setting::humanName($state))
+                    ->description(fn (Setting $record): string => Setting::humanDescription($record->key))
                     ->searchable()
-                    ->sortable(),
+                    ->sortable()
+                    ->weight('bold'),
                 TextColumn::make('value')
-                    ->label('Nilai (Value)')
-                    ->limit(60),
+                    ->label('Isi / Nilai')
+                    ->limit(80)
+                    ->wrap(),
                 TextColumn::make('group')
-                    ->label('Grup')
+                    ->label('Kategori')
                     ->badge()
-                    ->color('info')
+                    ->formatStateUsing(fn (string $state): string => Setting::humanGroup($state))
+                    ->color(fn (string $state): string => match ($state) {
+                        'general' => 'primary',
+                        'contact' => 'success',
+                        'operational' => 'warning',
+                        'social' => 'info',
+                        default => 'gray',
+                    })
                     ->sortable(),
             ])
             ->filters([
                 SelectFilter::make('group')
-                    ->label('Grup')
+                    ->label('Kategori')
                     ->options([
-                        'general' => 'Umum',
-                        'contact' => 'Kontak',
-                        'operational' => 'Operasional',
+                        'general' => 'Profil Bengkel',
+                        'contact' => 'Kontak & WhatsApp',
+                        'operational' => 'Jam Buka',
                         'social' => 'Media Sosial',
                     ]),
             ])
             ->recordActions([
-                EditAction::make(),
+                EditAction::make()->label('Ubah'),
             ])
             ->toolbarActions([
                 BulkActionGroup::make([

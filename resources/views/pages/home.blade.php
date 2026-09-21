@@ -7,7 +7,7 @@
         slides: [
             @if(isset($banners) && $banners->count() > 0)
                 @foreach($banners as $b)
-                    { img: '{{ asset(ltrim($b->image_path, '/')) }}', alt: '{{ addslashes($b->title ?? 'Pelangi Glass Banner') }}' },
+                    { img: '{{ $b->image_url }}', alt: '{{ addslashes($b->title ?? 'Pelangi Glass Banner') }}' },
                 @endforeach
             @else
                 { img: '{{ asset('banner1.png') }}', alt: 'Kaca Mobil Jernih Perjalanan Lebih Aman' },
@@ -44,7 +44,7 @@
         <div class="w-full overflow-hidden" :style="{ opacity: animating ? 0 : 1, transition: 'opacity 0.4s ease' }">
             <img 
                 :src="slides[current].img" 
-                src="{{ isset($banners) && $banners->count() > 0 ? asset(ltrim($banners[0]->image_path, '/')) : asset('banner1.png') }}"
+                src="{{ isset($banners) && $banners->count() > 0 ? $banners[0]->image_url : asset('banner1.png') }}"
                 :alt="slides[current].alt" 
                 alt="Pelangi Glass Banner"
                 class="w-full block" 

@@ -75,8 +75,11 @@ class HeroBannerResource extends Resource
         return $table
             ->columns([
                 ImageColumn::make('image_path')
-                    ->label('Gambar')
-                    ->rounded(),
+                    ->label('Gambar Preview')
+                    ->width(140)
+                    ->height(75)
+                    ->extraImgAttributes(['class' => 'object-cover rounded-lg shadow-xs'])
+                    ->defaultImageUrl(asset('banner1.png')),
                 TextColumn::make('title')
                     ->label('Judul Banner')
                     ->searchable()
