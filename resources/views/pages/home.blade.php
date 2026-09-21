@@ -15,36 +15,57 @@
             @endif
         ],
         current: 0,
+        animating: false,
         timer: null,
-        next() { this.current = (this.current + 1) % this.slides.length },
-        prev() { this.current = (this.current - 1 + this.slides.length) % this.slides.length },
-        init() {
+        goTo(idx) {
+            if (this.animating || idx === this.current) return;
+            this.animating = true;
+            this.resetTimer();
+            setTimeout(() => {
+                this.current = idx;
+                this.animating = false;
+            }, 400);
+        },
+        next() {
+            this.goTo((this.current + 1) % this.slides.length);
+        },
+        prev() {
+            this.goTo((this.current - 1 + this.slides.length) % this.slides.length);
+        },
+        resetTimer() {
+            if (this.timer) clearInterval(this.timer);
             this.timer = setInterval(() => this.next(), 5000);
+        },
+        init() {
+            this.resetTimer();
         }
     }">
-        <!-- Banner image with fade -->
-        <div class="w-full relative">
-            <template x-for="(slide, index) in slides" :key="index">
-                <div x-show="current === index" x-transition.opacity.duration.400ms class="w-full">
-                    <img :src="slide.img" :alt="slide.alt" class="w-full block" style="max-height: 90vh; object-fit: cover; object-position: center;">
-                </div>
-            </template>
+        <!-- Banner image with single container fade matching Home.tsx -->
+        <div class="w-full overflow-hidden" :style="{ opacity: animating ? 0 : 1, transition: 'opacity 0.4s ease' }">
+            <img 
+                :src="slides[current].img" 
+                src="{{ isset($banners) && $banners->count() > 0 ? asset(ltrim($banners[0]->image_path, '/')) : asset('banner1.png') }}"
+                :alt="slides[current].alt" 
+                alt="Pelangi Glass Banner"
+                class="w-full block" 
+                style="max-height: 90vh; object-fit: cover; object-position: center;"
+            >
         </div>
 
         <!-- Left arrow -->
-        <button @click="prev()" class="absolute left-4 top-1/2 -translate-y-1/2 z-20 w-11 h-11 flex items-center justify-center rounded-full transition-all cursor-pointer" style="background: rgba(0,0,0,0.35); border: 1px solid rgba(255,255,255,0.2); color: #fff;" onmouseenter="this.style.background='#2563eb'" onmouseleave="this.style.background='rgba(0,0,0,0.35)'">
-            <i data-lucide="chevron-left" class="w-5 h-5"></i>
+        <button @click="prev()" class="absolute left-4 top-1/2 -translate-y-1/2 z-20 w-11 h-11 flex items-center justify-center rounded-full transition-all cursor-pointer" style="background: rgba(0,0,0,0.35); border: 1px solid rgba(255,255,255,0.2); color: #fff;" onmouseenter="this.style.background='#2563eb'" onmouseleave="this.style.background='rgba(0,0,0,0.35)'" aria-label="Slide sebelumnya">
+            <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
         </button>
 
         <!-- Right arrow -->
-        <button @click="next()" class="absolute right-4 top-1/2 -translate-y-1/2 z-20 w-11 h-11 flex items-center justify-center rounded-full transition-all cursor-pointer" style="background: rgba(0,0,0,0.35); border: 1px solid rgba(255,255,255,0.2); color: #fff;" onmouseenter="this.style.background='#2563eb'" onmouseleave="this.style.background='rgba(0,0,0,0.35)'">
-            <i data-lucide="chevron-right" class="w-5 h-5"></i>
+        <button @click="next()" class="absolute right-4 top-1/2 -translate-y-1/2 z-20 w-11 h-11 flex items-center justify-center rounded-full transition-all cursor-pointer" style="background: rgba(0,0,0,0.35); border: 1px solid rgba(255,255,255,0.2); color: #fff;" onmouseenter="this.style.background='#2563eb'" onmouseleave="this.style.background='rgba(0,0,0,0.35)'" aria-label="Slide berikutnya">
+            <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>
         </button>
 
         <!-- Dot indicators -->
         <div class="absolute bottom-5 left-1/2 -translate-x-1/2 z-20 flex gap-2">
             <template x-for="(slide, index) in slides" :key="index">
-                <button @click="current = index" class="transition-all rounded-full cursor-pointer p-0 border-0" :style="current === index ? 'width: 28px; height: 8px; background: #2563eb;' : 'width: 8px; height: 8px; background: rgba(255,255,255,0.5);'"></button>
+                <button @click="goTo(index)" class="transition-all rounded-full cursor-pointer p-0 border-0" :style="current === index ? 'width: 28px; height: 8px; background: #2563eb;' : 'width: 8px; height: 8px; background: rgba(255,255,255,0.5);'" :aria-label="'Pilih slide ' + (index + 1)"></button>
             </template>
         </div>
     </section>
