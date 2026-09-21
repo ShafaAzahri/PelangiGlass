@@ -1,7 +1,22 @@
 <?php
 
+use App\Http\Controllers\AboutController;
+use App\Http\Controllers\ArticleController;
+use App\Http\Controllers\HomeController;
+use App\Http\Controllers\InquiryController;
+use App\Http\Controllers\ProductController;
+use App\Http\Controllers\ServiceController;
 use Illuminate\Support\Facades\Route;
 
-Route::get('/', function () {
-    return view('welcome');
-});
+// Public Web Portal Routes
+Route::get('/', [HomeController::class, 'index'])->name('home');
+Route::get('/tentang', [AboutController::class, 'index'])->name('about');
+Route::get('/produk', [ProductController::class, 'index'])->name('products.index');
+Route::get('/produk/{slug}', [ProductController::class, 'show'])->name('products.show');
+Route::get('/servis', [ServiceController::class, 'index'])->name('services.index');
+Route::get('/servis/{slug}', [ServiceController::class, 'show'])->name('services.show');
+Route::get('/artikel', [ArticleController::class, 'index'])->name('articles.index');
+Route::get('/artikel/{slug}', [ArticleController::class, 'show'])->name('articles.show');
+
+// Leads Form Submission
+Route::post('/kontak', [InquiryController::class, 'store'])->name('inquiries.store');

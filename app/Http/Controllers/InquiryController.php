@@ -1,0 +1,51 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use App\Enums\InquiryStatus;
+use App\Models\Inquiry;
+use App\Models\Setting;
+use Illuminate\Http\Request;
+
+class InquiryController extends Controller
+{
+    public function store(Request $request)
+    {
+        // Simple honeypot anti-spam
+        if ($request->filled('website_hp_field')) {
+            return back()->with('success', 'Pesan Anda telah berhasil dikirim.');
+        }
+
+        $validated = $request->validate([
+            'name' => ['required', 'string', 'max:150'],
+            'phone_number' => ['required', 'string', 'max:50'],
+            'email' => ['nullable', 'email', 'max:150'],
+            'message' => ['required', 'string', 'max:2000'],
+        ], [
+            'name.required' => 'Nama lengkap wajib diisi.',
+            'phone_number.required' => 'Nomor WhatsApp / HP wajib diisi.',
+            'message.required' => 'Pesan atau pertanyaan wajib diisi.',
+        ]);
+
+        $inquiry = Inquiry::create([
+            'name' => $validated['name'],
+            'phone_number' => $validated['phone_number'],
+            'email' => $validated['email'] ?? null,
+            'message' => $validated['message'],
+            'status' => InquiryStatus::NEW,
+            'ip_address' => $request->ip(),
+            'user_agent' => $request->userAgent(),
+        ]);
+
+        $waNumber = Setting::get('whatsapp', '6281390288875');
+        $cleanPhone = preg_replace('/[^0-9]/', '', $waNumber);
+        if (str_starts_with($cleanPhone, '0')) {
+            $cleanPhone = '62' . substr($cleanPhone, 1);
+        }
+
+        $waText = urlencode("Halo Pelangi Glass, saya {$validated['name']} ({$validated['phone_number']}). Saya ingin berkonsultasi:\n\n\"{$validated['message']}\"");
+        $redirectUrl = "https://wa.me/{$cleanPhone}?text={$waText}";
+
+        return redirect()->away($redirectUrl);
+    }
+}
