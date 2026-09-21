@@ -11,6 +11,7 @@ use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Forms\Components\FileUpload;
+use Filament\Forms\Components\Placeholder;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
@@ -28,24 +29,24 @@ class GalleryItemResource extends Resource
 {
     protected static ?string $model = GalleryItem::class;
 
-    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedCamera;
+    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedPhoto;
 
-    protected static string|\UnitEnum|null $navigationGroup = 'Konten & Publikasi';
+    protected static string|\UnitEnum|null $navigationGroup = 'Konten & Media';
 
-    protected static ?string $navigationLabel = 'Galeri Portofolio';
+    protected static ?string $navigationLabel = 'Galeri Foto';
 
-    protected static ?string $modelLabel = 'Foto Galeri';
+    protected static ?string $modelLabel = 'Dokumentasi';
 
-    protected static ?string $pluralModelLabel = 'Galeri Portofolio';
+    protected static ?string $pluralModelLabel = 'Galeri Dokumentasi';
 
-    protected static ?int $navigationSort = 4;
+    protected static ?int $navigationSort = 3;
 
     public static function form(Schema $schema): Schema
     {
         return $schema
             ->components([
                 Select::make('category_id')
-                    ->label('Kategori')
+                    ->label('Kategori Galeri')
                     ->relationship('category', 'name')
                     ->required()
                     ->searchable()
@@ -58,11 +59,32 @@ class GalleryItemResource extends Resource
                     ->label('Tipe Mobil')
                     ->placeholder('Contoh: Toyota Fortuner GR')
                     ->maxLength(150),
+                Placeholder::make('current_image_preview')
+                    ->label('Foto Saat Ini')
+                    ->content(function (?GalleryItem $record) {
+                        if (! $record || empty($record->image_url)) {
+                            return new \Illuminate\Support\HtmlString('<span class="text-xs text-gray-400">Belum ada foto yang terpasang</span>');
+                        }
+                        $url = e($record->image_url);
+                        return new \Illuminate\Support\HtmlString("
+                            <div class='flex items-center gap-4 p-3 bg-gray-50 dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 max-w-xl'>
+                                <img src='{$url}' alt='Preview Foto' class='h-20 w-28 object-cover rounded-lg shadow-sm border border-gray-300 dark:border-gray-600' />
+                                <div class='text-xs space-y-1'>
+                                    <div class='font-semibold text-gray-800 dark:text-gray-200'>Foto aktif saat ini</div>
+                                    <div class='text-gray-500 dark:text-gray-400 text-[11px] truncate max-w-xs'>{$url}</div>
+                                    <div class='text-emerald-600 dark:text-emerald-400 text-[11px] font-medium'>✓ Terpasang. Kosongkan upload jika tidak ingin mengganti.</div>
+                                </div>
+                            </div>
+                        ");
+                    })
+                    ->visible(fn (?GalleryItem $record) => $record !== null && !empty($record->image_url)),
                 FileUpload::make('image_path')
-                    ->label('Foto Hasil Pengerjaan')
+                    ->label('Upload Foto Baru')
                     ->image()
                     ->directory('gallery')
-                    ->required(),
+                    ->required(fn (string $operation, ?GalleryItem $record) => $operation === 'create' && empty($record?->image_path))
+                    ->dehydrated(fn ($state) => filled($state))
+                    ->helperText('Kosongkan upload ini jika tidak ingin mengubah foto yang sudah ada.'),
                 Textarea::make('description')
                     ->label('Deskripsi Pekerjaan')
                     ->rows(2)
@@ -83,7 +105,10 @@ class GalleryItemResource extends Resource
             ->columns([
                 ImageColumn::make('image_path')
                     ->label('Foto')
-                    ->rounded(),
+                    ->width(80)
+                    ->height(55)
+                    ->extraImgAttributes(['class' => 'object-cover rounded-md shadow-xs'])
+                    ->defaultImageUrl(fn (GalleryItem $record) => $record->image_url),
                 TextColumn::make('title')
                     ->label('Judul Pengerjaan')
                     ->searchable()

@@ -65,12 +65,27 @@
             'img' => 'https://images.unsplash.com/photo-1708805282695-ef186db20192?w=800&h=500&fit=crop&auto=format',
         ],
     ];
+    $items = (isset($articles) && $articles->count() > 0)
+        ? $articles->map(fn($a) => [
+            'id' => $a->id,
+            'slug' => $a->slug,
+            'title' => $a->title,
+            'excerpt' => $a->excerpt,
+            'category' => $a->category?->name ?? 'Edukasi',
+            'date' => $a->published_at ? $a->published_at->translatedFormat('d M Y') : 'Terbaru',
+            'readTime' => "{$a->read_time_minutes} menit",
+            'img' => $a->image_url,
+        ])->toArray()
+        : $defaultArticles;
+    $articleCats = (isset($categories) && $categories->count() > 0)
+        ? array_merge(['Semua'], $categories->pluck('name')->toArray())
+        : ['Semua', 'Tips Perawatan', 'Edukasi', 'Keselamatan', 'Panduan Produk', 'Panduan'];
 @endphp
 
 <div class="pt-[76px] md:pt-[88px]" style="background: #f8fafc; min-height: 100vh;" x-data="{
     active: 'Semua',
-    categories: ['Semua', 'Tips Perawatan', 'Edukasi', 'Keselamatan', 'Panduan Produk', 'Panduan'],
-    articles: {{ json_encode($defaultArticles) }},
+    categories: {{ json_encode($articleCats) }},
+    articles: {{ json_encode($items) }},
     get filtered() {
         return this.active === 'Semua' ? this.articles : this.articles.filter(a => a.category === this.active);
     },

@@ -14,6 +14,7 @@ use Filament\Actions\EditAction;
 use Filament\Actions\ForceDeleteBulkAction;
 use Filament\Actions\RestoreBulkAction;
 use Filament\Forms\Components\FileUpload;
+use Filament\Forms\Components\Placeholder;
 use Filament\Forms\Components\RichEditor;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
@@ -28,6 +29,7 @@ use Filament\Tables\Columns\ToggleColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TrashedFilter;
 use Filament\Tables\Table;
+use Illuminate\Support\HtmlString;
 use Illuminate\Support\Str;
 
 class ProductResource extends Resource
@@ -86,16 +88,38 @@ class ProductResource extends Resource
                 RichEditor::make('full_description')
                     ->label('Deskripsi Lengkap / Spesifikasi')
                     ->columnSpanFull(),
+                Placeholder::make('current_main_image_preview')
+                    ->label('Preview Foto Utama')
+                    ->content(function (?Product $record): ?HtmlString {
+                        if (!$record || empty($record->image_url)) {
+                            return null;
+                        }
+                        $url = e($record->image_url);
+                        return new HtmlString("
+                            <div class='flex items-center gap-4 p-3 bg-gray-50 dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 max-w-xl'>
+                                <img src='{$url}' alt='Preview Foto Produk' class='h-20 w-28 object-cover rounded-lg shadow-sm border border-gray-300 dark:border-gray-600' />
+                                <div class='text-xs space-y-1'>
+                                    <div class='font-semibold text-gray-800 dark:text-gray-200'>Foto utama aktif saat ini</div>
+                                    <div class='text-gray-500 dark:text-gray-400 text-[11px] truncate max-w-xs'>{$url}</div>
+                                    <div class='text-emerald-600 dark:text-emerald-400 text-[11px] font-medium'>✓ Terpasang. Kosongkan upload jika tidak ingin mengganti.</div>
+                                </div>
+                            </div>
+                        ");
+                    })
+                    ->visible(fn (?Product $record) => $record !== null && !empty($record->image_url)),
                 FileUpload::make('main_image')
-                    ->label('Foto Utama')
+                    ->label('Upload Foto Utama Baru')
                     ->image()
-                    ->directory('products'),
+                    ->directory('products')
+                    ->dehydrated(fn ($state) => filled($state))
+                    ->helperText('Kosongkan upload ini jika tidak ingin mengubah foto yang sudah ada.'),
                 FileUpload::make('gallery_images')
                     ->label('Galeri Foto Tambahan')
                     ->multiple()
                     ->reorderable()
                     ->image()
-                    ->directory('products/gallery'),
+                    ->directory('products/gallery')
+                    ->dehydrated(fn ($state) => filled($state)),
                 Toggle::make('is_active')
                     ->label('Aktif / Tampilkan di Web')
                     ->default(true),
@@ -112,7 +136,10 @@ class ProductResource extends Resource
             ->columns([
                 ImageColumn::make('main_image')
                     ->label('Foto')
-                    ->circular(),
+                    ->width(80)
+                    ->height(55)
+                    ->extraImgAttributes(['class' => 'object-cover rounded-md shadow-xs'])
+                    ->defaultImageUrl(fn (Product $record) => $record->image_url),
                 TextColumn::make('name')
                     ->label('Nama Produk')
                     ->searchable()

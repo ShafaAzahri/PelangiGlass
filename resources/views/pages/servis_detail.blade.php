@@ -18,7 +18,7 @@
                     <!-- Service Image -->
                     <div class="lg:col-span-6 space-y-4">
                         <div class="rounded-3xl overflow-hidden border border-slate-200 bg-white shadow-sm relative">
-                            <img src="{{ $service->image_path ?? asset('images/workshop.jpg') }}" alt="{{ $service->name }}" class="w-full h-80 sm:h-96 object-cover">
+                            <img src="{{ $service->image_url }}" alt="{{ $service->name }}" class="w-full h-80 sm:h-96 object-cover">
                             @if($service->badge)
                                 <span class="absolute top-4 left-4 text-xs font-bold px-3 py-1 rounded-full bg-blue-600 text-white shadow-sm" style="font-family: 'Plus Jakarta Sans', sans-serif;">
                                     {{ $service->badge->value }}

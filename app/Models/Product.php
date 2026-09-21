@@ -47,4 +47,27 @@ class Product extends Model
     {
         return $query->where('is_active', true)->orderBy('sort_order');
     }
+
+    public function getImageUrlAttribute(): string
+    {
+        if (empty($this->main_image)) {
+            return asset('banner-tint.jpg');
+        }
+
+        if (str_starts_with($this->main_image, 'http://') || str_starts_with($this->main_image, 'https://')) {
+            return $this->main_image;
+        }
+
+        $cleanPath = ltrim($this->main_image, '/');
+
+        if (file_exists(public_path('storage/' . $cleanPath))) {
+            return asset('storage/' . $cleanPath);
+        }
+
+        if (file_exists(public_path($cleanPath))) {
+            return asset($cleanPath);
+        }
+
+        return asset('storage/' . $cleanPath);
+    }
 }

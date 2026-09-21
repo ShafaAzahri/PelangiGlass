@@ -52,4 +52,25 @@ class FilamentAdminTest extends TestCase
         $response->assertSee('Banner Beranda');
         $response->assertSee('Gambar Preview');
     }
+
+    public function test_authenticated_admin_can_access_gallery_services_products_and_articles_resources(): void
+    {
+        $admin = User::where('email', 'admin@pelangiglass.com')->first();
+
+        $galleryRes = $this->actingAs($admin)->get('/admin/gallery-items');
+        $galleryRes->assertStatus(200);
+        $galleryRes->assertSee('Galeri Foto');
+
+        $servicesRes = $this->actingAs($admin)->get('/admin/services');
+        $servicesRes->assertStatus(200);
+        $servicesRes->assertSee('Layanan & Servis');
+
+        $productsRes = $this->actingAs($admin)->get('/admin/products');
+        $productsRes->assertStatus(200);
+        $productsRes->assertSee('Katalog Produk');
+
+        $articlesRes = $this->actingAs($admin)->get('/admin/articles');
+        $articlesRes->assertStatus(200);
+        $articlesRes->assertSee('Artikel & Tips');
+    }
 }

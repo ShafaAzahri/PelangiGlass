@@ -11,6 +11,7 @@ use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Forms\Components\FileUpload;
+use Filament\Forms\Components\Placeholder;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Resources\Resource;
@@ -47,11 +48,32 @@ class HeroBannerResource extends Resource
                 TextInput::make('subtitle')
                     ->label('Subjudul / Narasi')
                     ->maxLength(255),
+                Placeholder::make('current_image_preview')
+                    ->label('Preview Gambar Banner Saat Ini')
+                    ->content(function (?HeroBanner $record) {
+                        if (! $record || empty($record->image_url)) {
+                            return new \Illuminate\Support\HtmlString('<span class="text-xs text-gray-400">Belum ada gambar yang terpasang</span>');
+                        }
+                        $url = e($record->image_url);
+                        return new \Illuminate\Support\HtmlString("
+                            <div class='flex items-center gap-4 p-3 bg-gray-50 dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 max-w-xl'>
+                                <img src='{$url}' alt='Preview Banner' class='h-20 w-36 object-cover rounded-lg shadow-sm border border-gray-300 dark:border-gray-600' />
+                                <div class='text-xs space-y-1'>
+                                    <div class='font-semibold text-gray-800 dark:text-gray-200'>Banner aktif saat ini</div>
+                                    <div class='text-gray-500 dark:text-gray-400 text-[11px] truncate max-w-xs'>{$url}</div>
+                                    <div class='text-emerald-600 dark:text-emerald-400 text-[11px] font-medium'>✓ Terpasang. Kosongkan upload di bawah jika tidak ingin mengganti.</div>
+                                </div>
+                            </div>
+                        ");
+                    })
+                    ->visible(fn (?HeroBanner $record) => $record !== null && !empty($record->image_url)),
                 FileUpload::make('image_path')
-                    ->label('File Gambar Banner')
+                    ->label('Upload File Gambar Banner')
                     ->image()
                     ->directory('banners')
-                    ->required(),
+                    ->required(fn (string $operation, ?HeroBanner $record) => $operation === 'create' && empty($record?->image_path))
+                    ->dehydrated(fn ($state) => filled($state))
+                    ->helperText('Format: JPG/PNG/WEBP. Kosongkan jika tidak ingin mengubah gambar banner yang sudah ada.'),
                 TextInput::make('button_text')
                     ->label('Teks Tombol CTA')
                     ->placeholder('Contoh: Konsultasi Sekarang')

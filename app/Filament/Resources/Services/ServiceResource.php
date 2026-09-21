@@ -14,6 +14,7 @@ use Filament\Actions\EditAction;
 use Filament\Actions\ForceDeleteBulkAction;
 use Filament\Actions\RestoreBulkAction;
 use Filament\Forms\Components\FileUpload;
+use Filament\Forms\Components\Placeholder;
 use Filament\Forms\Components\RichEditor;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
@@ -85,10 +86,31 @@ class ServiceResource extends Resource
                 RichEditor::make('process_steps')
                     ->label('Langkah Proses Pengerjaan / SOP')
                     ->columnSpanFull(),
+                Placeholder::make('current_image_preview')
+                    ->label('Foto Layanan Saat Ini')
+                    ->content(function (?Service $record) {
+                        if (! $record || empty($record->image_url)) {
+                            return new \Illuminate\Support\HtmlString('<span class="text-xs text-gray-400">Belum ada foto yang terpasang</span>');
+                        }
+                        $url = e($record->image_url);
+                        return new \Illuminate\Support\HtmlString("
+                            <div class='flex items-center gap-4 p-3 bg-gray-50 dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 max-w-xl'>
+                                <img src='{$url}' alt='Preview Layanan' class='h-20 w-28 object-cover rounded-lg shadow-sm border border-gray-300 dark:border-gray-600' />
+                                <div class='text-xs space-y-1'>
+                                    <div class='font-semibold text-gray-800 dark:text-gray-200'>Foto aktif saat ini</div>
+                                    <div class='text-gray-500 dark:text-gray-400 text-[11px] truncate max-w-xs'>{$url}</div>
+                                    <div class='text-emerald-600 dark:text-emerald-400 text-[11px] font-medium'>✓ Terpasang. Kosongkan upload jika tidak ingin mengganti.</div>
+                                </div>
+                            </div>
+                        ");
+                    })
+                    ->visible(fn (?Service $record) => $record !== null && !empty($record->image_url)),
                 FileUpload::make('image_path')
-                    ->label('Foto Layanan')
+                    ->label('Upload Foto Layanan')
                     ->image()
-                    ->directory('services'),
+                    ->directory('services')
+                    ->dehydrated(fn ($state) => filled($state))
+                    ->helperText('Kosongkan upload ini jika tidak ingin mengubah foto layanan yang sudah ada.'),
                 Toggle::make('is_featured')
                     ->label('Tampilkan di Beranda (Unggulan)')
                     ->default(false),
@@ -108,7 +130,10 @@ class ServiceResource extends Resource
             ->columns([
                 ImageColumn::make('image_path')
                     ->label('Foto')
-                    ->circular(),
+                    ->width(80)
+                    ->height(55)
+                    ->extraImgAttributes(['class' => 'object-cover rounded-md shadow-xs'])
+                    ->defaultImageUrl(fn (Service $record) => $record->image_url),
                 TextColumn::make('name')
                     ->label('Nama Layanan')
                     ->searchable()

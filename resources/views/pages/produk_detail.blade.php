@@ -18,7 +18,7 @@
                     <!-- Product Image -->
                     <div class="lg:col-span-6 space-y-4">
                         <div class="rounded-3xl overflow-hidden border border-slate-200 bg-white shadow-sm relative">
-                            <img src="{{ $product->main_image ?? asset('images/logo.png') }}" alt="{{ $product->name }}" class="w-full h-80 sm:h-96 object-cover">
+                            <img src="{{ $product->image_url }}" alt="{{ $product->name }}" class="w-full h-80 sm:h-96 object-cover">
                             @if($product->badge)
                                 <span class="absolute top-4 left-4 text-xs font-bold px-3 py-1 rounded-full bg-amber-100 text-amber-800 border border-amber-200 shadow-sm" style="font-family: 'Plus Jakarta Sans', sans-serif;">
                                     {{ $product->badge->value }}

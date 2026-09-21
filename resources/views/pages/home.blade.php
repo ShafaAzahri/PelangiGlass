@@ -332,21 +332,28 @@
     </section>
 
     <!-- 5. GALLERY (matching Home.tsx Gallery with continuous lift marquee) -->
+    @php
+        $defaultGalleryItems = [
+            ['cat' => 'Kaca Depan', 'img' => 'https://images.unsplash.com/photo-1618934116136-16d28f184b10?w=600&auto=format'],
+            ['cat' => 'Workshop', 'img' => 'https://images.unsplash.com/photo-1708805282695-ef186db20192?w=600&auto=format'],
+            ['cat' => 'Film Kaca', 'img' => 'https://images.unsplash.com/photo-1526459915562-c5ca724b1d02?w=600&auto=format'],
+            ['cat' => 'Kaca Depan', 'img' => 'https://images.unsplash.com/photo-1608259243654-70c070e0f6ed?w=600&auto=format'],
+            ['cat' => 'Aksesoris', 'img' => 'https://images.unsplash.com/photo-1651084296894-105edab05b26?w=600&auto=format'],
+            ['cat' => 'Workshop', 'img' => 'https://images.unsplash.com/photo-1779599507365-1944b37b2980?w=600&auto=format'],
+            ['cat' => 'Film Kaca', 'img' => 'https://images.unsplash.com/photo-1764428950296-be81c8decb97?w=600&auto=format'],
+            ['cat' => 'Aksesoris', 'img' => 'https://images.unsplash.com/photo-1625047509248-ec889cbff17f?w=600&auto=format'],
+            ['cat' => 'Workshop', 'img' => 'https://images.unsplash.com/photo-1615906655593-ad0386982a0f?w=600&auto=format'],
+            ['cat' => 'Kaca Depan', 'img' => 'https://images.unsplash.com/photo-1761014586544-53fe5e1f1e25?w=600&auto=format'],
+        ];
+        $homeGalleryItems = (isset($galleryItems) && $galleryItems->count() > 0)
+            ? $galleryItems->map(fn($g) => ['cat' => $g->category?->name ?? 'Workshop', 'img' => $g->image_url])->toArray()
+            : $defaultGalleryItems;
+        $homeGalleryCats = array_values(array_unique(array_merge(['Semua'], array_column($homeGalleryItems, 'cat'))));
+    @endphp
     <section id="galeri" class="py-24" style="background: #f1f5f9;" x-data="{
         active: 'Semua',
-        galleryCats: ['Semua', 'Kaca Depan', 'Film Kaca', 'Aksesoris', 'Workshop'],
-        items: [
-            { cat: 'Kaca Depan', img: 'https://images.unsplash.com/photo-1618934116136-16d28f184b10?w=600&auto=format' },
-            { cat: 'Workshop', img: 'https://images.unsplash.com/photo-1708805282695-ef186db20192?w=600&auto=format' },
-            { cat: 'Film Kaca', img: 'https://images.unsplash.com/photo-1526459915562-c5ca724b1d02?w=600&auto=format' },
-            { cat: 'Kaca Depan', img: 'https://images.unsplash.com/photo-1608259243654-70c070e0f6ed?w=600&auto=format' },
-            { cat: 'Aksesoris', img: 'https://images.unsplash.com/photo-1651084296894-105edab05b26?w=600&auto=format' },
-            { cat: 'Workshop', img: 'https://images.unsplash.com/photo-1779599507365-1944b37b2980?w=600&auto=format' },
-            { cat: 'Film Kaca', img: 'https://images.unsplash.com/photo-1764428950296-be81c8decb97?w=600&auto=format' },
-            { cat: 'Aksesoris', img: 'https://images.unsplash.com/photo-1625047509248-ec889cbff17f?w=600&auto=format' },
-            { cat: 'Workshop', img: 'https://images.unsplash.com/photo-1615906655593-ad0386982a0f?w=600&auto=format' },
-            { cat: 'Kaca Depan', img: 'https://images.unsplash.com/photo-1761014586544-53fe5e1f1e25?w=600&auto=format' },
-        ],
+        galleryCats: {{ json_encode($homeGalleryCats) }},
+        items: {{ json_encode($homeGalleryItems) }},
         isPaused: false,
         speed: 0.85,
         pos: 0,
@@ -605,7 +612,7 @@
         </div>
 
         @php
-            $testimonialsList = [
+            $defaultTestimonials = [
                 [
                     'name' => 'Budi Santoso',
                     'role' => 'Pengusaha',
@@ -619,31 +626,31 @@
                     'role' => 'Dokter Umum',
                     'car' => 'Honda CR-V Turbo',
                     'rating' => 5,
-                    'text' => 'Kaca film tolak panas sudah 2 tahun terpasang, kabin mobil tetap sejuk meski parkir di luar rumah sakit. Pelayanan teknisinya ramah, edukatif, dan pengerjaannya sangat teliti tanpa lecet sedikitpun.',
+                    'text' => 'Pasang kaca film V-Kool di sini pelayanannya luar biasa ramah dan teliti. Ruang tunggu ber-AC sangat nyaman. Setelah pasang, kabin mobil jauh lebih adem walau parkir di terik siang.',
                     'color' => '#059669'
                 ],
                 [
-                    'name' => 'Dimas Pratama',
+                    'name' => 'Hendro Prasetyo',
                     'role' => 'Karyawan Swasta',
                     'car' => 'Mitsubishi Pajero Sport',
                     'rating' => 5,
-                    'text' => 'Kaca depan retak kena kerikil di tol Pejagan - Pemalang. Langsung dibawa ke Pelangi Glass Purwokerto, pengerjaan cuma 2 jam selesai dan beres. Harga persis seperti estimasi di awal, tanpa biaya siluman.',
+                    'text' => 'Kaca depan kena kerikil di tol dan langsung retak panjang. Teknisi Pelangi Glass sangat cekatan, dalam waktu 2 jam kaca sudah diganti baru dengan presisi OEM pabrik. Sangat direkomendasikan!',
                     'color' => '#d97706'
                 ],
                 [
-                    'name' => 'Hendra Kurniawan',
-                    'role' => 'Arsitek',
-                    'car' => 'Mazda CX-5',
+                    'name' => 'Siti Nurhaliza',
+                    'role' => 'Ibu Rumah Tangga',
+                    'car' => 'Toyota Raize',
                     'rating' => 5,
-                    'text' => 'Sangat memperhatikan detail seal dan karet kaca. Sensor wiper dan kamera ADAS depan tetap berfungsi normal setelah ganti kaca depan OEM. Benar-benar workshop spesialis yang paham teknis mobil modern.',
+                    'text' => 'Awalnya bingung pilih persentase kegelapan kaca film yang aman untuk malam hari. Konsultasinya sangat membantu dan tidak memaksakan produk termahal. Hasilnya pas banget sesuai kebutuhan!',
                     'color' => '#7c3aed'
                 ],
                 [
-                    'name' => 'Siti Rahmawati',
-                    'role' => 'Wiraswasta',
-                    'car' => 'Toyota Yaris Cross',
+                    'name' => 'Bambang Kusuma',
+                    'role' => 'Arsitek',
+                    'car' => 'Mazda CX-5',
                     'rating' => 5,
-                    'text' => 'Ruang tunggunya nyaman banget ber-AC dan bersih saat menunggu pengerjaan pasang kaca film. Hasil potongannya presisi komputer, pandangan malam hari tetap jernih dan tidak silau sama sekali.',
+                    'text' => 'Sangat detail dalam proses pengerjaan. Sealant dipasang rapi tanpa blepotan sama sekali. Sensor hujan dan kamera ADAS di kaca depan juga berfungsi normal tanpa kendala kalibrasi.',
                     'color' => '#dc2626'
                 ],
                 [
@@ -671,6 +678,16 @@
                     'color' => '#4f46e5'
                 ],
             ];
+            $testimonialsList = (isset($testimonials) && $testimonials->count() > 0)
+                ? $testimonials->map(fn($t) => [
+                    'name' => $t->customer_name,
+                    'role' => $t->service_rendered ?? 'Pelanggan',
+                    'car' => $t->car_model ?? 'Mobil',
+                    'rating' => $t->rating,
+                    'text' => $t->review_text,
+                    'color' => $t->avatar_color ?? '#2563eb',
+                ])->toArray()
+                : $defaultTestimonials;
         @endphp
 
         <div 
@@ -748,7 +765,7 @@
             </div>
 
             @php
-                $articlesPreview = [
+                $defaultArticlesPreview = [
                     [
                         'slug' => 'cara-merawat-kaca-mobil',
                         'title' => '5 Cara Merawat Kaca Mobil Agar Tetap Jernih dan Tahan Lama',
@@ -777,6 +794,17 @@
                         'img' => 'https://images.unsplash.com/photo-1608259243654-70c070e0f6ed?w=800&h=500&fit=crop&auto=format'
                     ],
                 ];
+                $articlesPreview = (isset($articles) && $articles->count() > 0)
+                    ? $articles->map(fn($a) => [
+                        'slug' => $a->slug,
+                        'title' => $a->title,
+                        'excerpt' => $a->excerpt,
+                        'category' => $a->category?->name ?? 'Artikel',
+                        'date' => $a->published_at ? $a->published_at->translatedFormat('d M Y') : 'Terbaru',
+                        'readTime' => "{$a->read_time_minutes} menit",
+                        'img' => $a->image_url,
+                    ])->toArray()
+                    : $defaultArticlesPreview;
 
                 $catColors = [
                     'Tips Perawatan' => ['bg' => '#eff6ff', 'color' => '#1d4ed8'],

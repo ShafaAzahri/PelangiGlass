@@ -15,6 +15,7 @@ use Filament\Actions\ForceDeleteBulkAction;
 use Filament\Actions\RestoreBulkAction;
 use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\FileUpload;
+use Filament\Forms\Components\Placeholder;
 use Filament\Forms\Components\RichEditor;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
@@ -27,6 +28,7 @@ use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TrashedFilter;
 use Filament\Tables\Table;
+use Illuminate\Support\HtmlString;
 use Illuminate\Support\Str;
 
 class ArticleResource extends Resource
@@ -86,10 +88,31 @@ class ArticleResource extends Resource
                     ->label('Isi Konten Artikel')
                     ->required()
                     ->columnSpanFull(),
+                Placeholder::make('current_image_preview')
+                    ->label('Preview Foto Unggulan')
+                    ->content(function (?Article $record): ?HtmlString {
+                        if (!$record || empty($record->image_url)) {
+                            return null;
+                        }
+                        $url = e($record->image_url);
+                        return new HtmlString("
+                            <div class='flex items-center gap-4 p-3 bg-gray-50 dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 max-w-xl'>
+                                <img src='{$url}' alt='Preview Foto Artikel' class='h-20 w-28 object-cover rounded-lg shadow-sm border border-gray-300 dark:border-gray-600' />
+                                <div class='text-xs space-y-1'>
+                                    <div class='font-semibold text-gray-800 dark:text-gray-200'>Foto artikel aktif saat ini</div>
+                                    <div class='text-gray-500 dark:text-gray-400 text-[11px] truncate max-w-xs'>{$url}</div>
+                                    <div class='text-emerald-600 dark:text-emerald-400 text-[11px] font-medium'>✓ Terpasang. Kosongkan upload jika tidak ingin mengganti.</div>
+                                </div>
+                            </div>
+                        ");
+                    })
+                    ->visible(fn (?Article $record) => $record !== null && !empty($record->image_url)),
                 FileUpload::make('featured_image')
-                    ->label('Foto Unggulan')
+                    ->label('Upload Foto Unggulan Baru')
                     ->image()
-                    ->directory('articles'),
+                    ->directory('articles')
+                    ->dehydrated(fn ($state) => filled($state))
+                    ->helperText('Kosongkan upload ini jika tidak ingin mengubah foto yang sudah ada.'),
             ]);
     }
 
@@ -99,7 +122,10 @@ class ArticleResource extends Resource
             ->columns([
                 ImageColumn::make('featured_image')
                     ->label('Cover')
-                    ->circular(),
+                    ->width(80)
+                    ->height(55)
+                    ->extraImgAttributes(['class' => 'object-cover rounded-md shadow-xs'])
+                    ->defaultImageUrl(fn (Article $record) => $record->image_url),
                 TextColumn::make('title')
                     ->label('Judul Artikel')
                     ->searchable()

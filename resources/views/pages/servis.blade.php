@@ -69,13 +69,26 @@
             'badge' => 'Baru',
         ],
     ];
+    $items = (isset($services) && $services->count() > 0)
+        ? $services->map(fn($s) => [
+            'id' => $s->id,
+            'name' => $s->name,
+            'category' => $s->category?->name ?? 'Ganti Kaca',
+            'desc' => $s->short_description,
+            'img' => $s->image_url,
+            'badge' => $s->badge?->value ?? null,
+        ])->toArray()
+        : $defaultServices;
+    $serviceCats = (isset($categories) && $categories->count() > 0)
+        ? array_merge(['Semua'], $categories->pluck('name')->toArray())
+        : ['Semua', 'Ganti Kaca', 'Kaca Film', 'Perbaikan Kaca', 'Aksesoris & Perawatan'];
 @endphp
 
 <div class="min-h-screen pt-[76px] md:pt-[88px] bg-slate-50 text-slate-900" x-data="{
     active: 'Semua',
     search: '',
-    categories: ['Semua', 'Ganti Kaca', 'Kaca Film', 'Perbaikan Kaca', 'Aksesoris & Perawatan'],
-    services: {{ json_encode($defaultServices) }},
+    categories: {{ json_encode($serviceCats) }},
+    services: {{ json_encode($items) }},
     get filtered() {
         return this.services.filter(s => {
             const matchCat = this.active === 'Semua' || s.category === this.active;

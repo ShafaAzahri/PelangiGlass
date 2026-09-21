@@ -32,7 +32,7 @@
                 <!-- Featured Image -->
                 @if($article->featured_image)
                     <div class="rounded-3xl overflow-hidden shadow-md mb-10 border border-slate-200 bg-slate-100 max-h-[460px]">
-                        <img src="{{ $article->featured_image }}" alt="{{ $article->title }}" class="w-full h-full object-cover">
+                        <img src="{{ $article->image_url }}" alt="{{ $article->title }}" class="w-full h-full object-cover">
                     </div>
                 @endif
 

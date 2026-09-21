@@ -69,13 +69,26 @@
             'badge' => null,
         ],
     ];
+    $items = (isset($products) && $products->count() > 0)
+        ? $products->map(fn($p) => [
+            'id' => $p->id,
+            'name' => $p->name,
+            'category' => $p->category?->name ?? 'Kaca Mobil',
+            'desc' => $p->short_description,
+            'img' => $p->image_url,
+            'badge' => $p->badge?->value ?? null,
+        ])->toArray()
+        : $defaultProducts;
+    $productCats = (isset($categories) && $categories->count() > 0)
+        ? array_merge(['Semua'], $categories->pluck('name')->toArray())
+        : ['Semua', 'Kaca Film', 'Kaca Mobil', 'Aksesoris', 'Perawatan'];
 @endphp
 
 <div class="min-h-screen pt-[76px] md:pt-[88px] bg-slate-50 text-slate-900" x-data="{
     active: 'Semua',
     search: '',
-    categories: ['Semua', 'Kaca Film', 'Kaca Mobil', 'Aksesoris', 'Perawatan'],
-    products: {{ json_encode($defaultProducts) }},
+    categories: {{ json_encode($productCats) }},
+    products: {{ json_encode($items) }},
     get filtered() {
         return this.products.filter(p => {
             const matchCat = this.active === 'Semua' || p.category === this.active;
