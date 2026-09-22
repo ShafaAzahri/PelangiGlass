@@ -33,15 +33,34 @@
         current: 0,
         total: {{ $totalBanners }},
         isPaused: false,
-        goTo(idx) {
-            if (idx === this.current) return;
-            this.current = idx;
+        timer: null,
+        startTimer() {
+            this.stopTimer();
+            this.timer = setInterval(() => {
+                if (!this.isPaused) {
+                    this.next();
+                }
+            }, 5000);
+        },
+        stopTimer() {
+            if (this.timer) {
+                clearInterval(this.timer);
+                this.timer = null;
+            }
         },
         next() {
             this.current = (this.current + 1) % this.total;
         },
         prev() {
             this.current = (this.current - 1 + this.total) % this.total;
+            this.startTimer();
+        },
+        goTo(idx) {
+            this.current = idx;
+            this.startTimer();
+        },
+        init() {
+            this.startTimer();
         }
     }"
     @mouseenter="isPaused = true"
@@ -132,7 +151,6 @@
             <div style="position: absolute; bottom: 0; left: 0; width: 100%; height: 5px; z-index: 50; background: rgba(255, 255, 255, 0.3); backdrop-filter: blur(4px); overflow: hidden;">
                 <div 
                     :key="current"
-                    @animationend="next()"
                     class="hero-progress-animate w-full h-full"
                     style="height: 100%; width: 100%; background: linear-gradient(90deg, #2563eb 0%, #38bdf8 80%, #ffffff 100%); box-shadow: 0 0 10px rgba(56, 189, 248, 0.9);"
                     :style="{ animationPlayState: isPaused ? 'paused' : 'running' }"
