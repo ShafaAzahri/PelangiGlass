@@ -77,15 +77,6 @@
                     <p class="text-xs sm:text-sm text-slate-400 leading-relaxed font-normal">
                         Pusat spesialis instalasi kaca mobil dan kaca film berkualitas OEM di Purwokerto sejak 1992. Menghadirkan presisi, ketahanan, dan standar keselamatan berkendara terbaik.
                     </p>
-                    <div class="flex flex-wrap gap-2 pt-1">
-                        <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-medium bg-blue-500/10 text-blue-400 border border-blue-500/20">
-                            <i data-lucide="shield-check" class="w-3.5 h-3.5 text-blue-400"></i>
-                            Garansi Pemasangan
-                        </span>
-                        <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-medium bg-amber-500/10 text-amber-400 border border-amber-500/20">
-                            Sejak 1992
-                        </span>
-                    </div>
                 </div>
 
                 <!-- Col 2: Navigasi Cepat -->
