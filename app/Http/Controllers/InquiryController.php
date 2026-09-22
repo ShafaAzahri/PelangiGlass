@@ -46,6 +46,8 @@ class InquiryController extends Controller
         $waText = urlencode("Halo Pelangi Glass, saya {$validated['name']} ({$validated['phone_number']}). Saya ingin berkonsultasi:\n\n\"{$validated['message']}\"");
         $redirectUrl = "https://wa.me/{$cleanPhone}?text={$waText}";
 
-        return redirect()->away($redirectUrl);
+        return redirect('/#kontak')
+            ->with('success', 'Terima kasih, ' . $validated['name'] . '! Pesan Anda telah berhasil terkirim ke sistem kami. Tim Pelangi Glass akan segera menghubungi Anda.')
+            ->with('wa_url', $redirectUrl);
     }
 }

@@ -132,8 +132,9 @@ class PublicWebRoutesTest extends TestCase
             'status' => InquiryStatus::NEW->value,
         ]);
 
-        $response->assertRedirect();
-        $this->assertStringContainsString('https://wa.me/', $response->headers->get('Location'));
+        $response->assertRedirect('/#kontak');
+        $response->assertSessionHas('success');
+        $response->assertSessionHas('wa_url');
     }
 
     public function test_inquiry_submission_with_honeypot_ignores_bot_and_does_not_save(): void

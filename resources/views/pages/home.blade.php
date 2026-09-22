@@ -1099,12 +1099,24 @@
                         Kirim Pesan
                     </h3>
                     <p class="text-xs mb-6" style="color: #94a3b8; font-family: 'Plus Jakarta Sans', sans-serif;">
-                        Pesan akan dikirim langsung ke WhatsApp kami.
+                        Isi formulir di bawah ini. Pesan Anda akan langsung masuk ke sistem admin kami.
                     </p>
 
                     @if(session('success'))
-                        <div class="mb-4 p-3 rounded-xl bg-emerald-50 text-emerald-700 text-xs font-medium border border-emerald-200">
-                            {{ session('success') }}
+                        <div class="mb-6 p-4 rounded-xl bg-emerald-50 text-emerald-800 border border-emerald-200">
+                            <div class="flex items-center gap-2 font-bold text-sm mb-1">
+                                <svg class="w-4 h-4 text-emerald-600 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20 6L9 17l-5-5"/></svg>
+                                <span>Pesan Berhasil Terkirim!</span>
+                            </div>
+                            <p class="text-xs text-emerald-700 leading-relaxed mb-3">
+                                {{ session('success') }}
+                            </p>
+                            @if(session('wa_url'))
+                                <a href="{{ session('wa_url') }}" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold no-underline transition shadow-xs">
+                                    <span>Atau Langsung Chat via WhatsApp</span>
+                                    <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+                                </a>
+                            @endif
                         </div>
                     @endif
 
