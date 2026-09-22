@@ -80,7 +80,7 @@ class UserResource extends Resource
                 TextColumn::make('role')
                     ->label('Peran')
                     ->badge()
-                    ->color(fn ($state) => $state === 'admin' ? 'danger' : 'info'),
+                    ->color(fn ($state) => $state === 'admin' ? 'primary' : 'gray'),
                 TextColumn::make('created_at')
                     ->label('Dibuat')
                     ->dateTime('d M Y')

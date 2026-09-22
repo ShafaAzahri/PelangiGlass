@@ -9,6 +9,7 @@ use Filament\Support\Contracts\HasLabel;
 enum InquiryStatus: string implements HasLabel, HasColor, HasIcon
 {
     case NEW = 'new';
+    case READ = 'read';
     case CONTACTED = 'contacted';
     case COMPLETED = 'completed';
     case SPAM = 'spam';
@@ -17,8 +18,9 @@ enum InquiryStatus: string implements HasLabel, HasColor, HasIcon
     {
         return match ($this) {
             self::NEW => 'Pesan Baru',
-            self::CONTACTED => 'Sedang Dihubungi',
-            self::COMPLETED => 'Selesai / Terlayani',
+            self::READ => 'Sudah Dibaca',
+            self::CONTACTED => 'Sudah Dihubungi',
+            self::COMPLETED => 'Selesai',
             self::SPAM => 'Spam',
         };
     }
@@ -27,7 +29,8 @@ enum InquiryStatus: string implements HasLabel, HasColor, HasIcon
     {
         return match ($this) {
             self::NEW => 'danger',
-            self::CONTACTED => 'warning',
+            self::READ => 'gray',
+            self::CONTACTED => 'info',
             self::COMPLETED => 'success',
             self::SPAM => 'gray',
         };
@@ -36,9 +39,10 @@ enum InquiryStatus: string implements HasLabel, HasColor, HasIcon
     public function getIcon(): ?string
     {
         return match ($this) {
-            self::NEW => 'heroicon-m-sparkles',
-            self::CONTACTED => 'heroicon-m-phone',
-            self::COMPLETED => 'heroicon-m-check-badge',
+            self::NEW => 'heroicon-m-envelope',
+            self::READ => 'heroicon-m-envelope-open',
+            self::CONTACTED => 'heroicon-m-chat-bubble-left-right',
+            self::COMPLETED => 'heroicon-m-check-circle',
             self::SPAM => 'heroicon-m-no-symbol',
         };
     }

@@ -20,7 +20,7 @@ class StatsOverview extends StatsOverviewWidget
             Stat::make('Pesan Masuk Baru', $newInquiries)
                 ->description($newInquiries > 0 ? 'Perlu segera ditindaklanjuti via WA' : 'Semua pesan telah ditindaklanjuti')
                 ->descriptionIcon('heroicon-m-inbox-arrow-down')
-                ->color($newInquiries > 0 ? 'danger' : 'success'),
+                ->color($newInquiries > 0 ? 'danger' : 'gray'),
 
             Stat::make('Total Produk Aktif', Product::where('is_active', true)->count())
                 ->description('Kaca Mobil, Kaca Film & Aksesoris')
@@ -30,12 +30,12 @@ class StatsOverview extends StatsOverviewWidget
             Stat::make('Layanan & Servis', Service::where('is_active', true)->count())
                 ->description('Paket ganti kaca & tolak panas')
                 ->descriptionIcon('heroicon-m-wrench-screwdriver')
-                ->color('info'),
+                ->color('primary'),
 
             Stat::make('Artikel & Edukasi', Article::count())
                 ->description('Tips perawatan & keselamatan')
                 ->descriptionIcon('heroicon-m-document-text')
-                ->color('warning'),
+                ->color('primary'),
         ];
     }
 }

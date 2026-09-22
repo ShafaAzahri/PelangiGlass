@@ -76,7 +76,7 @@ class ServiceCategoryResource extends Resource
                     ->label('Jumlah Layanan')
                     ->counts('services')
                     ->badge()
-                    ->color('info'),
+                    ->color('gray'),
                 ToggleColumn::make('is_active')
                     ->label('Aktif'),
                 TextColumn::make('sort_order')

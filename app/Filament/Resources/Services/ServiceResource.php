@@ -165,7 +165,7 @@ class ServiceResource extends Resource
                 TextColumn::make('category.name')
                     ->label('Kategori')
                     ->badge()
-                    ->color('primary')
+                    ->color('gray')
                     ->sortable(),
                 TextColumn::make('badge')
                     ->label('Badge')
@@ -173,7 +173,7 @@ class ServiceResource extends Resource
                 TextColumn::make('warranty_period')
                     ->label('Garansi')
                     ->badge()
-                    ->color('success'),
+                    ->color('gray'),
                 TextColumn::make('estimated_duration')
                     ->label('Durasi'),
                 ToggleColumn::make('is_featured')

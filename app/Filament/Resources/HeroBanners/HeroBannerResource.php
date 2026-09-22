@@ -137,7 +137,7 @@ class HeroBannerResource extends Resource
                 TextColumn::make('button_text')
                     ->label('Tombol CTA')
                     ->badge()
-                    ->color('info'),
+                    ->color('gray'),
                 ToggleColumn::make('is_active')
                     ->label('Aktif'),
                 TextColumn::make('sort_order')

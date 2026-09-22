@@ -80,7 +80,7 @@ class ProductCategoryResource extends Resource
                     ->label('Jumlah Produk')
                     ->counts('products')
                     ->badge()
-                    ->color('info'),
+                    ->color('gray'),
                 ToggleColumn::make('is_active')
                     ->label('Aktif'),
                 TextColumn::make('sort_order')

@@ -10,6 +10,16 @@ class EditInquiry extends EditRecord
 {
     protected static string $resource = InquiryResource::class;
 
+    protected function mutateFormDataBeforeFill(array $data): array
+    {
+        if ($this->record instanceof \App\Models\Inquiry && $this->record->status === \App\Enums\InquiryStatus::NEW) {
+            $this->record->update(['status' => \App\Enums\InquiryStatus::READ]);
+            $data['status'] = \App\Enums\InquiryStatus::READ->value;
+        }
+
+        return $data;
+    }
+
     protected function getHeaderActions(): array
     {
         return [

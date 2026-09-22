@@ -173,7 +173,7 @@ class ProductResource extends Resource
                 TextColumn::make('category.name')
                     ->label('Kategori')
                     ->badge()
-                    ->color('primary')
+                    ->color('gray')
                     ->sortable(),
                 TextColumn::make('badge')
                     ->label('Badge')

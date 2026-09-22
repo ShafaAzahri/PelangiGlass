@@ -71,7 +71,7 @@ class GalleryCategoryResource extends Resource
                     ->label('Jumlah Foto')
                     ->counts('items')
                     ->badge()
-                    ->color('info'),
+                    ->color('gray'),
                 TextColumn::make('sort_order')
                     ->label('Urutan')
                     ->sortable(),

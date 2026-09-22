@@ -75,7 +75,7 @@ class ArticleCategoryResource extends Resource
                     ->label('Jumlah Artikel')
                     ->counts('articles')
                     ->badge()
-                    ->color('info'),
+                    ->color('gray'),
                 TextColumn::make('color_scheme')
                     ->label('Skema Warna'),
             ])

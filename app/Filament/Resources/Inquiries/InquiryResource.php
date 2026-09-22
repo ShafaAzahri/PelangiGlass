@@ -111,14 +111,27 @@ class InquiryResource extends Resource
                     ->label('Filter Status')
                     ->options(InquiryStatus::class),
             ])
+            ->recordUrl(fn (Inquiry $record) => static::getUrl('edit', ['record' => $record]))
             ->recordActions([
                 Action::make('replyWhatsApp')
                     ->label('Balas WA')
                     ->icon(Heroicon::OutlinedChatBubbleLeftRight)
-                    ->color('success')
+                    ->color('gray')
                     ->url(fn (Inquiry $record) => $record->whatsapp_url)
-                    ->openUrlInNewTab(),
-                EditAction::make(),
+                    ->openUrlInNewTab()
+                    ->action(function (Inquiry $record) {
+                        if ($record->status === InquiryStatus::NEW || $record->status === InquiryStatus::READ) {
+                            $record->update(['status' => InquiryStatus::CONTACTED]);
+                        }
+                    }),
+                Action::make('markAsRead')
+                    ->label('Tandai Dibaca')
+                    ->icon(Heroicon::OutlinedCheckCircle)
+                    ->color('gray')
+                    ->visible(fn (Inquiry $record) => $record->status === InquiryStatus::NEW)
+                    ->action(fn (Inquiry $record) => $record->update(['status' => InquiryStatus::READ])),
+                EditAction::make()
+                    ->label('Buka'),
             ])
             ->toolbarActions([
                 BulkActionGroup::make([

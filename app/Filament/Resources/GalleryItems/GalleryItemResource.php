@@ -143,7 +143,7 @@ class GalleryItemResource extends Resource
                 TextColumn::make('category.name')
                     ->label('Kategori')
                     ->badge()
-                    ->color('primary')
+                    ->color('gray')
                     ->sortable(),
                 ToggleColumn::make('is_active')
                     ->label('Aktif'),

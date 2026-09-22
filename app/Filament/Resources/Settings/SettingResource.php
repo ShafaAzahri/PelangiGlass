@@ -105,13 +105,7 @@ class SettingResource extends Resource
                     ->label('Kategori')
                     ->badge()
                     ->formatStateUsing(fn (string $state): string => Setting::humanGroup($state))
-                    ->color(fn (string $state): string => match ($state) {
-                        'general' => 'primary',
-                        'contact' => 'success',
-                        'operational' => 'warning',
-                        'social' => 'info',
-                        default => 'gray',
-                    })
+                    ->color('gray')
                     ->sortable(),
             ])
             ->filters([
