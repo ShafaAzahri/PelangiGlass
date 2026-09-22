@@ -13,48 +13,35 @@
         $totalBanners = count($bannerList);
     @endphp
 
+    <style>
+        @keyframes heroProgressBar {
+            0% {
+                transform: scaleX(0);
+            }
+            100% {
+                transform: scaleX(1);
+            }
+        }
+        .hero-progress-animate {
+            transform-origin: 0% 50%;
+            animation: heroProgressBar 5000ms linear forwards;
+            will-change: transform;
+        }
+    </style>
+
     <section id="beranda" class="relative overflow-hidden pt-[76px] md:pt-[88px]" style="background: #0a0f1a;" x-data="{
         current: 0,
         total: {{ $totalBanners }},
-        progress: 0,
-        duration: 5000,
         isPaused: false,
-        timer: null,
-        startTimer() {
-            this.stopTimer();
-            this.progress = 0;
-            const step = 25;
-            const increment = (step / this.duration) * 100;
-            this.timer = setInterval(() => {
-                if (this.isPaused) return;
-                this.progress += increment;
-                if (this.progress >= 100) {
-                    this.progress = 0;
-                    this.current = (this.current + 1) % this.total;
-                }
-            }, step);
-        },
-        stopTimer() {
-            if (this.timer) {
-                clearInterval(this.timer);
-                this.timer = null;
-            }
-        },
         goTo(idx) {
             if (idx === this.current) return;
             this.current = idx;
-            this.startTimer();
         },
         next() {
             this.current = (this.current + 1) % this.total;
-            this.startTimer();
         },
         prev() {
             this.current = (this.current - 1 + this.total) % this.total;
-            this.startTimer();
-        },
-        init() {
-            this.startTimer();
         }
     }"
     @mouseenter="isPaused = true"
@@ -129,12 +116,14 @@
                             : 'width: 12px; height: 8px; border-radius: 9999px; background: rgba(255, 255, 255, 0.5);'" 
                         aria-label="Pilih slide {{ $index + 1 }}"
                     >
-                        <div 
-                            x-show="current === {{ $index }}"
-                            class="h-full transition-all duration-75 ease-linear"
-                            style="height: 100%; border-radius: 9999px; background: #2563eb; box-shadow: 0 0 8px rgba(37, 99, 235, 1);"
-                            :style="{ width: current === {{ $index }} ? Math.min(progress, 100) + '%' : '0%' }"
-                        ></div>
+                        <template x-if="current === {{ $index }}">
+                            <div 
+                                :key="current"
+                                class="hero-progress-animate w-full h-full"
+                                style="height: 100%; width: 100%; border-radius: 9999px; background: #2563eb; box-shadow: 0 0 8px rgba(37, 99, 235, 1);"
+                                :style="{ animationPlayState: isPaused ? 'paused' : 'running' }"
+                            ></div>
+                        </template>
                     </button>
                 @endforeach
             </div>
@@ -142,9 +131,11 @@
             <!-- Horizontal Loading Progress Bar at bottom of banner (matching user screenshot) -->
             <div style="position: absolute; bottom: 0; left: 0; width: 100%; height: 5px; z-index: 50; background: rgba(255, 255, 255, 0.3); backdrop-filter: blur(4px); overflow: hidden;">
                 <div 
-                    class="transition-all duration-75 ease-linear"
-                    style="height: 100%; background: linear-gradient(90deg, #2563eb 0%, #38bdf8 80%, #ffffff 100%); box-shadow: 0 0 10px rgba(56, 189, 248, 0.9);"
-                    :style="{ width: Math.min(progress, 100) + '%' }"
+                    :key="current"
+                    @animationend="next()"
+                    class="hero-progress-animate w-full h-full"
+                    style="height: 100%; width: 100%; background: linear-gradient(90deg, #2563eb 0%, #38bdf8 80%, #ffffff 100%); box-shadow: 0 0 10px rgba(56, 189, 248, 0.9);"
+                    :style="{ animationPlayState: isPaused ? 'paused' : 'running' }"
                 ></div>
             </div>
         </div>
