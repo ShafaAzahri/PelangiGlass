@@ -75,8 +75,45 @@
                     </div>
                 </div>
 
+                <!-- Layanan Terkait -->
+                @if(isset($otherServices) && $otherServices->count() > 0)
+                    <div class="mt-16 pt-10 border-t border-slate-200">
+                        <div class="flex items-center justify-between mb-6">
+                            <h3 class="text-xl font-bold text-slate-900" style="font-family: 'Plus Jakarta Sans', sans-serif;">
+                                Layanan & Servis Lainnya
+                            </h3>
+                            <a href="{{ url('/servis') }}" class="text-xs font-semibold text-blue-600 hover:text-blue-800 transition no-underline" style="font-family: 'Plus Jakarta Sans', sans-serif;">
+                                Lihat Semua Servis →
+                            </a>
+                        </div>
+
+                        <div class="grid sm:grid-cols-2 md:grid-cols-3 gap-5">
+                            @foreach($otherServices as $os)
+                                <a href="{{ url('/servis/' . $os->slug) }}" class="rounded-2xl overflow-hidden flex flex-col transition-all duration-300 group bg-white border border-slate-200 hover:border-blue-300 hover:-translate-y-1 hover:shadow-md no-underline">
+                                    <div class="overflow-hidden shrink-0" style="height: 140px;">
+                                        <img src="{{ $os->image_url }}" alt="{{ $os->name }}" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105">
+                                    </div>
+                                    <div class="p-4 flex flex-col flex-1">
+                                        <div class="text-[11px] font-semibold text-blue-600 mb-1" style="font-family: 'Plus Jakarta Sans', sans-serif;">
+                                            {{ $os->category->name }}
+                                        </div>
+                                        <h4 class="font-bold text-slate-900 group-hover:text-blue-600 transition text-xs line-clamp-2 mb-2 leading-snug" style="font-family: 'Plus Jakarta Sans', sans-serif;">
+                                            {{ $os->name }}
+                                        </h4>
+                                        @if($os->warranty_period)
+                                            <div class="mt-auto text-[11px] text-emerald-700 font-semibold" style="font-family: 'Plus Jakarta Sans', sans-serif;">
+                                                ✓ {{ $os->warranty_period }}
+                                            </div>
+                                        @endif
+                                    </div>
+                                </a>
+                            @endforeach
+                        </div>
+                    </div>
+                @endif
+
                 <!-- Back button -->
-                <div class="mt-8">
+                <div class="mt-10">
                     <a href="{{ url('/servis') }}" class="inline-flex items-center gap-2 text-xs font-semibold text-blue-600 hover:text-blue-800 transition no-underline" style="font-family: 'Plus Jakarta Sans', sans-serif;">
                         <i data-lucide="arrow-left" class="w-3.5 h-3.5"></i> Kembali ke Katalog Servis
                     </a>

@@ -19,4 +19,4 @@ Route::get('/artikel', [ArticleController::class, 'index'])->name('articles.inde
 Route::get('/artikel/{slug}', [ArticleController::class, 'show'])->name('articles.show');
 
 // Leads Form Submission
-Route::post('/kontak', [InquiryController::class, 'store'])->name('inquiries.store');
+Route::post('/kontak', [InquiryController::class, 'store'])->middleware('throttle:5,1')->name('inquiries.store');

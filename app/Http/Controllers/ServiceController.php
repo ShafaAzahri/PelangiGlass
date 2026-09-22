@@ -32,6 +32,7 @@ class ServiceController extends Controller
         $service = Service::active()->where('slug', $slug)->with('category')->firstOrFail();
         $otherServices = Service::active()
             ->where('id', '!=', $service->id)
+            ->with('category')
             ->take(3)
             ->get();
 

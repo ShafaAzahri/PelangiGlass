@@ -42,6 +42,7 @@ class ProductController extends Controller
         $relatedProducts = Product::active()
             ->where('category_id', $product->category_id)
             ->where('id', '!=', $product->id)
+            ->with('category')
             ->take(4)
             ->get();
 

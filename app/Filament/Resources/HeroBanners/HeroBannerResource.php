@@ -31,7 +31,7 @@ class HeroBannerResource extends Resource
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedSparkles;
 
-    protected static string|\UnitEnum|null $navigationGroup = 'Konten & Media';
+    protected static string|\UnitEnum|null $navigationGroup = 'Pengaturan Sistem';
 
     protected static ?string $navigationLabel = 'Banner Beranda';
 
@@ -121,6 +121,8 @@ class HeroBannerResource extends Resource
     public static function table(Table $table): Table
     {
         return $table
+            ->reorderable('sort_order')
+            ->defaultSort('sort_order')
             ->columns([
                 ImageColumn::make('image_path')
                     ->label('Gambar Preview')

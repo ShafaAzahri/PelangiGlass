@@ -54,9 +54,43 @@
                         Konsultasi via WhatsApp
                     </a>
                 </div>
+                <!-- Rekomendasi Artikel Terkait (PRD FR-4.2) -->
+                @if(isset($relatedArticles) && $relatedArticles->count() > 0)
+                    <div class="mt-14 pt-10 border-t border-slate-200">
+                        <div class="flex items-center justify-between mb-6">
+                            <h3 class="text-xl font-bold text-slate-900" style="font-family: 'Plus Jakarta Sans', sans-serif;">
+                                Artikel & Tips Terkait
+                            </h3>
+                            <a href="{{ url('/artikel') }}" class="text-xs font-semibold text-blue-600 hover:text-blue-800 transition no-underline" style="font-family: 'Plus Jakarta Sans', sans-serif;">
+                                Lihat Semua Tips →
+                            </a>
+                        </div>
+
+                        <div class="grid sm:grid-cols-2 md:grid-cols-3 gap-5">
+                            @foreach($relatedArticles as $rel)
+                                <a href="{{ url('/artikel/' . $rel->slug) }}" class="rounded-2xl overflow-hidden flex flex-col transition-all duration-300 group bg-white border border-slate-200 hover:border-blue-300 hover:-translate-y-1 hover:shadow-md no-underline">
+                                    <div class="overflow-hidden shrink-0" style="height: 140px;">
+                                        <img src="{{ $rel->image_url }}" alt="{{ $rel->title }}" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105">
+                                    </div>
+                                    <div class="p-4 flex flex-col flex-1">
+                                        <div class="text-[11px] font-semibold text-blue-600 mb-1" style="font-family: 'Plus Jakarta Sans', sans-serif;">
+                                            {{ $rel->category->name }}
+                                        </div>
+                                        <h4 class="font-bold text-slate-900 group-hover:text-blue-600 transition text-xs line-clamp-2 mb-2 leading-snug" style="font-family: 'Plus Jakarta Sans', sans-serif;">
+                                            {{ $rel->title }}
+                                        </h4>
+                                        <div class="mt-auto flex items-center gap-1 text-[11px] text-slate-400" style="font-family: 'Plus Jakarta Sans', sans-serif;">
+                                            <i data-lucide="clock" class="w-3 h-3"></i> {{ $rel->read_time_minutes ?? 4 }} menit baca
+                                        </div>
+                                    </div>
+                                </a>
+                            @endforeach
+                        </div>
+                    </div>
+                @endif
 
                 <!-- Back to Articles -->
-                <div class="mt-8">
+                <div class="mt-10">
                     <a href="{{ url('/artikel') }}" class="inline-flex items-center gap-2 text-xs font-semibold text-blue-600 hover:text-blue-800 transition no-underline" style="font-family: 'Plus Jakarta Sans', sans-serif;">
                         <i data-lucide="arrow-left" class="w-3.5 h-3.5"></i> Kembali ke Daftar Artikel
                     </a>

@@ -34,7 +34,7 @@ class GalleryItemResource extends Resource
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedPhoto;
 
-    protected static string|\UnitEnum|null $navigationGroup = 'Konten & Media';
+    protected static string|\UnitEnum|null $navigationGroup = 'Konten & Publikasi';
 
     protected static ?string $navigationLabel = 'Galeri Foto';
 
@@ -126,6 +126,8 @@ class GalleryItemResource extends Resource
     public static function table(Table $table): Table
     {
         return $table
+            ->reorderable('sort_order')
+            ->defaultSort('sort_order')
             ->columns([
                 ImageColumn::make('image_path')
                     ->label('Foto')

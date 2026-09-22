@@ -71,8 +71,48 @@
                     </div>
                 </div>
 
+                <!-- Produk Terkait -->
+                @if(isset($relatedProducts) && $relatedProducts->count() > 0)
+                    <div class="mt-16 pt-10 border-t border-slate-200">
+                        <div class="flex items-center justify-between mb-6">
+                            <h3 class="text-xl font-bold text-slate-900" style="font-family: 'Plus Jakarta Sans', sans-serif;">
+                                Produk Terkait Lainnya
+                            </h3>
+                            <a href="{{ url('/produk') }}" class="text-xs font-semibold text-blue-600 hover:text-blue-800 transition no-underline" style="font-family: 'Plus Jakarta Sans', sans-serif;">
+                                Lihat Semua Produk →
+                            </a>
+                        </div>
+
+                        <div class="grid sm:grid-cols-2 md:grid-cols-4 gap-5">
+                            @foreach($relatedProducts as $rp)
+                                <a href="{{ url('/produk/' . $rp->slug) }}" class="rounded-2xl overflow-hidden flex flex-col transition-all duration-300 group bg-white border border-slate-200 hover:border-blue-300 hover:-translate-y-1 hover:shadow-md no-underline">
+                                    <div class="overflow-hidden shrink-0 relative" style="height: 140px;">
+                                        <img src="{{ $rp->image_url }}" alt="{{ $rp->name }}" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105">
+                                        @if($rp->badge)
+                                            <span class="absolute top-2 left-2 text-[10px] px-2 py-0.5 rounded-full font-bold bg-blue-600 text-white shadow-xs">
+                                                {{ $rp->badge->value }}
+                                            </span>
+                                        @endif
+                                    </div>
+                                    <div class="p-4 flex flex-col flex-1">
+                                        <div class="text-[11px] font-semibold text-blue-600 mb-1" style="font-family: 'Plus Jakarta Sans', sans-serif;">
+                                            {{ $rp->category->name }}
+                                        </div>
+                                        <h4 class="font-bold text-slate-900 group-hover:text-blue-600 transition text-xs line-clamp-2 mb-1.5 leading-snug" style="font-family: 'Plus Jakarta Sans', sans-serif;">
+                                            {{ $rp->name }}
+                                        </h4>
+                                        <div class="mt-auto text-xs font-bold text-blue-800" style="font-family: 'Plus Jakarta Sans', sans-serif;">
+                                            {{ $rp->estimated_price ? 'Rp ' . number_format($rp->estimated_price, 0, ',', '.') : 'Hubungi Kami' }}
+                                        </div>
+                                    </div>
+                                </a>
+                            @endforeach
+                        </div>
+                    </div>
+                @endif
+
                 <!-- Back button -->
-                <div class="mt-8">
+                <div class="mt-10">
                     <a href="{{ url('/produk') }}" class="inline-flex items-center gap-2 text-xs font-semibold text-blue-600 hover:text-blue-800 transition no-underline" style="font-family: 'Plus Jakarta Sans', sans-serif;">
                         <i data-lucide="arrow-left" class="w-3.5 h-3.5"></i> Kembali ke Katalog Produk
                     </a>

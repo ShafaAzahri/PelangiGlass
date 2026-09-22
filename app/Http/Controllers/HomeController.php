@@ -24,7 +24,7 @@ class HomeController extends Controller
         $testimonials = Testimonial::featured()->get();
         $articles = Article::published()->with('category')->take(3)->get();
         $faqs = Faq::active()->get();
-        $products = Product::active()->take(4)->get();
+        $products = Product::active()->with('category')->take(4)->get();
 
         $settings = Setting::all()->pluck('value', 'key');
 

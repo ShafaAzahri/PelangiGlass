@@ -135,4 +135,41 @@ class PublicWebRoutesTest extends TestCase
         $response->assertRedirect();
         $this->assertStringContainsString('https://wa.me/', $response->headers->get('Location'));
     }
+
+    public function test_inquiry_submission_with_honeypot_ignores_bot_and_does_not_save(): void
+    {
+        $payload = [
+            'name' => 'Spam Bot',
+            'phone_number' => '08999999999',
+            'message' => 'Spam message',
+            'website_hp_field' => 'http://spam-link.com',
+        ];
+
+        $response = $this->post('/kontak', $payload);
+
+        $this->assertDatabaseMissing('inquiries', [
+            'name' => 'Spam Bot',
+        ]);
+
+        $response->assertRedirect();
+    }
+
+    public function test_inquiry_submission_rate_limiting_blocks_after_limit(): void
+    {
+        $payload = [
+            'name' => 'Rate Test',
+            'phone_number' => '08123456789',
+            'message' => 'Testing rate limit threshold.',
+        ];
+
+        // First 5 requests should pass (redirect to WhatsApp)
+        for ($i = 0; $i < 5; $i++) {
+            $res = $this->post('/kontak', $payload);
+            $this->assertTrue(in_array($res->getStatusCode(), [302, 200]));
+        }
+
+        // 6th request within the same minute must be throttled with HTTP 429
+        $response = $this->post('/kontak', $payload);
+        $response->assertStatus(429);
+    }
 }

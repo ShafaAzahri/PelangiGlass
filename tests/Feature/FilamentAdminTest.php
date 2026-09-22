@@ -73,4 +73,42 @@ class FilamentAdminTest extends TestCase
         $articlesRes->assertStatus(200);
         $articlesRes->assertSee('Artikel & Tips');
     }
+
+    public function test_authenticated_admin_can_access_inquiries_faqs_and_testimonials_resources(): void
+    {
+        $admin = User::where('email', 'admin@pelangiglass.com')->first();
+
+        $inquiriesRes = $this->actingAs($admin)->get('/admin/inquiries');
+        $inquiriesRes->assertStatus(200);
+        $inquiriesRes->assertSee('Pesan Masuk');
+
+        $faqsRes = $this->actingAs($admin)->get('/admin/faqs');
+        $faqsRes->assertStatus(200);
+        $faqsRes->assertSee('FAQ');
+
+        $testimonialsRes = $this->actingAs($admin)->get('/admin/testimonials');
+        $testimonialsRes->assertStatus(200);
+        $testimonialsRes->assertSee('Testimoni');
+
+        $usersRes = $this->actingAs($admin)->get('/admin/users');
+        $usersRes->assertStatus(200);
+        $usersRes->assertSee('Pengguna');
+    }
+
+    public function test_authenticated_admin_can_access_category_resources(): void
+    {
+        $admin = User::where('email', 'admin@pelangiglass.com')->first();
+
+        $prodCat = $this->actingAs($admin)->get('/admin/product-categories');
+        $prodCat->assertStatus(200);
+
+        $servCat = $this->actingAs($admin)->get('/admin/service-categories');
+        $servCat->assertStatus(200);
+
+        $artCat = $this->actingAs($admin)->get('/admin/article-categories');
+        $artCat->assertStatus(200);
+
+        $galCat = $this->actingAs($admin)->get('/admin/gallery-categories');
+        $galCat->assertStatus(200);
+    }
 }

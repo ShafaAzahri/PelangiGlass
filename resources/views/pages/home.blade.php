@@ -181,54 +181,81 @@
 
             <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
                 @php
-                    $homeServices = [
+                    $defaultServices = [
                         [
                             'title' => 'Penggantian Kaca',
                             'desc' => 'Kaca depan, belakang, dan samping. Produk original bergaransi resmi.',
-                            'img' => 'https://images.unsplash.com/photo-1618934116136-16d28f184b10?w=600&h=400&fit=crop&auto=format'
+                            'img' => 'https://images.unsplash.com/photo-1618934116136-16d28f184b10?w=600&h=400&fit=crop&auto=format',
+                            'badge' => 'Garansi 1 Tahun',
+                            'slug' => 'penggantian-kaca-depan-oem',
                         ],
                         [
                             'title' => 'Film Kaca Premium',
                             'desc' => 'Reduksi panas & UV hingga 99%. Pilihan brand V-Kool, 3M, Solar Gard.',
-                            'img' => 'https://images.unsplash.com/photo-1526459915562-c5ca724b1d02?w=600&h=400&fit=crop&auto=format'
+                            'img' => 'https://images.unsplash.com/photo-1526459915562-c5ca724b1d02?w=600&h=400&fit=crop&auto=format',
+                            'badge' => 'Garansi 5 Tahun',
+                            'slug' => 'pemasangan-kaca-film-v-kool',
                         ],
                         [
                             'title' => 'Perbaikan Retak',
                             'desc' => 'Perbaikan kaca baret ringan sebelum menjadi kerusakan permanen.',
-                            'img' => 'https://images.unsplash.com/photo-1608259243654-70c070e0f6ed?w=600&h=400&fit=crop&auto=format'
+                            'img' => 'https://images.unsplash.com/photo-1608259243654-70c070e0f6ed?w=600&h=400&fit=crop&auto=format',
+                            'badge' => 'Cepat & Rapi',
+                            'slug' => 'perbaikan-kaca-retak-chip',
                         ],
                         [
                             'title' => 'Aksesoris Kaca',
                             'desc' => 'Wiper, karet seal, spion, dan perlengkapan kaca lainnya.',
-                            'img' => 'https://images.unsplash.com/photo-1651084296894-105edab05b26?w=600&h=400&fit=crop&auto=format'
+                            'img' => 'https://images.unsplash.com/photo-1651084296894-105edab05b26?w=600&h=400&fit=crop&auto=format',
+                            'badge' => null,
+                            'slug' => 'penggantian-karet-seal-kaca',
                         ],
                         [
                             'title' => 'Rain Repellent',
                             'desc' => 'Cairan anti-hujan untuk visibilitas optimal saat berkendara.',
-                            'img' => 'https://images.unsplash.com/photo-1764428950296-be81c8decb97?w=600&h=400&fit=crop&auto=format'
+                            'img' => 'https://images.unsplash.com/photo-1764428950296-be81c8decb97?w=600&h=400&fit=crop&auto=format',
+                            'badge' => 'Hydrophobic',
+                            'slug' => 'poles-kaca-dan-rain-repellent',
                         ],
                         [
                             'title' => 'Konsultasi Gratis',
                             'desc' => 'Cek kondisi kaca mobil Anda tanpa biaya, tanpa komitmen.',
-                            'img' => 'https://images.unsplash.com/photo-1708805282695-ef186db20192?w=600&h=400&fit=crop&auto=format'
+                            'img' => 'https://images.unsplash.com/photo-1708805282695-ef186db20192?w=600&h=400&fit=crop&auto=format',
+                            'badge' => 'Gratis',
+                            'slug' => 'kalibrasi-kaca-bocor',
                         ],
                     ];
+
+                    $servicesToShow = (isset($featuredServices) && $featuredServices->count() > 0)
+                        ? $featuredServices->map(fn($s) => [
+                            'title' => $s->name,
+                            'desc' => $s->short_description ?? \Illuminate\Support\Str::limit($s->description, 95),
+                            'img' => $s->image_url,
+                            'badge' => $s->badge?->value ?? ($s->warranty_period ? 'Garansi ' . $s->warranty_period : null),
+                            'slug' => $s->slug,
+                        ])->toArray()
+                        : $defaultServices;
                 @endphp
 
-                @foreach($homeServices as $s)
-                    <div class="rounded-2xl overflow-hidden group cursor-pointer transition-all duration-300 bg-white border border-slate-200 shadow-xs hover:border-blue-300 hover:-translate-y-1 flex flex-col">
-                        <div class="overflow-hidden w-full" style="height: 180px;">
+                @foreach($servicesToShow as $s)
+                    <a href="{{ isset($s['slug']) && $s['slug'] ? url('/servis/' . $s['slug']) : url('/servis') }}" class="rounded-2xl overflow-hidden group transition-all duration-300 bg-white border border-slate-200 shadow-xs hover:border-blue-300 hover:-translate-y-1 flex flex-col no-underline relative">
+                        <div class="overflow-hidden w-full relative" style="height: 180px;">
                             <img src="{{ $s['img'] }}" alt="{{ $s['title'] }}" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105">
+                            @if(!empty($s['badge']))
+                                <span class="absolute top-3 left-3 text-xs px-2.5 py-1 rounded-full font-semibold bg-blue-600 text-white shadow-xs" style="font-family: 'Plus Jakarta Sans', sans-serif;">
+                                    {{ $s['badge'] }}
+                                </span>
+                            @endif
                         </div>
                         <div class="p-5 flex flex-col flex-1">
-                            <h3 class="font-bold uppercase mb-2 text-slate-900" style="font-family: 'Plus Jakarta Sans', sans-serif; font-size: 1.15rem; letter-spacing: 0.03em;">
+                            <h3 class="font-bold uppercase mb-2 text-slate-900 group-hover:text-blue-600 transition" style="font-family: 'Plus Jakarta Sans', sans-serif; font-size: 1.15rem; letter-spacing: 0.03em;">
                                 {{ $s['title'] }}
                             </h3>
                             <p class="text-sm leading-relaxed text-slate-500" style="font-family: 'Plus Jakarta Sans', sans-serif;">
                                 {{ $s['desc'] }}
                             </p>
                         </div>
-                    </div>
+                    </a>
                 @endforeach
             </div>
         </div>
@@ -875,7 +902,7 @@
 
                 <!-- Right — accordion card -->
                 @php
-                    $faqsList = [
+                    $defaultFaqs = [
                         ['q' => 'Berapa lama proses penggantian kaca mobil?', 'a' => 'Umumnya 2–3 jam untuk kaca depan atau belakang. Untuk kaca samping bisa lebih cepat, sekitar 1–1,5 jam. Kami akan informasikan estimasi waktu yang lebih tepat setelah melihat kondisi kendaraan Anda.'],
                         ['q' => 'Apakah ada garansi setelah penggantian kaca?', 'a' => 'Ya, kami memberikan garansi kebocoran 1 tahun untuk setiap penggantian kaca. Jika ada kebocoran dalam periode garansi, kami akan perbaiki tanpa biaya tambahan.'],
                         ['q' => 'Merek kaca apa saja yang tersedia?', 'a' => 'Kami menyediakan kaca original OEM dan berbagai merek aftermarket berkualitas seperti Asahimas, AGC, Pilkington, dan lainnya. Pilihan disesuaikan dengan kebutuhan dan anggaran Anda.'],
@@ -883,6 +910,10 @@
                         ['q' => 'Merek film kaca apa yang direkomendasikan?', 'a' => 'Kami merekomendasikan V-Kool, 3M, dan Solar Gard — merek premium dengan teknologi penolak panas dan UV terbaik. Semua dilengkapi garansi film 3–5 tahun dan sertifikat keaslian.'],
                         ['q' => 'Apakah asuransi kendaraan bisa digunakan?', 'a' => 'Kami dapat membantu proses klaim asuransi untuk penggantian kaca. Bawa serta dokumen kendaraan dan polis asuransi Anda, tim kami akan membantu prosesnya.'],
                     ];
+
+                    $faqsList = (isset($faqs) && $faqs->count() > 0)
+                        ? $faqs->map(fn($f) => ['q' => $f->question, 'a' => $f->answer])->toArray()
+                        : $defaultFaqs;
                 @endphp
 
                 <div class="flex-1 rounded-2xl overflow-hidden" style="border: 1.5px solid #e2e8f0; background: #ffffff;">
@@ -927,7 +958,7 @@
                         Siap Melayani<br />Anda Hari Ini
                     </h2>
                     <p class="text-sm leading-relaxed mb-8" style="color: #64748b; font-family: 'Plus Jakarta Sans', sans-serif;">
-                        Hubungi kami untuk konsultasi gratis. Tim kami siap membantu Senin hingga Jumat.
+                        Hubungi kami untuk Konsultasi Gratis. Tim kami siap membantu Senin hingga Jumat.
                     </p>
 
                     <div class="space-y-5">
