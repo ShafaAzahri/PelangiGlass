@@ -2,71 +2,124 @@
 
 @section('content')
 
-    <!-- 1. HERO SLIDER (matching Home.tsx Hero exactly) -->
+    <!-- 1. HERO SLIDER (Soft crossfade + dynamic loading bar) -->
+    @php
+        $bannerList = (isset($banners) && $banners->count() > 0)
+            ? $banners->map(fn($b) => ['img' => $b->image_url, 'alt' => $b->title ?? 'Pelangi Glass Banner'])->toArray()
+            : [
+                ['img' => asset('banner1.png'), 'alt' => 'Kaca Mobil Jernih Perjalanan Lebih Aman'],
+                ['img' => asset('banner2.png'), 'alt' => 'Pelangi Glass Banner 2']
+            ];
+        $totalBanners = count($bannerList);
+    @endphp
+
     <section id="beranda" class="relative overflow-hidden pt-[76px] md:pt-[88px]" style="background: #0a0f1a;" x-data="{
-        slides: [
-            @if(isset($banners) && $banners->count() > 0)
-                @foreach($banners as $b)
-                    { img: '{{ $b->image_url }}', alt: '{{ addslashes($b->title ?? 'Pelangi Glass Banner') }}' },
-                @endforeach
-            @else
-                { img: '{{ asset('banner1.png') }}', alt: 'Kaca Mobil Jernih Perjalanan Lebih Aman' },
-                { img: '{{ asset('banner2.png') }}', alt: 'Pelangi Glass Banner 2' }
-            @endif
-        ],
         current: 0,
-        animating: false,
+        total: {{ $totalBanners }},
+        progress: 0,
+        duration: 5000,
+        isPaused: false,
         timer: null,
+        startTimer() {
+            this.stopTimer();
+            this.progress = 0;
+            const step = 25;
+            const increment = (step / this.duration) * 100;
+            this.timer = setInterval(() => {
+                if (this.isPaused) return;
+                this.progress += increment;
+                if (this.progress >= 100) {
+                    this.progress = 0;
+                    this.current = (this.current + 1) % this.total;
+                }
+            }, step);
+        },
+        stopTimer() {
+            if (this.timer) {
+                clearInterval(this.timer);
+                this.timer = null;
+            }
+        },
         goTo(idx) {
-            if (this.animating || idx === this.current) return;
-            this.animating = true;
-            this.resetTimer();
-            setTimeout(() => {
-                this.current = idx;
-                this.animating = false;
-            }, 400);
+            if (idx === this.current) return;
+            this.current = idx;
+            this.startTimer();
         },
         next() {
-            this.goTo((this.current + 1) % this.slides.length);
+            this.current = (this.current + 1) % this.total;
+            this.startTimer();
         },
         prev() {
-            this.goTo((this.current - 1 + this.slides.length) % this.slides.length);
-        },
-        resetTimer() {
-            if (this.timer) clearInterval(this.timer);
-            this.timer = setInterval(() => this.next(), 5000);
+            this.current = (this.current - 1 + this.total) % this.total;
+            this.startTimer();
         },
         init() {
-            this.resetTimer();
+            this.startTimer();
         }
-    }">
-        <!-- Banner image with single container fade matching Home.tsx -->
-        <div class="w-full overflow-hidden" :style="{ opacity: animating ? 0 : 1, transition: 'opacity 0.4s ease' }">
+    }"
+    @mouseenter="isPaused = true"
+    @mouseleave="isPaused = false"
+    >
+        <!-- Banner Container with Sizer and Smooth Crossfade -->
+        <div class="relative w-full overflow-hidden" style="max-height: 90vh;">
+            <!-- Natural sizer image keeping container height 1:1 on all viewports without layout shift -->
             <img 
-                :src="slides[current].img" 
-                src="{{ isset($banners) && $banners->count() > 0 ? $banners[0]->image_url : asset('banner1.png') }}"
-                :alt="slides[current].alt" 
-                alt="Pelangi Glass Banner"
-                class="w-full block" 
+                src="{{ $bannerList[0]['img'] }}" 
+                alt="{{ $bannerList[0]['alt'] }}" 
+                class="w-full block invisible pointer-events-none select-none" 
                 style="max-height: 90vh; object-fit: cover; object-position: center;"
+                aria-hidden="true"
             >
+
+            <!-- Stacked Slides for Soft Dissolve Crossfade -->
+            @foreach($bannerList as $index => $slide)
+                <div 
+                    class="absolute inset-0 w-full h-full overflow-hidden pointer-events-none"
+                    :style="{
+                        opacity: current === {{ $index }} ? 1 : 0,
+                        zIndex: current === {{ $index }} ? 10 : 1
+                    }"
+                    style="{{ $index === 0 ? 'opacity: 1; z-index: 10;' : 'opacity: 0; z-index: 1;' }} transition: opacity 1200ms cubic-bezier(0.4, 0, 0.2, 1);"
+                >
+                    <img 
+                        src="{{ $slide['img'] }}" 
+                        alt="{{ $slide['alt'] }}" 
+                        class="w-full h-full object-cover object-center block"
+                        style="max-height: 90vh;"
+                    >
+                </div>
+            @endforeach
+        </div>
+
+        <!-- Horizontal Loading Progress Bar at bottom of banner (matching user screenshot) -->
+        <div class="absolute bottom-0 left-0 w-full z-30 overflow-hidden pointer-events-none" style="height: 5px; background: rgba(255, 255, 255, 0.35); backdrop-filter: blur(4px);">
+            <div 
+                class="transition-all duration-75 ease-linear"
+                style="height: 100%; background: linear-gradient(90deg, #2563eb 0%, #3b82f6 60%, #60a5fa 100%); box-shadow: 0 0 8px rgba(37, 99, 235, 0.8);"
+                :style="{ width: Math.min(progress, 100) + '%' }"
+            ></div>
         </div>
 
         <!-- Left arrow -->
-        <button @click="prev()" class="absolute left-4 top-1/2 -translate-y-1/2 z-20 w-11 h-11 flex items-center justify-center rounded-full transition-all cursor-pointer" style="background: rgba(0,0,0,0.35); border: 1px solid rgba(255,255,255,0.2); color: #fff;" onmouseenter="this.style.background='#2563eb'" onmouseleave="this.style.background='rgba(0,0,0,0.35)'" aria-label="Slide sebelumnya">
+        <button @click="prev()" class="absolute left-4 top-1/2 -translate-y-1/2 z-30 w-11 h-11 flex items-center justify-center rounded-full transition-all cursor-pointer" style="background: rgba(0,0,0,0.35); border: 1px solid rgba(255,255,255,0.2); color: #fff;" onmouseenter="this.style.background='#2563eb'" onmouseleave="this.style.background='rgba(0,0,0,0.35)'" aria-label="Slide sebelumnya">
             <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
         </button>
 
         <!-- Right arrow -->
-        <button @click="next()" class="absolute right-4 top-1/2 -translate-y-1/2 z-20 w-11 h-11 flex items-center justify-center rounded-full transition-all cursor-pointer" style="background: rgba(0,0,0,0.35); border: 1px solid rgba(255,255,255,0.2); color: #fff;" onmouseenter="this.style.background='#2563eb'" onmouseleave="this.style.background='rgba(0,0,0,0.35)'" aria-label="Slide berikutnya">
+        <button @click="next()" class="absolute right-4 top-1/2 -translate-y-1/2 z-30 w-11 h-11 flex items-center justify-center rounded-full transition-all cursor-pointer" style="background: rgba(0,0,0,0.35); border: 1px solid rgba(255,255,255,0.2); color: #fff;" onmouseenter="this.style.background='#2563eb'" onmouseleave="this.style.background='rgba(0,0,0,0.35)'" aria-label="Slide berikutnya">
             <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>
         </button>
 
         <!-- Dot indicators -->
-        <div class="absolute bottom-5 left-1/2 -translate-x-1/2 z-20 flex gap-2">
-            <template x-for="(slide, index) in slides" :key="index">
-                <button @click="goTo(index)" class="transition-all rounded-full cursor-pointer p-0 border-0" :style="current === index ? 'width: 28px; height: 8px; background: #2563eb;' : 'width: 8px; height: 8px; background: rgba(255,255,255,0.5);'" :aria-label="'Pilih slide ' + (index + 1)"></button>
-            </template>
+        <div class="absolute bottom-5 left-1/2 -translate-x-1/2 z-30 flex gap-2">
+            @foreach($bannerList as $index => $slide)
+                <button 
+                    @click="goTo({{ $index }})" 
+                    class="transition-all rounded-full cursor-pointer p-0 border-0" 
+                    :style="current === {{ $index }} ? 'width: 28px; height: 8px; background: #2563eb;' : 'width: 8px; height: 8px; background: rgba(255,255,255,0.5);'" 
+                    aria-label="Pilih slide {{ $index + 1 }}"
+                ></button>
+            @endforeach
         </div>
     </section>
 
