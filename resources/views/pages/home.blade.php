@@ -89,37 +89,64 @@
                     >
                 </div>
             @endforeach
-        </div>
 
-        <!-- Horizontal Loading Progress Bar at bottom of banner (matching user screenshot) -->
-        <div class="absolute bottom-0 left-0 w-full z-30 overflow-hidden pointer-events-none" style="height: 5px; background: rgba(255, 255, 255, 0.35); backdrop-filter: blur(4px);">
-            <div 
-                class="transition-all duration-75 ease-linear"
-                style="height: 100%; background: linear-gradient(90deg, #2563eb 0%, #3b82f6 60%, #60a5fa 100%); box-shadow: 0 0 8px rgba(37, 99, 235, 0.8);"
-                :style="{ width: Math.min(progress, 100) + '%' }"
-            ></div>
-        </div>
+            <!-- Left arrow (Next/Previous Navigation) -->
+            <button 
+                @click.stop="prev()" 
+                type="button"
+                aria-label="Slide sebelumnya"
+                class="cursor-pointer transition-all hover:scale-110 active:scale-95"
+                style="position: absolute; left: 20px; top: 50%; transform: translateY(-50%); z-index: 50; width: 48px; height: 48px; display: flex; align-items: center; justify-content: center; border-radius: 9999px; background: rgba(15, 23, 42, 0.7); border: 1.5px solid rgba(255, 255, 255, 0.4); color: #ffffff; backdrop-filter: blur(8px); box-shadow: 0 4px 14px rgba(0, 0, 0, 0.4);"
+                onmouseenter="this.style.background='#2563eb'; this.style.borderColor='#60a5fa';"
+                onmouseleave="this.style.background='rgba(15, 23, 42, 0.7)'; this.style.borderColor='rgba(255, 255, 255, 0.4)';"
+            >
+                <svg style="width: 24px; height: 24px;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
+            </button>
 
-        <!-- Left arrow -->
-        <button @click="prev()" class="absolute left-4 top-1/2 -translate-y-1/2 z-30 w-11 h-11 flex items-center justify-center rounded-full transition-all cursor-pointer" style="background: rgba(0,0,0,0.35); border: 1px solid rgba(255,255,255,0.2); color: #fff;" onmouseenter="this.style.background='#2563eb'" onmouseleave="this.style.background='rgba(0,0,0,0.35)'" aria-label="Slide sebelumnya">
-            <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
-        </button>
+            <!-- Right arrow (Next/Previous Navigation) -->
+            <button 
+                @click.stop="next()" 
+                type="button"
+                aria-label="Slide berikutnya"
+                class="cursor-pointer transition-all hover:scale-110 active:scale-95"
+                style="position: absolute; right: 20px; top: 50%; transform: translateY(-50%); z-index: 50; width: 48px; height: 48px; display: flex; align-items: center; justify-content: center; border-radius: 9999px; background: rgba(15, 23, 42, 0.7); border: 1.5px solid rgba(255, 255, 255, 0.4); color: #ffffff; backdrop-filter: blur(8px); box-shadow: 0 4px 14px rgba(0, 0, 0, 0.4);"
+                onmouseenter="this.style.background='#2563eb'; this.style.borderColor='#60a5fa';"
+                onmouseleave="this.style.background='rgba(15, 23, 42, 0.7)'; this.style.borderColor='rgba(255, 255, 255, 0.4)';"
+            >
+                <svg style="width: 24px; height: 24px;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>
+            </button>
 
-        <!-- Right arrow -->
-        <button @click="next()" class="absolute right-4 top-1/2 -translate-y-1/2 z-30 w-11 h-11 flex items-center justify-center rounded-full transition-all cursor-pointer" style="background: rgba(0,0,0,0.35); border: 1px solid rgba(255,255,255,0.2); color: #fff;" onmouseenter="this.style.background='#2563eb'" onmouseleave="this.style.background='rgba(0,0,0,0.35)'" aria-label="Slide berikutnya">
-            <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>
-        </button>
+            <!-- Dot indicators -->
+            <!-- Dot indicators with built-in timer progress bar -->
+            <div style="position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%); z-index: 50; display: flex; align-items: center; gap: 10px;">
+                @foreach($bannerList as $index => $slide)
+                    <button 
+                        @click.stop="goTo({{ $index }})" 
+                        type="button"
+                        class="transition-all cursor-pointer p-0 border-0 overflow-hidden relative" 
+                        :style="current === {{ $index }} 
+                            ? 'width: 52px; height: 8px; border-radius: 9999px; background: rgba(255, 255, 255, 0.35); box-shadow: 0 2px 8px rgba(0,0,0,0.3);' 
+                            : 'width: 12px; height: 8px; border-radius: 9999px; background: rgba(255, 255, 255, 0.5);'" 
+                        aria-label="Pilih slide {{ $index + 1 }}"
+                    >
+                        <div 
+                            x-show="current === {{ $index }}"
+                            class="h-full transition-all duration-75 ease-linear"
+                            style="height: 100%; border-radius: 9999px; background: #2563eb; box-shadow: 0 0 8px rgba(37, 99, 235, 1);"
+                            :style="{ width: current === {{ $index }} ? Math.min(progress, 100) + '%' : '0%' }"
+                        ></div>
+                    </button>
+                @endforeach
+            </div>
 
-        <!-- Dot indicators -->
-        <div class="absolute bottom-5 left-1/2 -translate-x-1/2 z-30 flex gap-2">
-            @foreach($bannerList as $index => $slide)
-                <button 
-                    @click="goTo({{ $index }})" 
-                    class="transition-all rounded-full cursor-pointer p-0 border-0" 
-                    :style="current === {{ $index }} ? 'width: 28px; height: 8px; background: #2563eb;' : 'width: 8px; height: 8px; background: rgba(255,255,255,0.5);'" 
-                    aria-label="Pilih slide {{ $index + 1 }}"
-                ></button>
-            @endforeach
+            <!-- Horizontal Loading Progress Bar at bottom of banner (matching user screenshot) -->
+            <div style="position: absolute; bottom: 0; left: 0; width: 100%; height: 5px; z-index: 50; background: rgba(255, 255, 255, 0.3); backdrop-filter: blur(4px); overflow: hidden;">
+                <div 
+                    class="transition-all duration-75 ease-linear"
+                    style="height: 100%; background: linear-gradient(90deg, #2563eb 0%, #38bdf8 80%, #ffffff 100%); box-shadow: 0 0 10px rgba(56, 189, 248, 0.9);"
+                    :style="{ width: Math.min(progress, 100) + '%' }"
+                ></div>
+            </div>
         </div>
     </section>
 
