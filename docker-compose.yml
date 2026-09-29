@@ -7,13 +7,13 @@ services:
     container_name: pelangiglass-app
     restart: unless-stopped
     ports:
-      - "${APP_PORT:-48729}:48729"
+      - "127.0.0.1:${APP_PORT:-48729}:48729"
     environment:
       APP_NAME: "${APP_NAME:-Pelangi Glass}"
       APP_ENV: "${APP_ENV:-production}"
-      APP_KEY: "${APP_KEY:-base64:8p1vV8R2yY9nN3kK6mM5jJ4hH7gG0fF1dD2sS3aA4qQ=}"
+      APP_KEY: "${APP_KEY}"
       APP_DEBUG: "${APP_DEBUG:-false}"
-      APP_URL: "${APP_URL:-http://localhost:48729}"
+      APP_URL: "${APP_URL:-https://localhost}"
       LOG_CHANNEL: stderr
       LOG_LEVEL: warning
       DB_CONNECTION: pgsql
@@ -21,7 +21,7 @@ services:
       DB_PORT: 5432
       DB_DATABASE: "${DB_DATABASE:-pelangiglass}"
       DB_USERNAME: "${DB_USERNAME:-pelangiglass}"
-      DB_PASSWORD: "${DB_PASSWORD:-secret}"
+      DB_PASSWORD: "${DB_PASSWORD}"
       SESSION_DRIVER: database
       CACHE_STORE: database
       QUEUE_CONNECTION: database
