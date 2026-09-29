@@ -6,7 +6,7 @@
     auto_https off
 }
 
-:8000 {
+:48729 {
     root * /app/public
     encode zstd br gzip
 
