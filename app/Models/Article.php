@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Enums\ArticleStatus;
+use App\Traits\HasAutoCleanupFiles;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -10,7 +11,9 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Article extends Model
 {
-    use HasFactory, SoftDeletes;
+    use HasFactory, SoftDeletes, HasAutoCleanupFiles;
+
+    protected array $fileFields = ['featured_image'];
 
     protected $fillable = [
         'category_id',

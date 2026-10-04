@@ -106,6 +106,31 @@ class PublicWebRoutesTest extends TestCase
 
         $response->assertStatus(404);
     }
+    public function test_promo_page_renders_successfully(): void
+    {
+        $response = $this->get('/promo');
+
+        $response->assertStatus(200);
+        $response->assertSee('Diskon Kaca Film V-KOOL & 3M');
+        $response->assertSee('Terlaris');
+    }
+
+    public function test_promo_detail_page_renders_successfully(): void
+    {
+        $response = $this->get('/promo/promo-kaca-film-v-kool-3m');
+
+        $response->assertStatus(200);
+        $response->assertSee('Diskon Kaca Film V-KOOL & 3M');
+        $response->assertSee('FILMPREMIUM25');
+    }
+
+    public function test_promo_detail_returns_404_for_missing_promo(): void
+    {
+        $response = $this->get('/promo/non-existent-promo-slug');
+
+        $response->assertStatus(404);
+    }
+
 
     public function test_inquiry_submission_validates_required_fields(): void
     {

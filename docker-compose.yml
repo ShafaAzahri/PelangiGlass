@@ -1,0 +1,92 @@
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: production
+    container_name: pelangiglass-app
+    restart: unless-stopped
+    ports:
+      - "${APP_PORT:-48729}:48729"
+    environment:
+      APP_NAME: "${APP_NAME:-Pelangi Glass}"
+      APP_ENV: "${APP_ENV:-production}"
+      APP_KEY: "${APP_KEY}"
+      APP_DEBUG: "${APP_DEBUG:-false}"
+      APP_URL: "${APP_URL:-http://localhost:48729}"
+      LOG_CHANNEL: stderr
+      LOG_LEVEL: warning
+      DB_CONNECTION: pgsql
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_DATABASE: "${DB_DATABASE:-pelangiglass}"
+      DB_USERNAME: "${DB_USERNAME:-pelangiglass}"
+      DB_PASSWORD: "${DB_PASSWORD}"
+      SESSION_DRIVER: database
+      CACHE_STORE: database
+      QUEUE_CONNECTION: database
+      RUN_MIGRATIONS: "true"
+    volumes:
+      - storage_public:/app/storage/app/public
+    depends_on:
+      postgres:
+        condition: service_healthy
+    deploy:
+      resources:
+        limits:
+          memory: 256M
+        reservations:
+          memory: 64M
+    networks:
+      - pelangiglass-net
+
+  postgres:
+    image: postgres:17-alpine
+    container_name: pelangiglass-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: "${DB_DATABASE:-pelangiglass}"
+      POSTGRES_USER: "${DB_USERNAME:-pelangiglass}"
+      POSTGRES_PASSWORD: "${DB_PASSWORD:-secret}"
+      PGDATA: /var/lib/postgresql/data/pgdata
+    command:
+      - "postgres"
+      - "-c"
+      - "shared_buffers=32MB"
+      - "-c"
+      - "effective_cache_size=64MB"
+      - "-c"
+      - "work_mem=2MB"
+      - "-c"
+      - "maintenance_work_mem=16MB"
+      - "-c"
+      - "max_connections=25"
+      - "-c"
+      - "wal_buffers=1MB"
+    ports:
+      - "127.0.0.1:${FORWARD_DB_PORT:-54829}:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USERNAME:-pelangiglass} -d ${DB_DATABASE:-pelangiglass}"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+    deploy:
+      resources:
+        limits:
+          memory: 128M
+        reservations:
+          memory: 32M
+    networks:
+      - pelangiglass-net
+
+volumes:
+  pgdata:
+    driver: local
+  storage_public:
+    driver: local
+
+networks:
+  pelangiglass-net:
+    driver: bridge

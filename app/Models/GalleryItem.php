@@ -2,13 +2,16 @@
 
 namespace App\Models;
 
+use App\Traits\HasAutoCleanupFiles;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class GalleryItem extends Model
 {
-    use HasFactory;
+    use HasFactory, HasAutoCleanupFiles;
+
+    protected array $fileFields = ['image_path'];
 
     protected $fillable = [
         'category_id',

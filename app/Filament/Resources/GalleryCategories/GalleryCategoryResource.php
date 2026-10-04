@@ -24,7 +24,7 @@ class GalleryCategoryResource extends Resource
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedPhoto;
 
-    protected static string|\UnitEnum|null $navigationGroup = 'Konten & Publikasi';
+    protected static string|\UnitEnum|null $navigationGroup = 'Galeri';
 
     protected static ?string $navigationLabel = 'Kategori Galeri';
 
@@ -32,7 +32,7 @@ class GalleryCategoryResource extends Resource
 
     protected static ?string $pluralModelLabel = 'Kategori Galeri';
 
-    protected static ?int $navigationSort = 3;
+    protected static ?int $navigationSort = 2;
 
     public static function form(Schema $schema): Schema
     {

@@ -27,7 +27,7 @@ class TestimonialResource extends Resource
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedChatBubbleBottomCenterText;
 
-    protected static string|\UnitEnum|null $navigationGroup = 'Konten & Publikasi';
+    protected static string|\UnitEnum|null $navigationGroup = 'Interaksi Pelanggan';
 
     protected static ?string $navigationLabel = 'Testimoni Pelanggan';
 
@@ -35,7 +35,7 @@ class TestimonialResource extends Resource
 
     protected static ?string $pluralModelLabel = 'Testimoni Pelanggan';
 
-    protected static ?int $navigationSort = 5;
+    protected static ?int $navigationSort = 2;
 
     public static function form(Schema $schema): Schema
     {

@@ -7,6 +7,7 @@ use App\Filament\Resources\HeroBanners\Pages\EditHeroBanner;
 use App\Filament\Resources\HeroBanners\Pages\ListHeroBanners;
 use App\Models\HeroBanner;
 use BackedEnum;
+use Filament\Actions\Action;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
@@ -87,10 +88,14 @@ class HeroBannerResource extends Resource
                                 $url = e($record->image_url);
                                 return new HtmlString("
                                     <div style='display: flex; align-items: center; gap: 12px; padding: 10px; background: rgba(30, 41, 59, 0.7); border: 1px solid rgba(255, 255, 255, 0.12); border-radius: 10px; margin-bottom: 8px;'>
-                                        <img src='{$url}' alt='Banner' style='width: 90px; height: 50px; min-width: 90px; object-fit: cover; border-radius: 6px; border: 1px solid rgba(255, 255, 255, 0.2); display: block;' />
-                                        <div style='font-size: 11px; line-height: 1.35; overflow: hidden;'>
+                                        <a href='{$url}' target='_blank' rel='noopener noreferrer' title='Klik untuk melihat banner ukuran penuh' style='display: block; cursor: pointer;'>
+                                            <img src='{$url}' alt='Banner' style='width: 90px; height: 50px; min-width: 90px; object-fit: cover; border-radius: 6px; border: 1px solid rgba(255, 255, 255, 0.2); display: block;' />
+                                        </a>
+                                        <div style='font-size: 11px; line-height: 1.4; overflow: hidden;'>
                                             <div style='font-weight: 600; color: #f8fafc; margin-bottom: 2px;'>Banner Terpasang</div>
-                                            <div style='color: #22c55e; font-weight: 500;'>✓ Aktif di beranda</div>
+                                            <a href='{$url}' target='_blank' rel='noopener noreferrer' style='color: #60a5fa; text-decoration: underline; font-weight: 500; display: inline-flex; align-items: center; gap: 4px;'>
+                                                🔍 Lihat Resolusi Penuh ↗
+                                            </a>
                                         </div>
                                     </div>
                                 ");
@@ -99,12 +104,16 @@ class HeroBannerResource extends Resource
                         FileUpload::make('image_path')
                             ->label('Upload / Ganti Gambar')
                             ->image()
+                            ->acceptedFileTypes(['image/jpeg', 'image/png', 'image/webp', 'image/jpg'])
+                            ->maxSize(10240)
                             ->disk('public')
                             ->directory('banners')
                             ->imagePreviewHeight('160')
+                            ->openable()
+                            ->downloadable()
                             ->required(fn (string $operation, ?HeroBanner $record) => $operation === 'create' && empty($record?->image_path))
                             ->dehydrated(fn ($state) => filled($state))
-                            ->helperText('Format JPG/PNG/WebP. Kosongkan jika tidak ingin mengubah banner.'),
+                            ->helperText('Format: JPG, PNG, atau WebP (Maks. 10 MB). Otomatis dioptimalkan.'),
                         Grid::make(2)->schema([
                             Toggle::make('is_active')
                                 ->label('Aktif')
@@ -128,8 +137,25 @@ class HeroBannerResource extends Resource
                     ->label('Gambar Preview')
                     ->width(140)
                     ->height(75)
-                    ->extraImgAttributes(['class' => 'object-cover rounded-lg shadow-xs'])
-                    ->defaultImageUrl(asset('banner1.png')),
+                    ->extraImgAttributes([
+                        'class' => 'object-cover rounded-lg shadow-xs cursor-pointer hover:opacity-80 transition',
+                        'title' => 'Klik untuk preview gambar',
+                    ])
+                    ->defaultImageUrl(asset('banner1.png'))
+                    ->action(
+                        Action::make('preview_banner')
+                            ->modalHeading(fn (HeroBanner $record) => 'Preview Banner: ' . $record->title)
+                            ->modalSubmitAction(false)
+                            ->modalCancelActionLabel('Tutup')
+                            ->modalContent(fn (HeroBanner $record) => new HtmlString("
+                                <div style='display: flex; flex-direction: column; align-items: center; gap: 12px; padding: 8px;'>
+                                    <img src='{$record->image_url}' alt='{$record->title}' style='max-height: 65vh; max-width: 100%; border-radius: 8px; object-fit: contain; box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5);' />
+                                    <a href='{$record->image_url}' target='_blank' rel='noopener noreferrer' style='color: #60a5fa; text-decoration: underline; font-size: 13px; font-weight: 500;'>
+                                        Buka di tab baru (Resolusi Asli) ↗
+                                    </a>
+                                </div>
+                            "))
+                    ),
                 TextColumn::make('title')
                     ->label('Judul Banner')
                     ->searchable()

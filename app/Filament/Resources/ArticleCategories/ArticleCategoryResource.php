@@ -24,7 +24,7 @@ class ArticleCategoryResource extends Resource
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedFolder;
 
-    protected static string|\UnitEnum|null $navigationGroup = 'Konten & Publikasi';
+    protected static string|\UnitEnum|null $navigationGroup = 'Artikel & Tips';
 
     protected static ?string $navigationLabel = 'Kategori Artikel';
 
@@ -32,7 +32,7 @@ class ArticleCategoryResource extends Resource
 
     protected static ?string $pluralModelLabel = 'Kategori Artikel';
 
-    protected static ?int $navigationSort = 1;
+    protected static ?int $navigationSort = 2;
 
     public static function form(Schema $schema): Schema
     {

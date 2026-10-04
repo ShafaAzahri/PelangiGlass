@@ -2,12 +2,18 @@
 
 namespace App\Models;
 
+use App\Traits\HasAutoCleanupFiles;
+use App\Traits\LogsActivity;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class HeroBanner extends Model
 {
-    use HasFactory;
+    use HasFactory, HasAutoCleanupFiles, LogsActivity;
+
+    protected string $activitySubjectName = 'Banner Beranda';
+
+    protected array $fileFields = ['image_path'];
 
     protected $fillable = [
         'title',

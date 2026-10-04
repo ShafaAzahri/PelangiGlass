@@ -1,0 +1,18 @@
+{
+    frankenphp {
+        num_threads 2
+    }
+    order php_server before file_server
+    auto_https off
+}
+
+:48729 {
+    root * /app/public
+    encode zstd br gzip
+
+    php_server {
+        resolve_root_symlink false
+    }
+
+    file_server
+}

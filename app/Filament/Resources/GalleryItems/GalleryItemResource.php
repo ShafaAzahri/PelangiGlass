@@ -7,6 +7,7 @@ use App\Filament\Resources\GalleryItems\Pages\EditGalleryItem;
 use App\Filament\Resources\GalleryItems\Pages\ListGalleryItems;
 use App\Models\GalleryItem;
 use BackedEnum;
+use Filament\Actions\Action;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
@@ -31,10 +32,9 @@ use Illuminate\Support\HtmlString;
 class GalleryItemResource extends Resource
 {
     protected static ?string $model = GalleryItem::class;
-
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedPhoto;
 
-    protected static string|\UnitEnum|null $navigationGroup = 'Konten & Publikasi';
+    protected static string|\UnitEnum|null $navigationGroup = 'Galeri';
 
     protected static ?string $navigationLabel = 'Galeri Foto';
 
@@ -42,7 +42,7 @@ class GalleryItemResource extends Resource
 
     protected static ?string $pluralModelLabel = 'Galeri Dokumentasi';
 
-    protected static ?int $navigationSort = 3;
+    protected static ?int $navigationSort = 1;
 
     public static function form(Schema $schema): Schema
     {
@@ -92,10 +92,14 @@ class GalleryItemResource extends Resource
                                 $url = e($record->image_url);
                                 return new HtmlString("
                                     <div style='display: flex; align-items: center; gap: 12px; padding: 10px; background: rgba(30, 41, 59, 0.7); border: 1px solid rgba(255, 255, 255, 0.12); border-radius: 10px; margin-bottom: 8px;'>
-                                        <img src='{$url}' alt='Foto' style='width: 72px; height: 54px; min-width: 72px; object-fit: cover; border-radius: 6px; border: 1px solid rgba(255, 255, 255, 0.2); display: block;' />
-                                        <div style='font-size: 11px; line-height: 1.35; overflow: hidden;'>
+                                        <a href='{$url}' target='_blank' rel='noopener noreferrer' title='Klik untuk melihat foto ukuran penuh' style='display: block; cursor: pointer;'>
+                                            <img src='{$url}' alt='Foto' style='width: 72px; height: 54px; min-width: 72px; object-fit: cover; border-radius: 6px; border: 1px solid rgba(255, 255, 255, 0.2); display: block;' />
+                                        </a>
+                                        <div style='font-size: 11px; line-height: 1.4; overflow: hidden;'>
                                             <div style='font-weight: 600; color: #f8fafc; margin-bottom: 2px;'>Foto Terpasang</div>
-                                            <div style='color: #22c55e; font-weight: 500;'>✓ Aktif di website</div>
+                                            <a href='{$url}' target='_blank' rel='noopener noreferrer' style='color: #60a5fa; text-decoration: underline; font-weight: 500; display: inline-flex; align-items: center; gap: 4px;'>
+                                                🔍 Lihat Resolusi Penuh ↗
+                                            </a>
                                         </div>
                                     </div>
                                 ");
@@ -104,12 +108,16 @@ class GalleryItemResource extends Resource
                         FileUpload::make('image_path')
                             ->label('Upload / Ganti Foto')
                             ->image()
+                            ->acceptedFileTypes(['image/jpeg', 'image/png', 'image/webp', 'image/jpg'])
+                            ->maxSize(10240)
                             ->disk('public')
                             ->directory('gallery')
                             ->imagePreviewHeight('180')
+                            ->openable()
+                            ->downloadable()
                             ->required(fn (string $operation, ?GalleryItem $record) => $operation === 'create' && empty($record?->image_path))
                             ->dehydrated(fn ($state) => filled($state))
-                            ->helperText('Kosongkan upload ini jika tidak ingin mengubah foto yang sudah ada.'),
+                            ->helperText('Format: JPG, PNG, atau WebP (Maks. 10 MB). Otomatis dioptimalkan.'),
                         Grid::make(2)->schema([
                             Toggle::make('is_active')
                                 ->label('Aktif di Web')
@@ -133,8 +141,25 @@ class GalleryItemResource extends Resource
                     ->label('Foto')
                     ->width(80)
                     ->height(55)
-                    ->extraImgAttributes(['class' => 'object-cover rounded-md shadow-xs'])
-                    ->defaultImageUrl(fn (GalleryItem $record) => $record->image_url),
+                    ->extraImgAttributes([
+                        'class' => 'object-cover rounded-md shadow-xs cursor-pointer hover:opacity-80 transition',
+                        'title' => 'Klik untuk preview gambar',
+                    ])
+                    ->defaultImageUrl(fn (GalleryItem $record) => $record->image_url)
+                    ->action(
+                        Action::make('preview_foto')
+                            ->modalHeading(fn (GalleryItem $record) => 'Preview Foto: ' . $record->title)
+                            ->modalSubmitAction(false)
+                            ->modalCancelActionLabel('Tutup')
+                            ->modalContent(fn (GalleryItem $record) => new HtmlString("
+                                <div style='display: flex; flex-direction: column; align-items: center; gap: 12px; padding: 8px;'>
+                                    <img src='{$record->image_url}' alt='{$record->title}' style='max-height: 65vh; max-width: 100%; border-radius: 8px; object-fit: contain; box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5);' />
+                                    <a href='{$record->image_url}' target='_blank' rel='noopener noreferrer' style='color: #60a5fa; text-decoration: underline; font-size: 13px; font-weight: 500;'>
+                                        Buka di tab baru (Resolusi Asli) ↗
+                                    </a>
+                                </div>
+                            "))
+                    ),
                 TextColumn::make('title')
                     ->label('Judul Pengerjaan')
                     ->searchable()

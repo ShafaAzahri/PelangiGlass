@@ -8,7 +8,7 @@
             ? $banners->map(fn($b) => ['img' => $b->image_url, 'alt' => $b->title ?? 'Pelangi Glass Banner'])->toArray()
             : [
                 ['img' => asset('banner1.png'), 'alt' => 'Kaca Mobil Jernih Perjalanan Lebih Aman'],
-                ['img' => asset('banner2.png'), 'alt' => 'Pelangi Glass Banner 2']
+                ['img' => asset('banner2.png'), 'alt' => 'Pelayanan Cepat, Rapi & Standar Pabrik'],
             ];
         $totalBanners = count($bannerList);
     @endphp
@@ -29,7 +29,7 @@
         }
     </style>
 
-    <section id="beranda" class="relative overflow-hidden pt-[76px] md:pt-[88px]" style="background: #0a0f1a;" x-data="{
+    <section id="beranda" class="relative overflow-hidden pt-[72px] sm:pt-[74px]" style="background: #ffffff;" x-data="{
         current: 0,
         total: {{ $totalBanners }},
         isPaused: false,
@@ -67,13 +67,12 @@
     @mouseleave="isPaused = false"
     >
         <!-- Banner Container with Sizer and Smooth Crossfade -->
-        <div class="relative w-full overflow-hidden" style="max-height: 90vh;">
+        <div class="relative w-full overflow-hidden">
             <!-- Natural sizer image keeping container height 1:1 on all viewports without layout shift -->
             <img 
                 src="{{ $bannerList[0]['img'] }}" 
                 alt="{{ $bannerList[0]['alt'] }}" 
-                class="w-full block invisible pointer-events-none select-none" 
-                style="max-height: 90vh; object-fit: cover; object-position: center;"
+                class="w-full h-auto block invisible pointer-events-none select-none" 
                 aria-hidden="true"
             >
 
@@ -91,7 +90,6 @@
                         src="{{ $slide['img'] }}" 
                         alt="{{ $slide['alt'] }}" 
                         class="w-full h-full object-cover object-center block"
-                        style="max-height: 90vh;"
                     >
                 </div>
             @endforeach
@@ -186,18 +184,18 @@
 
                     <!-- Tagline Elegan -->
                     <p class="text-xs sm:text-sm font-semibold text-slate-700 mb-3.5" style="font-family: 'Plus Jakarta Sans', sans-serif;">
-                        Pemasangan Presisi Kaca Mobil Original OEM & Kaca Film Bergaransi Resmi
+                        {{ \App\Models\Setting::get('tagline', 'Pemasangan Presisi Kaca Mobil Original OEM & Kaca Film Bergaransi Resmi') }}
                     </p>
 
                     <!-- Narasi Ringkas & Berwibawa (Text Justify) -->
                     <p class="text-xs sm:text-sm text-slate-600 leading-relaxed mb-5 text-justify" style="font-family: 'Plus Jakarta Sans', sans-serif;">
-                        Selama lebih dari 30 tahun, Pelangi Glass dipercaya melayani penggantian, pemasangan, dan perbaikan kaca untuk berbagai tipe dan merek mobil. Dikerjakan langsung oleh teknisi spesialis dengan standar lem sealant internasional anti-bocor serta estimasi biaya yang transparan.
+                        Selama lebih dari {{ \App\Models\Setting::get('years_experience', '30+') }} tahun, Pelangi Glass dipercaya melayani penggantian, pemasangan, dan perbaikan kaca untuk berbagai tipe dan merek mobil. Dikerjakan langsung oleh teknisi spesialis dengan standar lem sealant internasional anti-bocor serta estimasi biaya yang transparan.
                     </p>
 
                     <!-- 3 Key Stats Row -->
                     <div class="grid grid-cols-3 gap-3 py-3.5 mb-5 border-y border-slate-100">
                         <div>
-                            <div class="text-xl sm:text-2xl font-black text-slate-900 tracking-tight">30+</div>
+                            <div class="text-xl sm:text-2xl font-black text-slate-900 tracking-tight">{{ \App\Models\Setting::get('years_experience', '30+') }}</div>
                             <div class="text-[11px] sm:text-xs text-slate-500 font-medium mt-0.5">Tahun Pengalaman</div>
                         </div>
                         <div>
@@ -982,7 +980,7 @@
                     </h2>
                     <p class="text-sm leading-relaxed" style="color: #64748b; font-family: 'Plus Jakarta Sans', sans-serif;">
                         Masih ada yang mau ditanyakan?
-                        <a href="https://wa.me/6281390288875" target="_blank" rel="noopener noreferrer" style="color: #2563eb; font-weight: 600; text-decoration: none;">
+                        <a href="https://wa.me/6281390288875?text={{ urlencode('Halo Pelangi Glass, saya ada pertanyaan mengenai kaca mobil / kaca film.') }}" target="_blank" rel="noopener noreferrer" style="color: #2563eb; font-weight: 600; text-decoration: none;">
                             Hubungi tim kami
                         </a>
                         via WhatsApp, kami siap membantu.
@@ -1077,7 +1075,7 @@
                             </div>
                             <div>
                                 <div class="text-xs uppercase tracking-widest mb-0.5" style="color: #94a3b8; font-family: 'Plus Jakarta Sans', sans-serif;">Jam Buka</div>
-                                <div class="text-sm" style="font-family: 'Plus Jakarta Sans', sans-serif; color: #0f172a;">Senin – Jumat, 08.30 – 16.30 WIB</div>
+                                <div class="text-sm" style="font-family: 'Plus Jakarta Sans', sans-serif; color: #0f172a;">{{ \App\Models\Setting::get('operational_hours', 'Senin – Jumat, 08.30 – 16.30 WIB') }}</div>
                             </div>
                         </div>
 
@@ -1173,7 +1171,7 @@
 
             <!-- Map full width -->
             <div class="rounded-2xl overflow-hidden" style="border: 1px solid #e2e8f0;">
-                <iframe title="Lokasi Pelangi Glass Purwokerto" src="https://maps.google.com/maps?q=pelangi+glass+purwokerto&t=&z=15&ie=UTF8&iwloc=&output=embed" width="100%" height="300" style="border: 0; display: block;" allowfullscreen loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+                <iframe title="Lokasi Pelangi Glass Purwokerto" src="{{ \App\Models\Setting::get('google_maps_embed', 'https://maps.google.com/maps?q=pelangi+glass+purwokerto&t=&z=15&ie=UTF8&iwloc=&output=embed') }}" width="100%" height="300" style="border: 0; display: block;" allowfullscreen loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
                 <div class="px-5 py-4 flex items-center justify-between" style="background: #ffffff; border-top: 1px solid #e2e8f0;">
                     <div>
                         <div class="text-xs uppercase tracking-widest mb-0.5" style="color: #94a3b8; font-family: 'Plus Jakarta Sans', sans-serif;">

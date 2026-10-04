@@ -26,7 +26,7 @@ class ServiceCategoryResource extends Resource
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedWrench;
 
-    protected static string|\UnitEnum|null $navigationGroup = 'Katalog & Servis';
+    protected static string|\UnitEnum|null $navigationGroup = 'Layanan & Servis';
 
     protected static ?string $navigationLabel = 'Kategori Layanan';
 
@@ -34,7 +34,7 @@ class ServiceCategoryResource extends Resource
 
     protected static ?string $pluralModelLabel = 'Kategori Layanan';
 
-    protected static ?int $navigationSort = 3;
+    protected static ?int $navigationSort = 2;
 
     public static function form(Schema $schema): Schema
     {

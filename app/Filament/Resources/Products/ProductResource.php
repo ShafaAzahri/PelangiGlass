@@ -8,10 +8,12 @@ use App\Filament\Resources\Products\Pages\EditProduct;
 use App\Filament\Resources\Products\Pages\ListProducts;
 use App\Models\Product;
 use BackedEnum;
+use Filament\Actions\Action;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ForceDeleteBulkAction;
+use Filament\Actions\ReplicateAction;
 use Filament\Actions\RestoreBulkAction;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Placeholder;
@@ -40,7 +42,7 @@ class ProductResource extends Resource
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedShoppingBag;
 
-    protected static string|\UnitEnum|null $navigationGroup = 'Katalog & Servis';
+    protected static string|\UnitEnum|null $navigationGroup = 'Produk';
 
     protected static ?string $navigationLabel = 'Katalog Produk';
 
@@ -48,7 +50,7 @@ class ProductResource extends Resource
 
     protected static ?string $pluralModelLabel = 'Katalog Produk';
 
-    protected static ?int $navigationSort = 2;
+    protected static ?int $navigationSort = 1;
 
     public static function form(Schema $schema): Schema
     {
@@ -118,10 +120,14 @@ class ProductResource extends Resource
                                 $url = e($record->image_url);
                                 return new HtmlString("
                                     <div style='display: flex; align-items: center; gap: 12px; padding: 10px; background: rgba(30, 41, 59, 0.7); border: 1px solid rgba(255, 255, 255, 0.12); border-radius: 10px; margin-bottom: 8px;'>
-                                        <img src='{$url}' alt='Produk' style='width: 72px; height: 54px; min-width: 72px; object-fit: cover; border-radius: 6px; border: 1px solid rgba(255, 255, 255, 0.2); display: block;' />
-                                        <div style='font-size: 11px; line-height: 1.35; overflow: hidden;'>
+                                        <a href='{$url}' target='_blank' rel='noopener noreferrer' title='Klik untuk melihat foto ukuran penuh' style='display: block; cursor: pointer;'>
+                                            <img src='{$url}' alt='Produk' style='width: 72px; height: 54px; min-width: 72px; object-fit: cover; border-radius: 6px; border: 1px solid rgba(255, 255, 255, 0.2); display: block;' />
+                                        </a>
+                                        <div style='font-size: 11px; line-height: 1.4; overflow: hidden;'>
                                             <div style='font-weight: 600; color: #f8fafc; margin-bottom: 2px;'>Foto Utama Terpasang</div>
-                                            <div style='color: #22c55e; font-weight: 500;'>✓ Aktif di website</div>
+                                            <a href='{$url}' target='_blank' rel='noopener noreferrer' style='color: #60a5fa; text-decoration: underline; font-weight: 500; display: inline-flex; align-items: center; gap: 4px;'>
+                                                🔍 Lihat Resolusi Penuh ↗
+                                            </a>
                                         </div>
                                     </div>
                                 ");
@@ -130,19 +136,27 @@ class ProductResource extends Resource
                         FileUpload::make('main_image')
                             ->label('Upload / Ganti Foto Utama')
                             ->image()
+                            ->acceptedFileTypes(['image/jpeg', 'image/png', 'image/webp', 'image/jpg'])
+                            ->maxSize(10240)
                             ->disk('public')
                             ->directory('products')
                             ->imagePreviewHeight('180')
+                            ->openable()
+                            ->downloadable()
                             ->dehydrated(fn ($state) => filled($state))
-                            ->helperText('Kosongkan upload ini jika tidak ingin mengubah foto utama.'),
+                            ->helperText('Format: JPG, PNG, atau WebP (Maks. 10 MB). Otomatis dioptimalkan.'),
                         FileUpload::make('gallery_images')
                             ->label('Galeri Foto Tambahan')
                             ->multiple()
                             ->reorderable()
                             ->image()
+                            ->acceptedFileTypes(['image/jpeg', 'image/png', 'image/webp', 'image/jpg'])
+                            ->maxSize(10240)
                             ->disk('public')
                             ->directory('products/gallery')
                             ->imagePreviewHeight('120')
+                            ->openable()
+                            ->downloadable()
                             ->dehydrated(fn ($state) => filled($state)),
                         Toggle::make('is_active')
                             ->label('Aktif / Tampilkan di Web')
@@ -161,10 +175,27 @@ class ProductResource extends Resource
             ->columns([
                 ImageColumn::make('main_image')
                     ->label('Foto')
-                    ->width(80)
-                    ->height(55)
-                    ->extraImgAttributes(['class' => 'object-cover rounded-md shadow-xs'])
-                    ->defaultImageUrl(fn (Product $record) => $record->image_url),
+                    ->width(110)
+                    ->height(72)
+                    ->extraImgAttributes([
+                        'class' => 'object-cover rounded-lg shadow-xs cursor-pointer hover:opacity-80 transition',
+                        'title' => 'Klik untuk preview gambar',
+                    ])
+                    ->defaultImageUrl(fn (Product $record) => $record->image_url)
+                    ->action(
+                        Action::make('preview_main_image')
+                            ->modalHeading(fn (Product $record) => 'Preview Foto: ' . $record->name)
+                            ->modalSubmitAction(false)
+                            ->modalCancelActionLabel('Tutup')
+                            ->modalContent(fn (Product $record) => new HtmlString("
+                                <div style='display: flex; flex-direction: column; align-items: center; gap: 12px; padding: 8px;'>
+                                    <img src='{$record->image_url}' alt='{$record->name}' style='max-height: 65vh; max-width: 100%; border-radius: 8px; object-fit: contain; box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5);' />
+                                    <a href='{$record->image_url}' target='_blank' rel='noopener noreferrer' style='color: #60a5fa; text-decoration: underline; font-size: 13px; font-weight: 500;'>
+                                        Buka di tab baru (Resolusi Asli) ↗
+                                    </a>
+                                </div>
+                            "))
+                    ),
                 TextColumn::make('name')
                     ->label('Nama Produk')
                     ->searchable()
@@ -196,7 +227,7 @@ class ProductResource extends Resource
                 TrashedFilter::make(),
             ])
             ->recordActions([
-                EditAction::make(),
+                EditAction::make()->label('Ubah'),
             ])
             ->toolbarActions([
                 BulkActionGroup::make([

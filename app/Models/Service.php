@@ -3,6 +3,8 @@
 namespace App\Models;
 
 use App\Enums\ServiceBadge;
+use App\Traits\HasAutoCleanupFiles;
+use App\Traits\LogsActivity;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -10,7 +12,11 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Service extends Model
 {
-    use HasFactory, SoftDeletes;
+    use HasFactory, SoftDeletes, HasAutoCleanupFiles, LogsActivity;
+
+    protected string $activitySubjectName = 'Layanan';
+
+    protected array $fileFields = ['image_path'];
 
     protected $fillable = [
         'category_id',

@@ -3,6 +3,8 @@
 namespace App\Models;
 
 use App\Enums\ProductBadge;
+use App\Traits\HasAutoCleanupFiles;
+use App\Traits\LogsActivity;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -10,7 +12,11 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Product extends Model
 {
-    use HasFactory, SoftDeletes;
+    use HasFactory, SoftDeletes, HasAutoCleanupFiles, LogsActivity;
+
+    protected string $activitySubjectName = 'Produk';
+
+    protected array $fileFields = ['main_image', 'gallery_images'];
 
     protected $fillable = [
         'category_id',

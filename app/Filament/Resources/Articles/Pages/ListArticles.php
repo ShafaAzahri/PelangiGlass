@@ -10,10 +10,17 @@ class ListArticles extends ListRecords
 {
     protected static string $resource = ArticleResource::class;
 
+    protected ?string $heading = 'Artikel & Tips Perawatan Kaca';
+
+    public function getSubheading(): ?string
+    {
+        return 'Kelola konten publikasi, panduan perawatan kaca mobil, tips tolak panas, dan keselamatan berkendara.';
+    }
+
     protected function getHeaderActions(): array
     {
         return [
-            CreateAction::make(),
+            CreateAction::make()->label('Tulis Artikel Baru'),
         ];
     }
 }

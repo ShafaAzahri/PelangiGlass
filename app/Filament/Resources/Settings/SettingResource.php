@@ -2,26 +2,20 @@
 
 namespace App\Filament\Resources\Settings;
 
-use App\Filament\Resources\Settings\Pages\CreateSetting;
-use App\Filament\Resources\Settings\Pages\EditSetting;
 use App\Filament\Resources\Settings\Pages\ListSettings;
 use App\Models\Setting;
 use BackedEnum;
-use Filament\Actions\BulkActionGroup;
-use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
-use Filament\Forms\Components\Select;
+use Filament\Forms\Components\Placeholder;
 use Filament\Forms\Components\Textarea;
-use Filament\Forms\Components\TextInput;
 use Filament\Resources\Resource;
-use Filament\Schemas\Components\Grid;
-use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
-
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\HtmlString;
 class SettingResource extends Resource
 {
     protected static ?string $model = Setting::class;
@@ -38,51 +32,50 @@ class SettingResource extends Resource
 
     protected static ?int $navigationSort = 2;
 
+    public static function canCreate(): bool
+    {
+        return false;
+    }
+
+    public static function canDelete(Model $record): bool
+    {
+        return false;
+    }
+
+    public static function canDeleteAny(): bool
+    {
+        return false;
+    }
+
     public static function form(Schema $schema): Schema
     {
         return $schema
             ->components([
-                Section::make('Konfigurasi Pengaturan Workshop')
-                    ->description('Kelola identitas bengkel, kontak, jam buka operasional, dan media sosial')
-                    ->icon(Heroicon::OutlinedAdjustmentsHorizontal)
-                    ->schema([
-                        Grid::make(2)->schema([
-                            Select::make('key')
-                                ->label('Nama Pengaturan')
-                                ->options([
-                                    'site_name' => 'Nama Bengkel / Website',
-                                    'tagline' => 'Slogan / Tagline',
-                                    'phone' => 'Nomor Telepon Kantor',
-                                    'whatsapp' => 'Nomor WhatsApp Resmi',
-                                    'address' => 'Alamat Lengkap Workshop',
-                                    'operational_hours' => 'Jam Buka (Senin – Jumat)',
-                                    'operational_hours_weekend' => 'Jam Buka (Sabtu & Minggu)',
-                                    'instagram' => 'Akun Instagram',
-                                    'facebook' => 'Halaman Facebook',
-                                    'youtube' => 'Channel YouTube',
-                                    'google_maps_embed' => 'Link Peta Google Maps',
-                                    'years_experience' => 'Lama Pengalaman Workshop',
-                                ])
-                                ->required()
-                                ->disabled(fn (?Setting $record) => $record !== null)
-                                ->helperText(fn (?Setting $record) => $record ? Setting::humanDescription($record->key) : 'Pilih pengaturan yang ingin dikonfigurasi.'),
-                            Select::make('group')
-                                ->label('Kategori Pengaturan')
-                                ->options([
-                                    'general' => 'Profil Bengkel',
-                                    'contact' => 'Kontak & WhatsApp',
-                                    'operational' => 'Jam Buka',
-                                    'social' => 'Media Sosial',
-                                ])
-                                ->required(),
-                        ]),
-                        Textarea::make('value')
-                            ->label('Isi / Teks Pengaturan')
-                            ->placeholder('Masukkan isi pengaturan di sini...')
-                            ->rows(3)
-                            ->columnSpanFull()
-                            ->helperText('Perubahan teks ini akan otomatis tampil di bagian terkait pada website utama.'),
-                    ]),
+                Placeholder::make('info')
+                    ->label('Keterangan Pengaturan')
+                    ->content(fn (?Setting $record): ?HtmlString => $record ? new HtmlString("
+                        <div style='padding: 10px 14px; background: rgba(37, 99, 235, 0.08); border-left: 4px solid #2563eb; border-radius: 6px; font-size: 13px; color: #1e293b; line-height: 1.45;'>
+                            <div style='font-weight: 700; color: #1e40af; margin-bottom: 2px;'>" . e(Setting::humanName($record->key)) . " (" . e(Setting::humanGroup($record->group)) . ")</div>
+                            <div style='color: #475569;'>" . e(Setting::humanDescription($record->key)) . "</div>
+                        </div>
+                    ") : null),
+                Textarea::make('value')
+                    ->label('Nilai / Teks Pengaturan Baru')
+                    ->rows(fn (?Setting $record) => $record && in_array($record->key, ['address', 'google_maps_embed']) ? 4 : 2)
+                    ->required()
+                    ->helperText(function (?Setting $record) {
+                        if (!$record) return 'Teks ini akan otomatis tersimpan dan langsung tampil di website utama.';
+                        return match ($record->key) {
+                            'whatsapp' => 'Format nomor WhatsApp internasional tanpa tanda + atau spasi, contoh: 6281390288875.',
+                            'phone' => 'Nomor telepon kantor, contoh: +62 813-9028-8875.',
+                            'google_maps_embed' => 'Link URL sematan iframe dari Google Maps (biasanya diawali https://maps.google.com/...).',
+                            'years_experience' => 'Lama pengalaman bengkel, contoh: 30+ atau 32 Tahun.',
+                            'operational_hours' => 'Jam operasional hari kerja, contoh: Senin – Jumat, 08.30 – 16.30 WIB.',
+                            'operational_hours_weekend' => 'Jam operasional akhir pekan, contoh: Sabtu & Minggu: Tutup (Janji Temu via WA).',
+                            'instagram' => 'Username atau link Instagram, contoh: @pelangiglassofficial.',
+                            default => 'Teks ini akan otomatis tersimpan dan langsung tampil di website utama.',
+                        };
+                    }),
             ]);
     }
 
@@ -94,13 +87,23 @@ class SettingResource extends Resource
                     ->label('Nama Pengaturan')
                     ->formatStateUsing(fn (string $state): string => Setting::humanName($state))
                     ->description(fn (Setting $record): string => Setting::humanDescription($record->key))
+                    ->icon(fn (Setting $record): BackedEnum => match ($record->group) {
+                        'general' => Heroicon::OutlinedBuildingStorefront,
+                        'contact' => Heroicon::OutlinedPhone,
+                        'operational' => Heroicon::OutlinedClock,
+                        'social' => Heroicon::OutlinedGlobeAlt,
+                        default => Heroicon::OutlinedAdjustmentsHorizontal,
+                    })
+                    ->iconColor('gray')
                     ->searchable()
                     ->sortable()
                     ->weight('bold'),
                 TextColumn::make('value')
-                    ->label('Isi / Nilai')
-                    ->limit(80)
-                    ->wrap(),
+                    ->label('Nilai / Konten Saat Ini')
+                    ->limit(75)
+                    ->wrap()
+                    ->copyable()
+                    ->copyMessage('Nilai disalin ke clipboard'),
                 TextColumn::make('group')
                     ->label('Kategori')
                     ->badge()
@@ -119,13 +122,42 @@ class SettingResource extends Resource
                     ]),
             ])
             ->recordActions([
-                EditAction::make()->label('Ubah'),
+                EditAction::make()
+                    ->label('Ubah')
+                    ->icon(Heroicon::OutlinedPencilSquare)
+                    ->color('gray')
+                    ->modalHeading(fn (Setting $record): string => 'Ubah: ' . Setting::humanName($record->key))
+                    ->modalDescription(fn (Setting $record): string => Setting::humanDescription($record->key))
+                    ->modalSubmitActionLabel('Simpan Perubahan')
+                    ->modalWidth('lg')
+                    ->form([
+                        Placeholder::make('info')
+                            ->label('Petunjuk Pengaturan')
+                            ->content(fn (Setting $record): HtmlString => new HtmlString("
+                                <div style='padding: 10px 14px; background: #f8fafc; border: 1px solid #e2e8f0; border-left: 3px solid #64748b; border-radius: 6px; font-size: 13px; color: #334155; line-height: 1.45;'>
+                                    <div style='font-weight: 700; color: #0f172a; margin-bottom: 2px;'>" . e(Setting::humanName($record->key)) . " (" . e(Setting::humanGroup($record->group)) . ")</div>
+                                    <div style='color: #64748b;'>" . e(Setting::humanDescription($record->key)) . "</div>
+                                </div>
+                            ")),
+                        Textarea::make('value')
+                            ->label('Nilai / Teks Pengaturan Baru')
+                            ->rows(fn (Setting $record) => in_array($record->key, ['address', 'google_maps_embed']) ? 4 : 2)
+                            ->required()
+                            ->helperText(function (Setting $record) {
+                                return match ($record->key) {
+                                    'whatsapp' => 'Format nomor WhatsApp internasional tanpa tanda + atau spasi, contoh: 6281390288875.',
+                                    'phone' => 'Nomor telepon kantor, contoh: +62 813-9028-8875.',
+                                    'google_maps_embed' => 'Link URL sematan iframe dari Google Maps (biasanya diawali https://maps.google.com/...).',
+                                    'years_experience' => 'Lama pengalaman bengkel, contoh: 30+ atau 32 Tahun.',
+                                    'operational_hours' => 'Jam operasional hari kerja, contoh: Senin – Jumat, 08.30 – 16.30 WIB.',
+                                    'operational_hours_weekend' => 'Jam operasional akhir pekan, contoh: Sabtu & Minggu: Tutup (Janji Temu via WA).',
+                                    'instagram' => 'Username atau link Instagram, contoh: @pelangiglassofficial.',
+                                    default => 'Teks ini akan otomatis tersimpan dan langsung tampil di website utama.',
+                                };
+                            }),
+                    ]),
             ])
-            ->toolbarActions([
-                BulkActionGroup::make([
-                    DeleteBulkAction::make(),
-                ]),
-            ]);
+            ->toolbarActions([]);
     }
 
     public static function getRelations(): array
@@ -139,8 +171,6 @@ class SettingResource extends Resource
     {
         return [
             'index' => ListSettings::route('/'),
-            'create' => CreateSetting::route('/create'),
-            'edit' => EditSetting::route('/{record}/edit'),
         ];
     }
 }
