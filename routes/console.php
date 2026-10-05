@@ -12,7 +12,7 @@ Artisan::command('inspire', function () {
  * Scheduled Tasks & Background Maintenance
  */
 
-// Daily prune of soft deleted or old models (e.g., ActivityLog older than 90 days)
+// Daily prune of models implementing Prunable
 Schedule::command('model:prune')->dailyAt('02:00');
 
 // Daily prune of failed queue jobs and batches older than 48 hours
