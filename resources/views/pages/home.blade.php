@@ -397,7 +397,7 @@
                         'letter' => 'S',
                         'title' => 'Safety First',
                         'desc' => 'Menjadikan keamanan dan keselamatan teknis operasional bagi karyawan dan pelanggan sebagai prioritas utama dalam setiap langkah kerja.',
-                        'color' => '#dc2626',
+                        'color' => '#2563eb',
                         'img' => asset('images/safety.png')
                     ],
                 ];
@@ -412,7 +412,7 @@
                                 <img src="{{ $v['img'] }}" alt="{{ $v['title'] }}" class="w-full h-full object-cover">
                             </div>
                             <div class="p-7 flex flex-col flex-1">
-                                <h3 class="font-bold mb-3 leading-snug text-slate-900" style="font-family: 'Plus Jakarta Sans', sans-serif; font-size: 1.1rem; color: {{ $v['color'] === '#dc2626' ? '#dc2626' : 'inherit' }};">
+                                <h3 class="font-bold mb-3 leading-snug text-slate-900" style="font-family: 'Plus Jakarta Sans', sans-serif; font-size: 1.1rem;">
                                     {{ $v['title'] }}
                                 </h3>
                                 <p class="text-sm leading-relaxed text-slate-500" style="font-family: 'Plus Jakarta Sans', sans-serif;">
@@ -431,7 +431,7 @@
                                 <img src="{{ $v['img'] }}" alt="{{ $v['title'] }}" class="w-full h-full object-cover">
                             </div>
                             <div class="p-7 flex flex-col flex-1">
-                                <h3 class="font-bold mb-3 leading-snug text-slate-900" style="font-family: 'Plus Jakarta Sans', sans-serif; font-size: 1.1rem; color: {{ $v['color'] === '#dc2626' ? '#dc2626' : 'inherit' }};">
+                                <h3 class="font-bold mb-3 leading-snug text-slate-900" style="font-family: 'Plus Jakarta Sans', sans-serif; font-size: 1.1rem;">
                                     {{ $v['title'] }}
                                 </h3>
                                 <p class="text-sm leading-relaxed text-slate-500" style="font-family: 'Plus Jakarta Sans', sans-serif;">
