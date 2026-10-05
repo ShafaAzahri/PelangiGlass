@@ -2,8 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Enums\InquiryStatus;
-use App\Models\Inquiry;
+use App\Jobs\ProcessInquirySubmission;
 use App\Models\Setting;
 use Illuminate\Http\Request;
 
@@ -27,15 +26,12 @@ class InquiryController extends Controller
             'message.required' => 'Pesan atau pertanyaan wajib diisi.',
         ]);
 
-        $inquiry = Inquiry::create([
-            'name' => $validated['name'],
-            'phone_number' => $validated['phone_number'],
-            'email' => $validated['email'] ?? null,
-            'message' => $validated['message'],
-            'status' => InquiryStatus::NEW,
-            'ip_address' => $request->ip(),
-            'user_agent' => $request->userAgent(),
-        ]);
+        // Dispatch queued job to process the inquiry and audit log in background
+        ProcessInquirySubmission::dispatch(
+            $validated,
+            $request->ip(),
+            $request->userAgent()
+        );
 
         $waNumber = Setting::get('whatsapp', '6281390288875');
         $cleanPhone = preg_replace('/[^0-9]/', '', $waNumber);
