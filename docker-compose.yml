@@ -8,7 +8,7 @@ services:
     restart: unless-stopped
     ports:
       - "${APP_PORT:-48729}:48729"
-    environment:
+    environment: &default-env
       APP_NAME: "${APP_NAME:-Pelangi Glass}"
       APP_ENV: "${APP_ENV:-production}"
       APP_KEY: "${APP_KEY}"
@@ -35,6 +35,60 @@ services:
       resources:
         limits:
           memory: 256M
+        reservations:
+          memory: 64M
+    networks:
+      - pelangiglass-net
+
+  scheduler:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: production
+    container_name: pelangiglass-scheduler
+    restart: unless-stopped
+    command: ["php", "artisan", "schedule:work"]
+    environment:
+      <<: *default-env
+      RUN_MIGRATIONS: "false"
+    volumes:
+      - storage_public:/app/storage/app/public
+    depends_on:
+      postgres:
+        condition: service_healthy
+      app:
+        condition: service_started
+    deploy:
+      resources:
+        limits:
+          memory: 64M
+        reservations:
+          memory: 32M
+    networks:
+      - pelangiglass-net
+
+  queue:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: production
+    container_name: pelangiglass-queue
+    restart: unless-stopped
+    command: ["php", "artisan", "queue:work", "--tries=3", "--timeout=90", "--sleep=3", "--max-jobs=500", "--max-time=3600"]
+    environment:
+      <<: *default-env
+      RUN_MIGRATIONS: "false"
+    volumes:
+      - storage_public:/app/storage/app/public
+    depends_on:
+      postgres:
+        condition: service_healthy
+      app:
+        condition: service_started
+    deploy:
+      resources:
+        limits:
+          memory: 128M
         reservations:
           memory: 64M
     networks:

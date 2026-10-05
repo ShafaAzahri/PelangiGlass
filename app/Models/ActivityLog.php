@@ -2,14 +2,15 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Prunable;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class ActivityLog extends Model
 {
-    use HasFactory;
-
+    use HasFactory, Prunable;
     protected $fillable = [
         'user_id',
         'causer_name',
@@ -21,6 +22,14 @@ class ActivityLog extends Model
         'ip_address',
         'user_agent',
     ];
+
+    /**
+     * Get the prunable model query (retain logs for 90 days).
+     */
+    public function prunable(): Builder
+    {
+        return static::where('created_at', '<=', now()->subDays(90));
+    }
 
     protected function casts(): array
     {

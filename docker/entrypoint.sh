@@ -33,4 +33,9 @@ if [ "${APP_ENV:-production}" = "production" ]; then
     php artisan filament:optimize --no-interaction || true
 fi
 
+if [ "$#" -gt 0 ]; then
+    echo "Starting custom worker: $@"
+    exec "$@"
+fi
+
 exec frankenphp run --config /etc/caddy/Caddyfile
