@@ -5,31 +5,31 @@
 @php
     $defaultArticlesPreview = [
         [
-            'slug' => 'cara-merawat-kaca-mobil',
-            'title' => '5 Cara Merawat Kaca Mobil Agar Tetap Jernih dan Tahan Lama',
-            'excerpt' => 'Kaca mobil yang kotor dan baret bisa mengganggu visibilitas saat berkendara. Berikut tips perawatan rutin yang bisa Anda lakukan sendiri di rumah.',
+            'slug' => 'cara-membersihkan-jamur-kaca-mobil',
+            'title' => 'Cara Efektif Membersihkan Jamur Kaca Mobil Sendiri di Rumah',
+            'excerpt' => 'Jamur kaca dan kerak air sering mengganggu visibilitas saat berkendara di malam hari atau hujan deras. Simak cara aman membersihkannya tanpa merusak lapisan kaca.',
             'category' => 'Tips Perawatan',
             'date' => '2 Sep 2026',
             'readTime' => '4 menit',
-            'img' => 'https://images.unsplash.com/photo-1618934116136-16d28f184b10?w=800&h=500&fit=crop&auto=format'
+            'img' => asset('storage/articles/bersihkan-kaca-dari-jamur.png'),
         ],
         [
-            'slug' => 'kaca-film-vs-tanpa-film',
-            'title' => 'Kaca Film atau Tanpa Film? Ini Perbedaan yang Perlu Anda Tahu',
-            'excerpt' => 'Banyak pemilik kendaraan masih bingung antara manfaat kaca film dan tanpa film. Kami jelaskan keuntungan, kekurangan, dan rekomendasinya.',
-            'category' => 'Edukasi',
+            'slug' => 'panduan-merawat-kabin-dan-kaca-mobil',
+            'title' => 'Panduan Merawat Kebersihan Kabin & Kaca Mobil Agar Bebas Bau dan Lembap',
+            'excerpt' => 'Kabin yang bersih dan kaca bebas embun membuat perjalanan jauh lebih nyaman. Pelajari tips perawatan sirkulasi AC, pembersihan karpet, dan perawatan kaca film.',
+            'category' => 'Tips Perawatan',
             'date' => '28 Agu 2026',
             'readTime' => '5 menit',
-            'img' => 'https://images.unsplash.com/photo-1526459915562-c5ca724b1d02?w=800&h=500&fit=crop&auto=format'
+            'img' => asset('storage/articles/cara-merawat-kabin-mobil.png'),
         ],
         [
-            'slug' => 'tanda-kaca-harus-diganti',
-            'title' => '7 Tanda Kaca Mobil Anda Sudah Harus Diganti Sekarang',
-            'excerpt' => 'Keretakan kecil sering diabaikan, padahal bisa berkembang menjadi bahaya besar. Kenali tanda-tanda kaca yang wajib segera diganti.',
-            'category' => 'Keselamatan',
+            'slug' => 'penyebab-alarm-mobil-bunyi-terus-dan-solusinya',
+            'title' => 'Penyebab Alarm Mobil Bunyi Terus Menerus dan Cara Mengatasinya',
+            'excerpt' => 'Alarm mobil tiba-tiba berbunyi tanpa sebab di tengah malam? Kenali faktor penyebabnya mulai dari baterai remote, switch pintu, sensor getar kaca, hingga modul alarm.',
+            'category' => 'Edukasi',
             'date' => '20 Agu 2026',
-            'readTime' => '3 menit',
-            'img' => 'https://images.unsplash.com/photo-1608259243654-70c070e0f6ed?w=800&h=500&fit=crop&auto=format'
+            'readTime' => '4 menit',
+            'img' => asset('storage/articles/alarm-mobil-nyala-terus.png'),
         ],
     ];
     $articlesPreview = (isset($articles) && $articles->count() > 0)

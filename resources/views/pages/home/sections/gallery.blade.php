@@ -5,16 +5,16 @@
 
 @php
     $defaultGalleryItems = [
-        ['cat' => 'Kaca Depan', 'img' => 'https://images.unsplash.com/photo-1618934116136-16d28f184b10?w=600&auto=format'],
-        ['cat' => 'Workshop', 'img' => 'https://images.unsplash.com/photo-1708805282695-ef186db20192?w=600&auto=format'],
-        ['cat' => 'Film Kaca', 'img' => 'https://images.unsplash.com/photo-1526459915562-c5ca724b1d02?w=600&auto=format'],
-        ['cat' => 'Kaca Depan', 'img' => 'https://images.unsplash.com/photo-1608259243654-70c070e0f6ed?w=600&auto=format'],
-        ['cat' => 'Aksesoris', 'img' => 'https://images.unsplash.com/photo-1651084296894-105edab05b26?w=600&auto=format'],
-        ['cat' => 'Workshop', 'img' => 'https://images.unsplash.com/photo-1779599507365-1944b37b2980?w=600&auto=format'],
-        ['cat' => 'Film Kaca', 'img' => 'https://images.unsplash.com/photo-1764428950296-be81c8decb97?w=600&auto=format'],
-        ['cat' => 'Aksesoris', 'img' => 'https://images.unsplash.com/photo-1625047509248-ec889cbff17f?w=600&auto=format'],
-        ['cat' => 'Workshop', 'img' => 'https://images.unsplash.com/photo-1615906655593-ad0386982a0f?w=600&auto=format'],
-        ['cat' => 'Kaca Depan', 'img' => 'https://images.unsplash.com/photo-1761014586544-53fe5e1f1e25?w=600&auto=format'],
+        ['cat' => 'Kaca Depan', 'img' => asset('storage/gallery/avanza-gen-1.png')],
+        ['cat' => 'Workshop', 'img' => asset('storage/gallery/bus-aneka-bintang.png')],
+        ['cat' => 'Film Kaca', 'img' => asset('storage/gallery/brio-merah-s.png')],
+        ['cat' => 'Kaca Depan', 'img' => asset('storage/gallery/innova.png')],
+        ['cat' => 'Aksesoris', 'img' => asset('storage/gallery/granmax-belakang-4.png')],
+        ['cat' => 'Workshop', 'img' => asset('storage/gallery/hino-dutro-putih.png')],
+        ['cat' => 'Film Kaca', 'img' => asset('storage/gallery/crv-gen-3-s1.png')],
+        ['cat' => 'Kaca Depan', 'img' => asset('storage/gallery/fortuner-gen-2.png')],
+        ['cat' => 'Workshop', 'img' => asset('storage/gallery/isuzu-elf-4.png')],
+        ['cat' => 'Film Kaca', 'img' => asset('storage/gallery/bmw-e-91.png')],
     ];
     $homeGalleryItems = (isset($galleryItems) && $galleryItems->count() > 0)
         ? $galleryItems->map(fn($g) => ['cat' => $g->category?->name ?? 'Workshop', 'img' => $g->image_url])->toArray()
