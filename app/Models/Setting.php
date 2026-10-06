@@ -15,9 +15,29 @@ class Setting extends Model
         'group',
     ];
 
+    /** @var array<string, string|null>|null */
+    protected static ?array $cachedSettings = null;
+
+    public static function allKeyed(): array
+    {
+        if (static::$cachedSettings !== null) {
+            return static::$cachedSettings;
+        }
+
+        try {
+            static::$cachedSettings = static::pluck('value', 'key')->toArray();
+        } catch (\Throwable $e) {
+            static::$cachedSettings = [];
+        }
+
+        return static::$cachedSettings;
+    }
+
     public static function get(string $key, ?string $default = null): ?string
     {
-        return static::where('key', $key)->value('value') ?? $default;
+        $settings = static::allKeyed();
+
+        return $settings[$key] ?? $default;
     }
 
     public static function set(string $key, ?string $value, string $group = 'general'): void
@@ -26,6 +46,31 @@ class Setting extends Model
             ['key' => $key],
             ['value' => $value, 'group' => $group]
         );
+        static::clearCache();
+    }
+
+    public static function clearCache(): void
+    {
+        static::$cachedSettings = null;
+    }
+
+    public static function cleanWhatsapp(?string $default = '6281390288875'): string
+    {
+        $raw = static::get('whatsapp', $default) ?? $default ?? '';
+        $clean = preg_replace('/[^0-9]/', '', $raw);
+        if (str_starts_with($clean, '0')) {
+            $clean = '62'.substr($clean, 1);
+        }
+
+        return $clean ?: ($default ?? '6281390288875');
+    }
+
+    public static function whatsappUrl(string $text = '', ?string $defaultNumber = null): string
+    {
+        $number = static::cleanWhatsapp($defaultNumber);
+        $encodedText = urlencode($text);
+
+        return "https://wa.me/{$number}".($encodedText !== '' ? "?text={$encodedText}" : '');
     }
 
     public static function humanName(string $key): string
@@ -42,7 +87,7 @@ class Setting extends Model
             'facebook' => 'Halaman Facebook',
             'youtube' => 'Channel YouTube',
             'google_maps_embed' => 'Link Peta Google Maps',
-            'years_experience' => 'Lama Pengalaman Workshop',
+            'years_experience' => 'Lama Pengalaman Workshop (Beranda & Tentang)',
             default => ucwords(str_replace('_', ' ', $key)),
         };
     }
@@ -61,7 +106,7 @@ class Setting extends Model
             'facebook' => 'Tautan / link ke halaman Facebook Pelangi Glass',
             'youtube' => 'Tautan / link ke channel YouTube resmi bengkel',
             'google_maps_embed' => 'URL sematan (embed) peta lokasi workshop dari Google Maps',
-            'years_experience' => 'Lama pengalaman bengkel melayani pelanggan (contoh: 30+)',
+            'years_experience' => 'Lama pengalaman bengkel melayani pelanggan (contoh: 30+). Otomatis sinkron di halaman Beranda dan Tentang Kami.',
             default => 'Pengaturan konfigurasi website',
         };
     }

@@ -32,10 +32,11 @@ class Inquiry extends Model
     {
         $cleanPhone = preg_replace('/[^0-9]/', '', $this->phone_number);
         if (str_starts_with($cleanPhone, '0')) {
-            $cleanPhone = '62' . substr($cleanPhone, 1);
+            $cleanPhone = '62'.substr($cleanPhone, 1);
         }
 
         $greeting = urlencode("Halo {$this->name}, terima kasih telah menghubungi Pelangi Glass Purwokerto. Terkait pertanyaan Anda: \"{$this->message}\", ada yang bisa kami bantu lebih lanjut?");
+
         return "https://wa.me/{$cleanPhone}?text={$greeting}";
     }
 }

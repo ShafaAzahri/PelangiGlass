@@ -99,10 +99,11 @@ class ArticleResource extends Resource
                         Placeholder::make('current_image_preview')
                             ->label('Cover Artikel Aktif')
                             ->content(function (?Article $record): ?HtmlString {
-                                if (!$record || empty($record->image_url)) {
+                                if (! $record || empty($record->image_url)) {
                                     return null;
                                 }
                                 $url = e($record->image_url);
+
                                 return new HtmlString("
                                     <div style='display: flex; align-items: center; gap: 12px; padding: 10px; background: rgba(30, 41, 59, 0.7); border: 1px solid rgba(255, 255, 255, 0.12); border-radius: 10px; margin-bottom: 8px;'>
                                         <a href='{$url}' target='_blank' rel='noopener noreferrer' title='Klik untuk melihat cover ukuran penuh' style='display: block; cursor: pointer;'>
@@ -117,7 +118,7 @@ class ArticleResource extends Resource
                                     </div>
                                 ");
                             })
-                            ->visible(fn (?Article $record) => $record !== null && !empty($record->image_url)),
+                            ->visible(fn (?Article $record) => $record !== null && ! empty($record->image_url)),
                         FileUpload::make('featured_image')
                             ->label('Upload / Ganti Cover')
                             ->image()
@@ -129,7 +130,7 @@ class ArticleResource extends Resource
                             ->openable()
                             ->downloadable()
                             ->dehydrated(fn ($state) => filled($state))
-                            ->helperText('Format: JPG, PNG, atau WebP (Maks. 10 MB). Otomatis dioptimalkan.'),
+                            ->helperText('💡 Rekomendasi Ukuran: 1200 × 675 px atau 800 × 450 px (Rasio 16:9 Landscape). Format: JPG, PNG, atau WebP (Maks. 5 MB).'),
                         Select::make('status')
                             ->label('Status Publikasi')
                             ->options(ArticleStatus::class)
@@ -161,7 +162,7 @@ class ArticleResource extends Resource
                     ->defaultImageUrl(fn (Article $record) => $record->image_url)
                     ->action(
                         Action::make('preview_cover')
-                            ->modalHeading(fn (Article $record) => 'Preview Cover: ' . $record->title)
+                            ->modalHeading(fn (Article $record) => 'Preview Cover: '.$record->title)
                             ->modalSubmitAction(false)
                             ->modalCancelActionLabel('Tutup')
                             ->modalContent(fn (Article $record) => new HtmlString("

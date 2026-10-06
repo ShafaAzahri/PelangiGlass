@@ -25,25 +25,25 @@ class StatsOverview extends StatsOverviewWidget
         $activePromos = Promo::where('is_active', true)->count();
 
         return [
-            Stat::make('Pesan Masuk (Leads)', $newInquiries . ' Baru')
-                ->description($totalInquiries . ' total pesan masuk kontak')
+            Stat::make('Pesan Masuk (Leads)', $newInquiries.' Baru')
+                ->description($totalInquiries.' total pesan masuk kontak')
                 ->descriptionIcon('heroicon-m-envelope')
                 ->chart([2, 4, 3, 5, 4, 6, $newInquiries > 0 ? 8 : 4])
                 ->color('gray'),
 
-            Stat::make('Katalog Produk Aktif', $activeProducts . ' Produk')
-                ->description($totalCategories . ' kategori kaca mobil & film')
+            Stat::make('Katalog Produk Aktif', $activeProducts.' Produk')
+                ->description($totalCategories.' kategori kaca mobil & film')
                 ->descriptionIcon('heroicon-m-shopping-bag')
                 ->chart([3, 5, 4, 6, 7, 8])
                 ->color('gray'),
 
-            Stat::make('Layanan & Servis', $activeServices . ' Layanan')
+            Stat::make('Layanan & Servis', $activeServices.' Layanan')
                 ->description('Pemasangan kaca & kaca film')
                 ->descriptionIcon('heroicon-m-wrench-screwdriver')
                 ->chart([2, 3, 5, 5, 6, 8])
                 ->color('gray'),
 
-            Stat::make('Promo & Penawaran', $activePromos . ' Aktif')
+            Stat::make('Promo & Penawaran', $activePromos.' Aktif')
                 ->description('Diskon spesial tayang di website')
                 ->descriptionIcon('heroicon-m-sparkles')
                 ->chart([1, 2, 2, 3, 3, 3])

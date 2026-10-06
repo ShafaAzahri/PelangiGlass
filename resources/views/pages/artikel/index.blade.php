@@ -82,10 +82,12 @@
         : ['Semua', 'Tips Perawatan', 'Edukasi', 'Keselamatan', 'Panduan Produk', 'Panduan'];
 @endphp
 
-<div class="pt-[76px] md:pt-[88px]" style="background: #f8fafc; min-height: 100vh;" x-data="{
+<div class="pt-[76px] md:pt-[88px] min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 transition-colors" x-data="{
     active: 'Semua',
     categories: {{ json_encode($articleCats) }},
     articles: {{ json_encode($items) }},
+    limit: 6,
+    pageSize: 6,
     get filtered() {
         return this.active === 'Semua' ? this.articles : this.articles.filter(a => a.category === this.active);
     },
@@ -94,6 +96,21 @@
     },
     get rest() {
         return this.filtered.length > 1 ? this.filtered.slice(1) : [];
+    },
+    get visibleRest() {
+        return this.rest.slice(0, this.limit);
+    },
+    get hasMore() {
+        return this.visibleRest.length < this.rest.length;
+    },
+    loadMore() {
+        if (this.hasMore) {
+            this.limit += this.pageSize;
+        }
+    },
+    filterCategory(c) {
+        this.active = c;
+        this.limit = this.pageSize;
     },
     catStyle(cat) {
         const colors = {
@@ -111,7 +128,7 @@
         <!-- Filter (matching Artikel.tsx exactly) -->
         <div class="flex gap-2 flex-wrap mb-10">
             <template x-for="c in categories" :key="c">
-                <button @click="active = c" class="px-4 py-2 rounded-full text-xs font-medium transition-all flex items-center gap-1.5 cursor-pointer" :style="active === c ? 'background: #2563eb; color: #fff; border: 1.5px solid #2563eb;' : 'background: #ffffff; color: #64748b; border: 1.5px solid #e2e8f0;'" style="font-family: 'Plus Jakarta Sans', sans-serif;">
+                <button @click="filterCategory(c)" :class="active === c ? 'bg-blue-600 text-white border-blue-600 shadow-xs' : 'bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-300 border-slate-200 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700'" class="px-4 py-2 rounded-full text-xs font-medium transition-all flex items-center gap-1.5 cursor-pointer border" style="font-family: 'Plus Jakarta Sans', sans-serif;">
                     <template x-if="c !== 'Semua'">
                         <i data-lucide="tag" class="w-2.5 h-2.5"></i>
                     </template>
@@ -123,9 +140,9 @@
         <!-- Featured Article (matching Artikel.tsx exactly) -->
         <template x-if="featured">
             <div class="mb-6">
-                <div class="rounded-2xl overflow-hidden flex flex-col lg:flex-row transition-all duration-300 group" style="background: #ffffff; border: 1px solid #e2e8f0; box-shadow: 0 1px 4px rgba(15,23,42,0.06);" onmouseenter="this.style.boxShadow='0 8px 28px rgba(37,99,235,0.10)'; this.style.transform='translateY(-3px)'; this.style.borderColor='#bfdbfe';" onmouseleave="this.style.boxShadow='0 1px 4px rgba(15,23,42,0.06)'; this.style.transform='translateY(0)'; this.style.borderColor='#e2e8f0';">
+                <div class="rounded-2xl overflow-hidden flex flex-col lg:flex-row transition-all duration-300 group bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-xs hover:border-blue-300 dark:hover:border-blue-700">
                     <div class="overflow-hidden shrink-0 lg:w-2/5" style="min-height: 220px;">
-                        <img :src="featured.img" :alt="featured.title" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105">
+                        <img :src="featured.img" :alt="featured.title" loading="lazy" decoding="async" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105">
                     </div>
                     <div class="p-6 flex flex-col flex-1">
                         <div class="flex items-center gap-2 mb-3 flex-wrap">
@@ -134,8 +151,8 @@
                                 <i data-lucide="clock" class="w-3 h-3"></i> <span x-text="featured.readTime"></span>
                             </span>
                         </div>
-                        <h3 class="font-bold mb-2 leading-snug text-lg" style="font-family: 'Plus Jakarta Sans', sans-serif; color: #0f172a;" x-text="featured.title"></h3>
-                        <p class="text-xs leading-relaxed flex-1 mb-4" style="color: #64748b; font-family: 'Plus Jakarta Sans', sans-serif;" x-text="featured.excerpt"></p>
+                        <h3 class="font-bold mb-2 leading-snug text-lg text-slate-900 dark:text-slate-100" style="font-family: 'Plus Jakarta Sans', sans-serif;" x-text="featured.title"></h3>
+                        <p class="text-xs leading-relaxed flex-1 mb-4 text-slate-600 dark:text-slate-400" style="font-family: 'Plus Jakarta Sans', sans-serif;" x-text="featured.excerpt"></p>
                         <div class="flex items-center justify-between">
                             <span class="text-xs" style="color: #94a3b8; font-family: 'Plus Jakarta Sans', sans-serif;" x-text="featured.date"></span>
                             <a :href="'/artikel/' + featured.slug" class="flex items-center gap-1 text-xs font-semibold transition-all hover:opacity-70 no-underline" style="color: #2563eb; font-family: 'Plus Jakarta Sans', sans-serif;">
@@ -148,11 +165,11 @@
         </template>
 
         <!-- Grid of Remaining Articles -->
-        <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-5" x-show="rest.length > 0">
-            <template x-for="artikel in rest" :key="artikel.id">
-                <div class="rounded-2xl overflow-hidden flex flex-col transition-all duration-300 group" style="background: #ffffff; border: 1px solid #e2e8f0; box-shadow: 0 1px 4px rgba(15,23,42,0.06);" onmouseenter="this.style.boxShadow='0 8px 28px rgba(37,99,235,0.10)'; this.style.transform='translateY(-3px)'; this.style.borderColor='#bfdbfe';" onmouseleave="this.style.boxShadow='0 1px 4px rgba(15,23,42,0.06)'; this.style.transform='translateY(0)'; this.style.borderColor='#e2e8f0';">
+        <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-5" x-show="visibleRest.length > 0">
+            <template x-for="artikel in visibleRest" :key="artikel.id">
+                <div class="rounded-2xl overflow-hidden flex flex-col transition-all duration-300 group bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-xs hover:border-blue-300 dark:hover:border-blue-700">
                     <div class="overflow-hidden shrink-0" style="height: 200px;">
-                        <img :src="artikel.img" :alt="artikel.title" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105">
+                        <img :src="artikel.img" :alt="artikel.title" loading="lazy" decoding="async" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105">
                     </div>
                     <div class="p-6 flex flex-col flex-1">
                         <div class="flex items-center gap-2 mb-3 flex-wrap">
@@ -161,8 +178,8 @@
                                 <i data-lucide="clock" class="w-3 h-3"></i> <span x-text="artikel.readTime"></span>
                             </span>
                         </div>
-                        <h3 class="font-bold mb-2 leading-snug text-sm" style="font-family: 'Plus Jakarta Sans', sans-serif; color: #0f172a;" x-text="artikel.title"></h3>
-                        <p class="text-xs leading-relaxed flex-1 mb-4" style="color: #64748b; font-family: 'Plus Jakarta Sans', sans-serif;" x-text="artikel.excerpt"></p>
+                        <h3 class="font-bold mb-2 leading-snug text-sm text-slate-900 dark:text-slate-100" style="font-family: 'Plus Jakarta Sans', sans-serif;" x-text="artikel.title"></h3>
+                        <p class="text-xs leading-relaxed flex-1 mb-4 text-slate-600 dark:text-slate-400" style="font-family: 'Plus Jakarta Sans', sans-serif;" x-text="artikel.excerpt"></p>
                         <div class="flex items-center justify-between">
                             <span class="text-xs" style="color: #94a3b8; font-family: 'Plus Jakarta Sans', sans-serif;" x-text="artikel.date"></span>
                             <a :href="'/artikel/' + artikel.slug" class="flex items-center gap-1 text-xs font-semibold transition-all hover:opacity-70 no-underline" style="color: #2563eb; font-family: 'Plus Jakarta Sans', sans-serif;">
@@ -172,6 +189,14 @@
                     </div>
                 </div>
             </template>
+        </div>
+
+        <!-- Lazy Loading Sentinel (x-intersect) -->
+        <div x-show="hasMore" x-intersect.margin.200px="loadMore()" class="py-8 text-center">
+            <button @click="loadMore()" type="button" class="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 text-xs font-semibold shadow-xs transition active:scale-95 cursor-pointer" style="font-family: 'Plus Jakarta Sans', sans-serif;">
+                <i data-lucide="arrow-down" class="w-3.5 h-3.5"></i>
+                <span>Tampilkan Lebih Banyak Artikel</span>
+            </button>
         </div>
     </div>
 </div>

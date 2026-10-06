@@ -9,7 +9,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class HeroBanner extends Model
 {
-    use HasFactory, HasAutoCleanupFiles, LogsActivity;
+    use HasAutoCleanupFiles, HasFactory, LogsActivity;
 
     protected string $activitySubjectName = 'Banner Beranda';
 
@@ -41,7 +41,7 @@ class HeroBanner extends Model
     public function getImageUrlAttribute(): string
     {
         if (empty($this->image_path)) {
-            return asset('banner1.png');
+            return asset('images/banner1.png');
         }
 
         if (str_starts_with($this->image_path, 'http://') || str_starts_with($this->image_path, 'https://')) {
@@ -50,14 +50,14 @@ class HeroBanner extends Model
 
         $cleanPath = ltrim($this->image_path, '/');
 
-        if (file_exists(public_path('storage/' . $cleanPath))) {
-            return asset('storage/' . $cleanPath);
+        if (file_exists(public_path('storage/'.$cleanPath))) {
+            return asset('storage/'.$cleanPath);
         }
 
         if (file_exists(public_path($cleanPath))) {
             return asset($cleanPath);
         }
 
-        return asset('storage/' . $cleanPath);
+        return asset('storage/'.$cleanPath);
     }
 }

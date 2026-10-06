@@ -15,12 +15,12 @@ class ImageOptimizerService
      */
     public static function convertToWebP(string $absolutePath, int $maxWidth = 1600, int $maxHeight = 1600, int $quality = 82): ?string
     {
-        if (!file_exists($absolutePath) || is_dir($absolutePath)) {
+        if (! file_exists($absolutePath) || is_dir($absolutePath)) {
             return null;
         }
 
         $mime = @mime_content_type($absolutePath);
-        if (!$mime || !str_starts_with($mime, 'image/')) {
+        if (! $mime || ! str_starts_with($mime, 'image/')) {
             return null;
         }
 
@@ -30,7 +30,7 @@ class ImageOptimizerService
 
         $dir = dirname($absolutePath);
         $filenameWithoutExt = pathinfo($absolutePath, PATHINFO_FILENAME);
-        $newWebpPath = $dir . DIRECTORY_SEPARATOR . $filenameWithoutExt . '.webp';
+        $newWebpPath = $dir.DIRECTORY_SEPARATOR.$filenameWithoutExt.'.webp';
 
         $pythonScript = <<<'PYTHON'
 import sys, os
@@ -73,7 +73,7 @@ except Exception as e:
     sys.exit(1)
 PYTHON;
 
-        $tempFile = tempnam(sys_get_temp_dir(), 'imgwebp_') . '.py';
+        $tempFile = tempnam(sys_get_temp_dir(), 'imgwebp_').'.py';
         file_put_contents($tempFile, $pythonScript);
 
         $escapedSrc = escapeshellarg($absolutePath);
@@ -83,8 +83,9 @@ PYTHON;
         exec($cmd, $output, $exitCode);
         @unlink($tempFile);
 
-        if ($exitCode !== 0 || !file_exists($newWebpPath)) {
-            Log::warning('WebP conversion failed for ' . $absolutePath . ': ' . implode("\n", $output));
+        if ($exitCode !== 0 || ! file_exists($newWebpPath)) {
+            Log::warning('WebP conversion failed for '.$absolutePath.': '.implode("\n", $output));
+
             return null;
         }
 

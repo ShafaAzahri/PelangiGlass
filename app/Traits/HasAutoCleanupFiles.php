@@ -23,7 +23,7 @@ trait HasAutoCleanupFiles
                             static::deleteStoredFile($file);
                         }
                     } else {
-                        if (!empty($original) && $original !== $current) {
+                        if (! empty($original) && $original !== $current) {
                             static::deleteStoredFile($original);
                         }
                     }
@@ -57,7 +57,7 @@ trait HasAutoCleanupFiles
                         }
                         $model->setAttribute($field, $converted);
                     } else {
-                        if (!empty($value)) {
+                        if (! empty($value)) {
                             $model->setAttribute($field, static::processStoredFileToWebP($value));
                         }
                     }
@@ -89,7 +89,7 @@ trait HasAutoCleanupFiles
                 'logo.png',
             ]);
 
-            if (!$isRootDefault) {
+            if (! $isRootDefault) {
                 $disk->delete($cleanPath);
             }
         }
@@ -122,7 +122,8 @@ trait HasAutoCleanupFiles
             if ($newFullPath) {
                 $dir = dirname($cleanPath);
                 $newFilename = basename($newFullPath);
-                return ($dir !== '.' ? $dir . '/' : '') . $newFilename;
+
+                return ($dir !== '.' ? $dir.'/' : '').$newFilename;
             }
         }
 

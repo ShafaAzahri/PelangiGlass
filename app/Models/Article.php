@@ -11,7 +11,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Article extends Model
 {
-    use HasFactory, SoftDeletes, HasAutoCleanupFiles;
+    use HasAutoCleanupFiles, HasFactory, SoftDeletes;
 
     protected array $fileFields = ['featured_image'];
 
@@ -52,15 +52,15 @@ class Article extends Model
     public function scopePublished($query)
     {
         return $query->where('status', ArticleStatus::PUBLISHED)
-                     ->whereNotNull('published_at')
-                     ->where('published_at', '<=', now())
-                     ->orderByDesc('published_at');
+            ->whereNotNull('published_at')
+            ->where('published_at', '<=', now())
+            ->orderByDesc('published_at');
     }
 
     public function getImageUrlAttribute(): string
     {
         if (empty($this->featured_image)) {
-            return asset('banner-workshop.jpg');
+            return asset('images/banner1.png');
         }
 
         if (str_starts_with($this->featured_image, 'http://') || str_starts_with($this->featured_image, 'https://')) {
@@ -69,14 +69,14 @@ class Article extends Model
 
         $cleanPath = ltrim($this->featured_image, '/');
 
-        if (file_exists(public_path('storage/' . $cleanPath))) {
-            return asset('storage/' . $cleanPath);
+        if (file_exists(public_path('storage/'.$cleanPath))) {
+            return asset('storage/'.$cleanPath);
         }
 
         if (file_exists(public_path($cleanPath))) {
             return asset($cleanPath);
         }
 
-        return asset('storage/' . $cleanPath);
+        return asset('storage/'.$cleanPath);
     }
 }

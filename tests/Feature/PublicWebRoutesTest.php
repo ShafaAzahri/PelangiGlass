@@ -3,10 +3,10 @@
 namespace Tests\Feature;
 
 use App\Enums\InquiryStatus;
-use App\Models\Inquiry;
+use App\Models\Article;
 use App\Models\Product;
 use App\Models\Service;
-use App\Models\Article;
+use App\Models\Setting;
 use Tests\TestCase;
 
 class PublicWebRoutesTest extends TestCase
@@ -106,6 +106,7 @@ class PublicWebRoutesTest extends TestCase
 
         $response->assertStatus(404);
     }
+
     public function test_promo_page_renders_successfully(): void
     {
         $response = $this->get('/promo');
@@ -130,7 +131,6 @@ class PublicWebRoutesTest extends TestCase
 
         $response->assertStatus(404);
     }
-
 
     public function test_inquiry_submission_validates_required_fields(): void
     {
@@ -197,5 +197,71 @@ class PublicWebRoutesTest extends TestCase
         // 6th request within the same minute must be throttled with HTTP 429
         $response = $this->post('/kontak', $payload);
         $response->assertStatus(429);
+    }
+
+    public function test_layout_includes_turbo_and_alpine_intersect_plugins(): void
+    {
+        $response = $this->get('/');
+        $response->assertStatus(200);
+        $response->assertSee('@alpinejs/intersect', false);
+        $response->assertSee('@hotwired/turbo', false);
+    }
+
+    public function test_catalogs_render_incremental_lazy_loading_and_image_lazy_load(): void
+    {
+        $productResponse = $this->get('/produk');
+        $productResponse->assertStatus(200);
+        $productResponse->assertSee('x-intersect', false);
+        $productResponse->assertSee('loading="lazy"', false);
+
+        $serviceResponse = $this->get('/servis');
+        $serviceResponse->assertStatus(200);
+        $serviceResponse->assertSee('x-intersect', false);
+        $serviceResponse->assertSee('loading="lazy"', false);
+    }
+
+    public function test_setting_caching_and_whatsapp_helpers_work_correctly(): void
+    {
+        Setting::clearCache();
+        $cached = Setting::allKeyed();
+        $this->assertIsArray($cached);
+
+        $cleanWa = Setting::cleanWhatsapp();
+        $this->assertStringStartsWith('62', $cleanWa);
+
+        $waUrl = Setting::whatsappUrl('Test Message');
+        $this->assertStringContainsString('https://wa.me/', $waUrl);
+        $this->assertStringContainsString('text=Test+Message', $waUrl);
+    }
+
+    public function test_home_page_renders_clickable_banners(): void
+    {
+        $response = $this->get('/');
+        $response->assertStatus(200);
+        // Banner link should be present on home page
+        $response->assertSee('href="/servis"', false);
+    }
+
+    public function test_layout_includes_dark_mode_anti_fouc_and_toggle_switch(): void
+    {
+        $response = $this->get('/');
+        $response->assertStatus(200);
+        // Anti-FOUC theme script
+        $response->assertSee('localStorage.getItem(\'theme\')', false);
+        // Theme toggle button
+        $response->assertSee('aria-label="Toggle theme"', false);
+    }
+
+    public function test_years_experience_synchronizes_between_home_and_about_pages(): void
+    {
+        Setting::set('years_experience', '30+', 'general');
+
+        $homeRes = $this->get('/');
+        $homeRes->assertStatus(200);
+        $homeRes->assertSee('30+');
+
+        $aboutRes = $this->get('/tentang');
+        $aboutRes->assertStatus(200);
+        $aboutRes->assertSee('30+');
     }
 }

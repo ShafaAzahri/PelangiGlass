@@ -12,6 +12,7 @@ use Filament\Notifications\Notification;
 use Filament\Resources\Pages\ListRecords;
 use Filament\Support\Icons\Heroicon;
 use Illuminate\Support\HtmlString;
+
 class ListProducts extends ListRecords
 {
     protected static string $resource = ProductResource::class;
@@ -22,6 +23,7 @@ class ListProducts extends ListRecords
     {
         return 'Daftar seluruh produk kaca mobil original OEM, kaca film tolak panas, dan perlengkapan aksesoris resmi.';
     }
+
     protected function getHeaderActions(): array
     {
         return [
@@ -61,9 +63,9 @@ class ListProducts extends ListRecords
                         ->helperText('Pastikan baris pertama berisi nama kolom seperti pada contoh template (Maks. 5 MB).'),
                 ])
                 ->action(function (array $data): void {
-                    $path = storage_path('app/' . $data['file']);
-                    if (!file_exists($path)) {
-                        $path = storage_path('app/private/' . $data['file']);
+                    $path = storage_path('app/'.$data['file']);
+                    if (! file_exists($path)) {
+                        $path = storage_path('app/private/'.$data['file']);
                     }
                     $count = DataImportService::importProducts($path);
                     @unlink($path);

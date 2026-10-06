@@ -37,7 +37,9 @@ trait LogsActivity
 
             $old = [];
             foreach ($changes as $key => $newValue) {
-                if (in_array($key, ['password', 'remember_token'])) continue;
+                if (in_array($key, ['password', 'remember_token'])) {
+                    continue;
+                }
                 $old[$key] = $model->getOriginal($key);
             }
 
@@ -77,7 +79,7 @@ trait LogsActivity
             ?? $this->title
             ?? $this->question
             ?? $this->key
-            ?? ('#' . $this->getKey());
+            ?? ('#'.$this->getKey());
     }
 
     public function getActivityLogSubjectName(): string

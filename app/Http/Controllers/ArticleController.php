@@ -25,7 +25,7 @@ class ArticleController extends Controller
             $search = $request->q;
             $query->where(function ($q) use ($search) {
                 $q->where('title', 'ilike', "%{$search}%")
-                  ->orWhere('excerpt', 'ilike', "%{$search}%");
+                    ->orWhere('excerpt', 'ilike', "%{$search}%");
             });
         }
 

@@ -12,6 +12,7 @@ use Filament\Notifications\Notification;
 use Filament\Resources\Pages\ListRecords;
 use Filament\Support\Icons\Heroicon;
 use Illuminate\Support\HtmlString;
+
 class ListServices extends ListRecords
 {
     protected static string $resource = ServiceResource::class;
@@ -55,9 +56,9 @@ class ListServices extends ListRecords
                         ->helperText('Pastikan baris pertama berisi nama kolom seperti pada contoh template (Maks. 5 MB).'),
                 ])
                 ->action(function (array $data): void {
-                    $path = storage_path('app/' . $data['file']);
-                    if (!file_exists($path)) {
-                        $path = storage_path('app/private/' . $data['file']);
+                    $path = storage_path('app/'.$data['file']);
+                    if (! file_exists($path)) {
+                        $path = storage_path('app/private/'.$data['file']);
                     }
                     $count = DataImportService::importServices($path);
                     @unlink($path);

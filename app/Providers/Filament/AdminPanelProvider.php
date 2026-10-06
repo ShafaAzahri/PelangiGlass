@@ -57,6 +57,7 @@ class AdminPanelProvider extends PanelProvider
                 'Artikel & Tips',
                 'Galeri',
                 'Interaksi Pelanggan',
+                'Manajemen Konten',
                 'Pengaturan Sistem',
             ])
             ->discoverResources(in: app_path('Filament/Resources'), for: 'App\Filament\Resources')

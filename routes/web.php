@@ -9,6 +9,7 @@ use App\Http\Controllers\PromoController;
 use App\Http\Controllers\ServiceController;
 use App\Services\DataImportService;
 use Illuminate\Support\Facades\Route;
+
 Route::get('/', [HomeController::class, 'index'])->name('home');
 Route::get('/tentang', [AboutController::class, 'index'])->name('about');
 Route::get('/produk', [ProductController::class, 'index'])->name('products.index');

@@ -111,11 +111,13 @@
         : ['Semua', 'Ganti Kaca', 'Kaca Film', 'Perbaikan Kaca', 'Aksesoris & Perawatan'];
 @endphp
 
-<div class="min-h-screen pt-[76px] md:pt-[88px] bg-slate-50 text-slate-900" x-data="{
+<div class="min-h-screen pt-[76px] md:pt-[88px] bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 transition-colors" x-data="{
     active: 'Semua',
     search: '',
     categories: {{ json_encode($serviceCats) }},
     services: {{ json_encode($items) }},
+    limit: 8,
+    pageSize: 8,
     get filtered() {
         return this.services.filter(s => {
             const matchCat = this.active === 'Semua' || s.category === this.active;
@@ -125,11 +127,26 @@
             return matchCat && matchSearch;
         });
     },
-    badgeStyle(badge) {
-        if (badge === 'Premium') return 'background: #fef3c7; color: #92400e; border: 1px solid #fde68a;';
-        if (badge === 'Baru' || badge === 'Bergaransi') return 'background: #eff6ff; color: #1d4ed8; border: 1px solid #bfdbfe;';
-        if (badge === 'Hemat') return 'background: #f0fdf4; color: #166534; border: 1px solid #bbf7d0;';
-        return 'background: #fef2f2; color: #b91c1c; border: 1px solid #fecaca;';
+    get visibleServices() {
+        return this.filtered.slice(0, this.limit);
+    },
+    get hasMore() {
+        return this.visibleServices.length < this.filtered.length;
+    },
+    loadMore() {
+        if (this.hasMore) {
+            this.limit += this.pageSize;
+        }
+    },
+    filterCategory(c) {
+        this.active = c;
+        this.limit = this.pageSize;
+    },
+    badgeTheme(badge) {
+        if (badge === 'Premium') return 'bg-gradient-to-r from-amber-600 via-amber-500 to-yellow-500 shadow-amber-950/20';
+        if (badge === 'Baru') return 'bg-gradient-to-r from-blue-600 to-sky-500 shadow-blue-950/20';
+        if (badge === 'Hemat' || badge === 'Bergaransi') return 'bg-gradient-to-r from-emerald-600 to-teal-500 shadow-emerald-950/20';
+        return 'bg-gradient-to-r from-red-600 to-rose-600 shadow-rose-950/20';
     }
 }">
     <div class="max-w-6xl mx-auto px-6 py-12">
@@ -137,11 +154,11 @@
         <div class="flex flex-col sm:flex-row gap-4 mb-10">
             <div class="relative flex-1 max-w-xs">
                 <i data-lucide="search" class="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"></i>
-                <input type="text" placeholder="Cari servis / layanan..." x-model="search" class="w-full pl-9 pr-4 py-2.5 rounded-xl text-sm outline-none transition-all bg-white border border-slate-200 text-slate-900 placeholder:text-slate-400 focus:border-blue-600" style="font-family: 'Plus Jakarta Sans', sans-serif;">
+                <input type="text" placeholder="Cari servis / layanan..." x-model="search" @input="limit = pageSize" class="w-full pl-9 pr-4 py-2.5 rounded-xl text-sm outline-none transition-all bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-900 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:border-blue-600 dark:focus:border-blue-500" style="font-family: 'Plus Jakarta Sans', sans-serif;">
             </div>
             <div class="flex gap-2 flex-wrap">
                 <template x-for="c in categories" :key="c">
-                    <button @click="active = c" :class="active === c ? 'bg-blue-600 text-white border border-blue-600 shadow-xs' : 'bg-white text-slate-600 border border-slate-200 hover:border-slate-300'" class="px-4 py-2 rounded-full text-xs font-medium transition-all cursor-pointer" style="font-family: 'Plus Jakarta Sans', sans-serif;" x-text="c"></button>
+                    <button @click="filterCategory(c)" :class="active === c ? 'bg-blue-600 text-white border border-blue-600 shadow-xs' : 'bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700'" class="px-4 py-2 rounded-full text-xs font-medium transition-all cursor-pointer" style="font-family: 'Plus Jakarta Sans', sans-serif;" x-text="c"></button>
                 </template>
             </div>
         </div>
@@ -154,36 +171,40 @@
         </template>
 
         <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-5 items-stretch" x-show="filtered.length > 0">
-            <template x-for="service in filtered" :key="service.id">
-                <div class="rounded-2xl overflow-hidden transition-all duration-300 group flex flex-col h-full bg-white border border-slate-200 shadow-xs hover:border-blue-300 hover:-translate-y-1 hover:shadow-md">
+            <template x-for="service in visibleServices" :key="service.id">
+                <div class="rounded-2xl overflow-hidden transition-all duration-300 group flex flex-col h-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-xs hover:border-blue-300 dark:hover:border-blue-700 hover:-translate-y-1 hover:shadow-md">
                     <a :href="'/servis/' + (service.slug || service.id)" class="relative overflow-hidden block shrink-0" style="height: 180px;">
-                        <img :src="service.img" :alt="service.name" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105">
+                        <img :src="service.img" :alt="service.name" loading="lazy" decoding="async" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105">
                         <template x-if="service.badge">
-                            <span class="absolute top-3 left-3 text-xs px-2.5 py-1 rounded-full font-semibold shadow-xs" :style="badgeStyle(service.badge)" style="font-family: 'Plus Jakarta Sans', sans-serif;" x-text="service.badge"></span>
+                            <div class="absolute top-0 left-0 z-10">
+                                <span class="inline-flex items-center gap-1 px-2.5 py-1 text-[10.5px] font-extrabold uppercase tracking-wider text-white shadow-md rounded-br-xl select-none"
+                                      :class="badgeTheme(service.badge)"
+                                      style="font-family: 'Plus Jakarta Sans', sans-serif;">
+                                    <template x-if="service.badge === 'Terlaris'">
+                                        <svg class="w-3 h-3 fill-current text-white/95" viewBox="0 0 24 24"><path d="M12 2c.5 3 2 4.5 4 6 2.5 1.8 4 4.5 4 8a8 8 0 1 1-16 0c0-3.5 2-6.5 4.5-8.5C9.5 6 11 4.5 12 2z"/></svg>
+                                    </template>
+                                    <template x-if="service.badge === 'Premium'">
+                                        <svg class="w-3 h-3 fill-current text-white/95" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                                    </template>
+                                    <template x-if="service.badge === 'Baru'">
+                                        <svg class="w-3 h-3 text-white/95" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/></svg>
+                                    </template>
+                                    <template x-if="service.badge === 'Bergaransi' || service.badge === 'Hemat'">
+                                        <svg class="w-3 h-3 text-white/95" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
+                                    </template>
+                                    <span x-text="service.badge"></span>
+                                </span>
+                            </div>
                         </template>
                     </a>
                     <div class="p-5 flex flex-col flex-1">
                         <div class="text-xs font-medium mb-1 text-blue-600" style="font-family: 'Plus Jakarta Sans', sans-serif;" x-text="service.category"></div>
-                        <a :href="'/servis/' + (service.slug || service.id)" class="no-underline text-slate-900 group-hover:text-blue-600 transition">
-                            <h3 class="font-bold text-slate-900 group-hover:text-blue-600 transition text-[0.95rem] leading-snug line-clamp-2 mb-1.5" style="font-family: 'Plus Jakarta Sans', sans-serif;" x-text="service.name"></h3>
+                        <a :href="'/servis/' + (service.slug || service.id)" class="no-underline text-slate-900 dark:text-slate-100 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition">
+                            <h3 class="font-bold text-slate-900 dark:text-slate-100 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition text-[0.95rem] leading-snug line-clamp-2 mb-2" style="font-family: 'Plus Jakarta Sans', sans-serif;" x-text="service.name"></h3>
                         </a>
-                        <div class="flex items-center gap-1.5 flex-wrap mb-2 text-[11px] font-semibold text-slate-500" style="font-family: 'Plus Jakarta Sans', sans-serif;">
-                            <template x-if="service.warranty_period">
-                                <span class="px-2 py-0.5 rounded-md bg-emerald-50 text-emerald-700 border border-emerald-200 flex items-center gap-1">
-                                    ✓ <span x-text="service.warranty_period"></span>
-                                </span>
-                            </template>
-                            <template x-if="service.estimated_duration">
-                                <span class="px-2 py-0.5 rounded-md bg-slate-100 text-slate-600 flex items-center gap-1">
-                                    ⏱ <span x-text="service.estimated_duration"></span>
-                                </span>
-                            </template>
-                        </div>
-                        <p class="text-xs leading-relaxed text-slate-500 line-clamp-2 text-justify mb-3.5" style="font-family: 'Plus Jakarta Sans', sans-serif;" x-text="service.desc"></p>
-                        <a :href="'https://wa.me/6281390288875?text=' + encodeURIComponent('Halo Pelangi Glass, saya ingin konsultasi layanan ' + service.name)" target="_blank" rel="noopener noreferrer" class="mt-auto w-full flex items-center justify-center gap-1.5 py-2.5 rounded-xl text-xs font-semibold text-white transition-all hover:opacity-90 bg-blue-700 hover:bg-blue-800 no-underline shadow-xs hover:scale-[1.02] active:scale-95" style="font-family: 'Plus Jakarta Sans', sans-serif;">
-                            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
-                                <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
-                            </svg>
+                        <p class="text-xs leading-relaxed text-slate-500 dark:text-slate-400 line-clamp-3 text-justify mb-4" style="font-family: 'Plus Jakarta Sans', sans-serif;" x-text="service.desc"></p>
+                        <a :href="'https://wa.me/{{ \App\Models\Setting::cleanWhatsapp() }}?text=' + encodeURIComponent('Halo Pelangi Glass, saya ingin konsultasi layanan ' + service.name)" target="_blank" rel="noopener noreferrer" class="mt-auto w-full flex items-center justify-center gap-1.5 py-2.5 rounded-xl text-xs font-semibold text-white transition-all hover:opacity-90 bg-blue-700 hover:bg-blue-800 no-underline shadow-xs hover:scale-[1.02] active:scale-95" style="font-family: 'Plus Jakarta Sans', sans-serif;">
+                            <x-icons.whatsapp class="w-3.5 h-3.5 shrink-0" />
                             <span>Hubungi Kami</span>
                         </a>
                     </div>
@@ -191,17 +212,20 @@
             </template>
         </div>
 
+        <!-- Lazy Loading Sentinel (x-intersect) -->
+        <div x-show="hasMore" x-intersect.margin.200px="loadMore()" class="py-8 text-center">
+            <button @click="loadMore()" type="button" class="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 text-xs font-semibold shadow-xs transition active:scale-95 cursor-pointer" style="font-family: 'Plus Jakarta Sans', sans-serif;">
+                <i data-lucide="arrow-down" class="w-3.5 h-3.5"></i>
+                <span>Tampilkan Lebih Banyak Layanan</span>
+            </button>
+        </div>
+
         <!-- Bottom CTA Card -->
-        <div class="mt-12 rounded-2xl p-8 text-center bg-white border border-slate-200">
-            <p class="text-sm mb-4 text-slate-600" style="font-family: 'Plus Jakarta Sans', sans-serif;">
-                Layanan yang Anda butuhkan tidak ada di daftar? Hubungi kami, kami siap memberikan konsultasi gratis.
-            </p>
-            <a href="https://wa.me/6281390288875?text={{ urlencode('Halo Pelangi Glass, layanan yang saya butuhkan tidak ada di daftar. Saya ingin konsultasi gratis.') }}" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-2.5 px-6 py-3 rounded-full text-sm font-semibold text-white transition-all hover:opacity-90 bg-blue-700 hover:bg-blue-800 no-underline shadow-md hover:scale-105 active:scale-95" style="font-family: 'Plus Jakarta Sans', sans-serif;">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
-                </svg>
-                <span>Hubungi Kami</span>
-            </a>
+        <x-cta-card
+            message="Layanan yang Anda butuhkan tidak ada di daftar? Hubungi kami, kami siap memberikan konsultasi gratis."
+            button-label="Hubungi Kami"
+            whatsapp-text="Halo Pelangi Glass, layanan yang saya butuhkan tidak ada di daftar. Saya ingin konsultasi gratis."
+        />
     </div>
 </div>
 

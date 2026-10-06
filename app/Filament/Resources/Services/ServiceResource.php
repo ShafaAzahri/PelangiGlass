@@ -13,7 +13,6 @@ use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ForceDeleteBulkAction;
-use Filament\Actions\ReplicateAction;
 use Filament\Actions\RestoreBulkAction;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Placeholder;
@@ -117,6 +116,7 @@ class ServiceResource extends Resource
                                     return null;
                                 }
                                 $url = e($record->image_url);
+
                                 return new HtmlString("
                                     <div style='display: flex; align-items: center; gap: 12px; padding: 10px; background: rgba(30, 41, 59, 0.7); border: 1px solid rgba(255, 255, 255, 0.12); border-radius: 10px; margin-bottom: 8px;'>
                                         <a href='{$url}' target='_blank' rel='noopener noreferrer' title='Klik untuk melihat foto ukuran penuh' style='display: block; cursor: pointer;'>
@@ -131,7 +131,7 @@ class ServiceResource extends Resource
                                     </div>
                                 ");
                             })
-                            ->visible(fn (?Service $record) => $record !== null && !empty($record->image_url)),
+                            ->visible(fn (?Service $record) => $record !== null && ! empty($record->image_url)),
                         FileUpload::make('image_path')
                             ->label('Upload / Ganti Foto')
                             ->image()
@@ -143,7 +143,7 @@ class ServiceResource extends Resource
                             ->openable()
                             ->downloadable()
                             ->dehydrated(fn ($state) => filled($state))
-                            ->helperText('Format: JPG, PNG, atau WebP (Maks. 10 MB). Otomatis dioptimalkan.'),
+                            ->helperText('💡 Rekomendasi Ukuran: 800 × 600 px (Rasio 4:3). Format: JPG, PNG, atau WebP (Maks. 5 MB). Otomatis dioptimalkan.'),
                         Toggle::make('is_featured')
                             ->label('Layanan Unggulan (Beranda)')
                             ->default(false),
@@ -173,7 +173,7 @@ class ServiceResource extends Resource
                     ->defaultImageUrl(fn (Service $record) => $record->image_url)
                     ->action(
                         Action::make('preview_image')
-                            ->modalHeading(fn (Service $record) => 'Preview Foto: ' . $record->name)
+                            ->modalHeading(fn (Service $record) => 'Preview Foto: '.$record->name)
                             ->modalSubmitAction(false)
                             ->modalCancelActionLabel('Tutup')
                             ->modalContent(fn (Service $record) => new HtmlString("

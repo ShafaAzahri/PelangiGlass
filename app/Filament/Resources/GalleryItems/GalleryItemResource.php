@@ -32,6 +32,7 @@ use Illuminate\Support\HtmlString;
 class GalleryItemResource extends Resource
 {
     protected static ?string $model = GalleryItem::class;
+
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedPhoto;
 
     protected static string|\UnitEnum|null $navigationGroup = 'Galeri';
@@ -90,6 +91,7 @@ class GalleryItemResource extends Resource
                                     return null;
                                 }
                                 $url = e($record->image_url);
+
                                 return new HtmlString("
                                     <div style='display: flex; align-items: center; gap: 12px; padding: 10px; background: rgba(30, 41, 59, 0.7); border: 1px solid rgba(255, 255, 255, 0.12); border-radius: 10px; margin-bottom: 8px;'>
                                         <a href='{$url}' target='_blank' rel='noopener noreferrer' title='Klik untuk melihat foto ukuran penuh' style='display: block; cursor: pointer;'>
@@ -104,7 +106,7 @@ class GalleryItemResource extends Resource
                                     </div>
                                 ");
                             })
-                            ->visible(fn (?GalleryItem $record) => $record !== null && !empty($record->image_url)),
+                            ->visible(fn (?GalleryItem $record) => $record !== null && ! empty($record->image_url)),
                         FileUpload::make('image_path')
                             ->label('Upload / Ganti Foto')
                             ->image()
@@ -117,7 +119,7 @@ class GalleryItemResource extends Resource
                             ->downloadable()
                             ->required(fn (string $operation, ?GalleryItem $record) => $operation === 'create' && empty($record?->image_path))
                             ->dehydrated(fn ($state) => filled($state))
-                            ->helperText('Format: JPG, PNG, atau WebP (Maks. 10 MB). Otomatis dioptimalkan.'),
+                            ->helperText('💡 Rekomendasi Ukuran: 600 × 800 px atau 900 × 1200 px (Rasio 3:4 Vertikal/Potret Carousel). Format: JPG, PNG, atau WebP (Maks. 5 MB).'),
                         Grid::make(2)->schema([
                             Toggle::make('is_active')
                                 ->label('Aktif di Web')
@@ -148,7 +150,7 @@ class GalleryItemResource extends Resource
                     ->defaultImageUrl(fn (GalleryItem $record) => $record->image_url)
                     ->action(
                         Action::make('preview_foto')
-                            ->modalHeading(fn (GalleryItem $record) => 'Preview Foto: ' . $record->title)
+                            ->modalHeading(fn (GalleryItem $record) => 'Preview Foto: '.$record->title)
                             ->modalSubmitAction(false)
                             ->modalCancelActionLabel('Tutup')
                             ->modalContent(fn (GalleryItem $record) => new HtmlString("

@@ -13,6 +13,7 @@ use App\Models\GalleryItem;
 use App\Models\HeroBanner;
 use App\Models\Product;
 use App\Models\ProductCategory;
+use App\Models\Promo;
 use App\Models\Service;
 use App\Models\ServiceCategory;
 use App\Models\Setting;
@@ -427,7 +428,7 @@ class DatabaseSeeder extends Seeder
                 'title' => $gi['title'],
                 'car_model' => $gi['car'],
                 'image_path' => $gi['img'],
-                'description' => "Dokumentasi pengerjaan presisi di workshop Pelangi Glass Purwokerto.",
+                'description' => 'Dokumentasi pengerjaan presisi di workshop Pelangi Glass Purwokerto.',
                 'sort_order' => $idx + 1,
                 'is_active' => true,
             ]);
@@ -520,6 +521,83 @@ class DatabaseSeeder extends Seeder
                 'sort_order' => $idx + 1,
                 'is_active' => true,
             ]);
+        }
+
+        // Promos Seeding
+        $promosData = [
+            [
+                'name' => 'Diskon Kaca Film V-KOOL & 3M',
+                'slug' => 'promo-kaca-film-v-kool-3m',
+                'category' => 'Kaca Film',
+                'desc' => 'Diskon hingga 25% paket full body kaca film premium anti panas UV bergaransi 5 tahun.',
+                'img' => 'https://images.unsplash.com/photo-1526459915562-c5ca724b1d02?w=400&h=300&fit=crop&auto=format',
+                'badge' => 'Terlaris',
+                'original_price' => 'Rp 2.800.000',
+                'promo_price' => 'Rp 2.100.000',
+                'discount_percent' => '25%',
+                'discount' => 'Hemat Rp 700.000',
+                'code' => 'FILMPREMIUM25',
+                'valid_until' => '31 Oktober 2026',
+                'vehicle_compatibility' => 'Universal (Semua Tipe Mobil)',
+                'benefits' => [
+                    'Diskon 25% paket kaca film Full Body (depan, samping, belakang)',
+                    'Garansi resmi 5 tahun distributor resmi V-KOOL & 3M',
+                    'Pemasangan presisi di ruangan ber-AC bebas debu',
+                    'Gratis demo uji tolak panas alat digital di tempat',
+                ],
+                'sort_order' => 1,
+                'is_active' => true,
+            ],
+            [
+                'name' => 'Ganti Kaca Depan + Free Wiper',
+                'slug' => 'promo-ganti-kaca-depan-free-wiper',
+                'category' => 'Ganti Kaca',
+                'desc' => 'Penggantian kaca depan original OEM presisi tinggi, gratis 1 set wiper Bosch original.',
+                'img' => 'https://images.unsplash.com/photo-1699897483215-a66a9ca292b3?w=400&h=300&fit=crop&auto=format',
+                'badge' => null,
+                'original_price' => 'Rp 1.630.000',
+                'promo_price' => 'Rp 1.450.000',
+                'discount_percent' => '11%',
+                'discount' => 'Free Wiper Bosch',
+                'code' => 'FREEWIPER2026',
+                'valid_until' => '15 November 2026',
+                'vehicle_compatibility' => 'Avanza, Xenia, Xpander, Innova, Brio',
+                'benefits' => [
+                    'Kaca depan bersertifikasi SNI & OEM grade presisi',
+                    'Gratis sepasang wiper Bosch Aerotwin baru',
+                    'Garansi pengerjaan anti bocor air & angin 1 tahun',
+                    'Waktu pengerjaan cepat 2-3 jam siap jalan',
+                ],
+                'sort_order' => 2,
+                'is_active' => true,
+            ],
+            [
+                'name' => 'Reparasi Kaca Chip Diskon 20%',
+                'slug' => 'promo-reparasi-kaca-retak-chip',
+                'category' => 'Perbaikan Kaca',
+                'desc' => 'Hemat biaya ganti baru. Perbaiki titik retak atau bintang dengan injeksi resin khusus.',
+                'img' => 'https://images.unsplash.com/photo-1608259243654-70c070e0f6ed?w=400&h=300&fit=crop&auto=format',
+                'badge' => 'Hemat',
+                'original_price' => 'Rp 350.000',
+                'promo_price' => 'Rp 280.000',
+                'discount_percent' => '20%',
+                'discount' => 'Hemat Rp 70.000',
+                'code' => 'REPAIRCHIP20',
+                'valid_until' => '30 November 2026',
+                'vehicle_compatibility' => 'Semua Jenis Mobil',
+                'benefits' => [
+                    'Teknologi injeksi resin khusus restorasi kejernihan 85-95%',
+                    'Mencegah retakan merambat ke seluruh permukaan kaca',
+                    'Pengerjaan singkat hanya 45-60 menit',
+                    'Garansi tidak merambat selama 6 bulan',
+                ],
+                'sort_order' => 3,
+                'is_active' => true,
+            ],
+        ];
+
+        foreach ($promosData as $promo) {
+            Promo::updateOrCreate(['slug' => $promo['slug']], $promo);
         }
     }
 }

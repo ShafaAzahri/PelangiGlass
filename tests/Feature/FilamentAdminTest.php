@@ -111,4 +111,14 @@ class FilamentAdminTest extends TestCase
         $galCat = $this->actingAs($admin)->get('/admin/gallery-categories');
         $galCat->assertStatus(200);
     }
+
+    public function test_authenticated_admin_can_access_manage_about_page(): void
+    {
+        $admin = User::where('email', 'admin@pelangiglass.com')->first();
+        $this->assertNotNull($admin, 'Admin user should be seeded');
+
+        $response = $this->actingAs($admin)->get('/admin/manage-about');
+        $response->assertStatus(200);
+        $response->assertSee('Tentang Kami');
+    }
 }

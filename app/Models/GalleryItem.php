@@ -9,7 +9,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class GalleryItem extends Model
 {
-    use HasFactory, HasAutoCleanupFiles;
+    use HasAutoCleanupFiles, HasFactory;
 
     protected array $fileFields = ['image_path'];
 
@@ -44,7 +44,7 @@ class GalleryItem extends Model
     public function getImageUrlAttribute(): string
     {
         if (empty($this->image_path)) {
-            return asset('workshop.jpg');
+            return asset('images/workshop-illustration.jpg');
         }
 
         if (str_starts_with($this->image_path, 'http://') || str_starts_with($this->image_path, 'https://')) {
@@ -53,14 +53,14 @@ class GalleryItem extends Model
 
         $cleanPath = ltrim($this->image_path, '/');
 
-        if (file_exists(public_path('storage/' . $cleanPath))) {
-            return asset('storage/' . $cleanPath);
+        if (file_exists(public_path('storage/'.$cleanPath))) {
+            return asset('storage/'.$cleanPath);
         }
 
         if (file_exists(public_path($cleanPath))) {
             return asset($cleanPath);
         }
 
-        return asset('storage/' . $cleanPath);
+        return asset('storage/'.$cleanPath);
     }
 }

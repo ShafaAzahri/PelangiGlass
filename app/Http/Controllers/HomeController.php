@@ -11,7 +11,6 @@ use App\Models\Product;
 use App\Models\Service;
 use App\Models\Setting;
 use App\Models\Testimonial;
-use Illuminate\Http\Request;
 
 class HomeController extends Controller
 {
@@ -28,7 +27,7 @@ class HomeController extends Controller
 
         $settings = Setting::all()->pluck('value', 'key');
 
-        return view('pages.home', compact(
+        return view('pages.home.index', compact(
             'banners',
             'featuredServices',
             'galleryCategories',

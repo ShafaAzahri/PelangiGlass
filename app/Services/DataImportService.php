@@ -16,7 +16,7 @@ class DataImportService
         $extension = strtolower(pathinfo($filePath, PATHINFO_EXTENSION));
 
         if ($extension === 'xlsx' && class_exists(XlsxReader::class)) {
-            $reader = new XlsxReader();
+            $reader = new XlsxReader;
             $reader->open($filePath);
             $rows = [];
 
@@ -32,6 +32,7 @@ class DataImportService
             }
 
             $reader->close();
+
             return $rows;
         }
 
@@ -59,7 +60,9 @@ class DataImportService
         $count = 0;
 
         foreach ($rows as $row) {
-            if (empty(array_filter($row))) continue;
+            if (empty(array_filter($row))) {
+                continue;
+            }
 
             $data = [];
             foreach ($header as $idx => $key) {
@@ -67,7 +70,9 @@ class DataImportService
             }
 
             $name = $data['nama_produk'] ?? $data['nama'] ?? $data['name'] ?? null;
-            if (empty($name)) continue;
+            if (empty($name)) {
+                continue;
+            }
 
             $catName = $data['kategori'] ?? $data['category'] ?? 'Kaca Mobil';
             $category = ProductCategory::firstOrCreate(
@@ -79,7 +84,7 @@ class DataImportService
             $numericPrice = $priceStr ? (float) preg_replace('/[^0-9.]/', '', $priceStr) : null;
 
             $compatibility = $data['kompatibilitas'] ?? $data['kompatibilitas_mobil'] ?? $data['vehicle_compatibility'] ?? 'Universal';
-            $shortDesc = $data['deskripsi'] ?? $data['deskripsi_singkat'] ?? $data['short_description'] ?? ($name . ' kualitas resmi Pelangi Glass.');
+            $shortDesc = $data['deskripsi'] ?? $data['deskripsi_singkat'] ?? $data['short_description'] ?? ($name.' kualitas resmi Pelangi Glass.');
 
             $product = Product::firstOrNew(['name' => $name]);
             $product->slug = Str::slug($name);
@@ -108,7 +113,9 @@ class DataImportService
         $count = 0;
 
         foreach ($rows as $row) {
-            if (empty(array_filter($row))) continue;
+            if (empty(array_filter($row))) {
+                continue;
+            }
 
             $data = [];
             foreach ($header as $idx => $key) {
@@ -116,7 +123,9 @@ class DataImportService
             }
 
             $name = $data['nama_layanan'] ?? $data['nama'] ?? $data['name'] ?? null;
-            if (empty($name)) continue;
+            if (empty($name)) {
+                continue;
+            }
 
             $catName = $data['kategori'] ?? $data['category'] ?? 'Layanan Umum';
             $category = ServiceCategory::firstOrCreate(
@@ -126,7 +135,7 @@ class DataImportService
 
             $warranty = $data['garansi'] ?? $data['warranty_period'] ?? '1 Tahun';
             $duration = $data['durasi'] ?? $data['estimated_duration'] ?? '2 - 3 Jam';
-            $desc = $data['deskripsi'] ?? $data['description'] ?? ($name . ' bergaransi resmi dari Pelangi Glass Purwokerto.');
+            $desc = $data['deskripsi'] ?? $data['description'] ?? ($name.' bergaransi resmi dari Pelangi Glass Purwokerto.');
 
             $service = Service::firstOrNew(['name' => $name]);
             $service->slug = Str::slug($name);
@@ -149,6 +158,7 @@ class DataImportService
         $csv = "nama_produk,kategori,harga,kompatibilitas_mobil,deskripsi_singkat\n";
         $csv .= "Kaca Depan Brio Satya Original,Kaca Mobil,1250000,Honda Brio 2013-2023,Kaca depan OEM standar keselamatan SNI tahan getaran anti-bocor.\n";
         $csv .= "Kaca Film Solar Gard Premium,Kaca Film,1800000,Universal Semua Mobil,Kaca film tolak panas tinggi 60% bergaransi resmi 5 tahun.\n";
+
         return $csv;
     }
 
@@ -157,6 +167,7 @@ class DataImportService
         $csv = "nama_layanan,kategori,garansi,durasi,deskripsi\n";
         $csv .= "Pemasangan Kaca Depan Standar Pabrik,Ganti Kaca,1 Tahun,2 - 3 Jam,Pemasangan kaca depan presisi lem sealant polyurethane anti bocor.\n";
         $csv .= "Poles Kaca Jamur dan Water Repellent,Perawatan,3 Bulan,1 - 2 Jam,Pembersihan jamur kaca membandel disertai lapisan daun talas anti hujan.\n";
+
         return $csv;
     }
 }

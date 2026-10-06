@@ -212,7 +212,7 @@ class PromoController extends Controller
 
         $settings = Setting::all()->pluck('value', 'key');
 
-        return view('pages.promo', compact('promos', 'categories', 'settings'));
+        return view('pages.promo.index', compact('promos', 'categories', 'settings'));
     }
 
     public function show(string $slug)
@@ -241,10 +241,10 @@ class PromoController extends Controller
             $promo = collect($this->promos)->firstWhere('slug', $slug);
         }
 
-        abort_if(!$promo, 404);
+        abort_if(! $promo, 404);
 
         $settings = Setting::all()->pluck('value', 'key');
 
-        return view('pages.promo_detail', compact('promo', 'settings'));
+        return view('pages.promo.show', compact('promo', 'settings'));
     }
 }

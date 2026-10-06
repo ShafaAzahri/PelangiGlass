@@ -2,7 +2,9 @@
 
 namespace App\Filament\Resources\Inquiries\Pages;
 
+use App\Enums\InquiryStatus;
 use App\Filament\Resources\Inquiries\InquiryResource;
+use App\Models\Inquiry;
 use Filament\Actions\DeleteAction;
 use Filament\Resources\Pages\EditRecord;
 
@@ -12,9 +14,9 @@ class EditInquiry extends EditRecord
 
     protected function mutateFormDataBeforeFill(array $data): array
     {
-        if ($this->record instanceof \App\Models\Inquiry && $this->record->status === \App\Enums\InquiryStatus::NEW) {
-            $this->record->update(['status' => \App\Enums\InquiryStatus::READ]);
-            $data['status'] = \App\Enums\InquiryStatus::READ->value;
+        if ($this->record instanceof Inquiry && $this->record->status === InquiryStatus::NEW) {
+            $this->record->update(['status' => InquiryStatus::READ]);
+            $data['status'] = InquiryStatus::READ->value;
         }
 
         return $data;

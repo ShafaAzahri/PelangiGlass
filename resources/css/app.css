@@ -1,6 +1,7 @@
 @import url('https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;800;900&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800;900&display=swap');
 @import 'tailwindcss';
 
+@custom-variant dark (&:where(.dark, .dark *));
 @source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
 @source '../../storage/framework/views/*.php';
 @source '../views/**/*.blade.php';
@@ -39,6 +40,12 @@ body {
   background-color: #ffffff;
   color: #0f172a;
   overflow-x: hidden;
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+html.dark body {
+  background-color: #090d16;
+  color: #f1f5f9;
 }
 
 h1, h2, h3, h4 {
@@ -135,4 +142,73 @@ h1, h2, h3, h4 {
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
+}
+
+/* ========================================================
+   Theme Switch Slide Animation (View Transitions API)
+   ======================================================== */
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation-duration: 380ms;
+  animation-timing-function: cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+/* Slide Right when transitioning to dark */
+html[data-theme-transition="to-dark"]::view-transition-old(root) {
+  animation-name: theme-slide-out-left;
+}
+html[data-theme-transition="to-dark"]::view-transition-new(root) {
+  animation-name: theme-slide-in-right;
+}
+
+/* Slide Left when transitioning to light */
+html[data-theme-transition="to-light"]::view-transition-old(root) {
+  animation-name: theme-slide-out-right;
+}
+html[data-theme-transition="to-light"]::view-transition-new(root) {
+  animation-name: theme-slide-in-left;
+}
+
+@keyframes theme-slide-out-left {
+  from {
+    opacity: 1;
+    transform: translateX(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateX(-40px);
+  }
+}
+
+@keyframes theme-slide-in-right {
+  from {
+    opacity: 0;
+    transform: translateX(40px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes theme-slide-out-right {
+  from {
+    opacity: 1;
+    transform: translateX(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateX(40px);
+  }
+}
+
+@keyframes theme-slide-in-left {
+  from {
+    opacity: 0;
+    transform: translateX(-40px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
 }

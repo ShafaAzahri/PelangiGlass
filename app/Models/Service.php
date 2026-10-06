@@ -12,7 +12,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Service extends Model
 {
-    use HasFactory, SoftDeletes, HasAutoCleanupFiles, LogsActivity;
+    use HasAutoCleanupFiles, HasFactory, LogsActivity, SoftDeletes;
 
     protected string $activitySubjectName = 'Layanan';
 
@@ -61,7 +61,7 @@ class Service extends Model
     public function getImageUrlAttribute(): string
     {
         if (empty($this->image_path)) {
-            return asset('banner-windshield.jpg');
+            return asset('images/banner1.png');
         }
 
         if (str_starts_with($this->image_path, 'http://') || str_starts_with($this->image_path, 'https://')) {
@@ -70,14 +70,14 @@ class Service extends Model
 
         $cleanPath = ltrim($this->image_path, '/');
 
-        if (file_exists(public_path('storage/' . $cleanPath))) {
-            return asset('storage/' . $cleanPath);
+        if (file_exists(public_path('storage/'.$cleanPath))) {
+            return asset('storage/'.$cleanPath);
         }
 
         if (file_exists(public_path($cleanPath))) {
             return asset($cleanPath);
         }
 
-        return asset('storage/' . $cleanPath);
+        return asset('storage/'.$cleanPath);
     }
 }

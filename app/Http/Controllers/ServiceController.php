@@ -24,7 +24,7 @@ class ServiceController extends Controller
         $services = $query->paginate(12)->withQueryString();
         $settings = Setting::all()->pluck('value', 'key');
 
-        return view('pages.servis', compact('services', 'categories', 'settings'));
+        return view('pages.servis.index', compact('services', 'categories', 'settings'));
     }
 
     public function show(string $slug)
@@ -38,6 +38,6 @@ class ServiceController extends Controller
 
         $settings = Setting::all()->pluck('value', 'key');
 
-        return view('pages.servis_detail', compact('service', 'otherServices', 'settings'));
+        return view('pages.servis.show', compact('service', 'otherServices', 'settings'));
     }
 }

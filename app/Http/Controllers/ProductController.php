@@ -25,15 +25,15 @@ class ProductController extends Controller
             $search = $request->q;
             $query->where(function ($q) use ($search) {
                 $q->where('name', 'ilike', "%{$search}%")
-                  ->orWhere('vehicle_compatibility', 'ilike', "%{$search}%")
-                  ->orWhere('short_description', 'ilike', "%{$search}%");
+                    ->orWhere('vehicle_compatibility', 'ilike', "%{$search}%")
+                    ->orWhere('short_description', 'ilike', "%{$search}%");
             });
         }
 
         $products = $query->paginate(12)->withQueryString();
         $settings = Setting::all()->pluck('value', 'key');
 
-        return view('pages.produk', compact('products', 'categories', 'settings'));
+        return view('pages.produk.index', compact('products', 'categories', 'settings'));
     }
 
     public function show(string $slug)
@@ -48,6 +48,6 @@ class ProductController extends Controller
 
         $settings = Setting::all()->pluck('value', 'key');
 
-        return view('pages.produk_detail', compact('product', 'relatedProducts', 'settings'));
+        return view('pages.produk.show', compact('product', 'relatedProducts', 'settings'));
     }
 }

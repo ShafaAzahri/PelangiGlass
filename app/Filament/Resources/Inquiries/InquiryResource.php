@@ -41,6 +41,7 @@ class InquiryResource extends Resource
     public static function getNavigationBadge(): ?string
     {
         $count = static::getModel()::where('status', InquiryStatus::NEW)->count();
+
         return $count > 0 ? (string) $count : null;
     }
 

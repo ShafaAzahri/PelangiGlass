@@ -5,7 +5,7 @@ namespace App\Enums;
 use Filament\Support\Contracts\HasColor;
 use Filament\Support\Contracts\HasLabel;
 
-enum ProductBadge: string implements HasLabel, HasColor
+enum ProductBadge: string implements HasColor, HasLabel
 {
     case TERLARIS = 'Terlaris';
     case PREMIUM = 'Premium';

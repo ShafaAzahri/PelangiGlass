@@ -9,7 +9,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Promo extends Model
 {
-    use HasFactory, HasAutoCleanupFiles, LogsActivity;
+    use HasAutoCleanupFiles, HasFactory, LogsActivity;
 
     protected string $activitySubjectName = 'Promo';
 
@@ -51,7 +51,7 @@ class Promo extends Model
     public function getImageUrlAttribute(): string
     {
         if (empty($this->img)) {
-            return asset('banner1.png');
+            return asset('images/banner1.png');
         }
 
         if (str_starts_with($this->img, 'http://') || str_starts_with($this->img, 'https://')) {
@@ -60,14 +60,14 @@ class Promo extends Model
 
         $cleanPath = ltrim($this->img, '/');
 
-        if (file_exists(public_path('storage/' . $cleanPath))) {
-            return asset('storage/' . $cleanPath);
+        if (file_exists(public_path('storage/'.$cleanPath))) {
+            return asset('storage/'.$cleanPath);
         }
 
         if (file_exists(public_path($cleanPath))) {
             return asset($cleanPath);
         }
 
-        return asset('storage/' . $cleanPath);
+        return asset('storage/'.$cleanPath);
     }
 }

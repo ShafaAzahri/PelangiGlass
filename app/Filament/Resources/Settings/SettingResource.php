@@ -16,6 +16,7 @@ use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\HtmlString;
+
 class SettingResource extends Resource
 {
     protected static ?string $model = Setting::class;
@@ -55,16 +56,19 @@ class SettingResource extends Resource
                     ->label('Keterangan Pengaturan')
                     ->content(fn (?Setting $record): ?HtmlString => $record ? new HtmlString("
                         <div style='padding: 10px 14px; background: rgba(37, 99, 235, 0.08); border-left: 4px solid #2563eb; border-radius: 6px; font-size: 13px; color: #1e293b; line-height: 1.45;'>
-                            <div style='font-weight: 700; color: #1e40af; margin-bottom: 2px;'>" . e(Setting::humanName($record->key)) . " (" . e(Setting::humanGroup($record->group)) . ")</div>
-                            <div style='color: #475569;'>" . e(Setting::humanDescription($record->key)) . "</div>
+                            <div style='font-weight: 700; color: #1e40af; margin-bottom: 2px;'>".e(Setting::humanName($record->key)).' ('.e(Setting::humanGroup($record->group)).")</div>
+                            <div style='color: #475569;'>".e(Setting::humanDescription($record->key)).'</div>
                         </div>
-                    ") : null),
+                    ') : null),
                 Textarea::make('value')
                     ->label('Nilai / Teks Pengaturan Baru')
                     ->rows(fn (?Setting $record) => $record && in_array($record->key, ['address', 'google_maps_embed']) ? 4 : 2)
                     ->required()
                     ->helperText(function (?Setting $record) {
-                        if (!$record) return 'Teks ini akan otomatis tersimpan dan langsung tampil di website utama.';
+                        if (! $record) {
+                            return 'Teks ini akan otomatis tersimpan dan langsung tampil di website utama.';
+                        }
+
                         return match ($record->key) {
                             'whatsapp' => 'Format nomor WhatsApp internasional tanpa tanda + atau spasi, contoh: 6281390288875.',
                             'phone' => 'Nomor telepon kantor, contoh: +62 813-9028-8875.',
@@ -126,7 +130,7 @@ class SettingResource extends Resource
                     ->label('Ubah')
                     ->icon(Heroicon::OutlinedPencilSquare)
                     ->color('gray')
-                    ->modalHeading(fn (Setting $record): string => 'Ubah: ' . Setting::humanName($record->key))
+                    ->modalHeading(fn (Setting $record): string => 'Ubah: '.Setting::humanName($record->key))
                     ->modalDescription(fn (Setting $record): string => Setting::humanDescription($record->key))
                     ->modalSubmitActionLabel('Simpan Perubahan')
                     ->modalWidth('lg')
@@ -135,10 +139,10 @@ class SettingResource extends Resource
                             ->label('Petunjuk Pengaturan')
                             ->content(fn (Setting $record): HtmlString => new HtmlString("
                                 <div style='padding: 10px 14px; background: #f8fafc; border: 1px solid #e2e8f0; border-left: 3px solid #64748b; border-radius: 6px; font-size: 13px; color: #334155; line-height: 1.45;'>
-                                    <div style='font-weight: 700; color: #0f172a; margin-bottom: 2px;'>" . e(Setting::humanName($record->key)) . " (" . e(Setting::humanGroup($record->group)) . ")</div>
-                                    <div style='color: #64748b;'>" . e(Setting::humanDescription($record->key)) . "</div>
+                                    <div style='font-weight: 700; color: #0f172a; margin-bottom: 2px;'>".e(Setting::humanName($record->key)).' ('.e(Setting::humanGroup($record->group)).")</div>
+                                    <div style='color: #64748b;'>".e(Setting::humanDescription($record->key)).'</div>
                                 </div>
-                            ")),
+                            ')),
                         Textarea::make('value')
                             ->label('Nilai / Teks Pengaturan Baru')
                             ->rows(fn (Setting $record) => in_array($record->key, ['address', 'google_maps_embed']) ? 4 : 2)

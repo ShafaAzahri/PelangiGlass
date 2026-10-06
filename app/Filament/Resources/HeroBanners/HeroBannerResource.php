@@ -86,6 +86,7 @@ class HeroBannerResource extends Resource
                                     return null;
                                 }
                                 $url = e($record->image_url);
+
                                 return new HtmlString("
                                     <div style='display: flex; align-items: center; gap: 12px; padding: 10px; background: rgba(30, 41, 59, 0.7); border: 1px solid rgba(255, 255, 255, 0.12); border-radius: 10px; margin-bottom: 8px;'>
                                         <a href='{$url}' target='_blank' rel='noopener noreferrer' title='Klik untuk melihat banner ukuran penuh' style='display: block; cursor: pointer;'>
@@ -100,7 +101,7 @@ class HeroBannerResource extends Resource
                                     </div>
                                 ");
                             })
-                            ->visible(fn (?HeroBanner $record) => $record !== null && !empty($record->image_url)),
+                            ->visible(fn (?HeroBanner $record) => $record !== null && ! empty($record->image_url)),
                         FileUpload::make('image_path')
                             ->label('Upload / Ganti Gambar')
                             ->image()
@@ -113,7 +114,7 @@ class HeroBannerResource extends Resource
                             ->downloadable()
                             ->required(fn (string $operation, ?HeroBanner $record) => $operation === 'create' && empty($record?->image_path))
                             ->dehydrated(fn ($state) => filled($state))
-                            ->helperText('Format: JPG, PNG, atau WebP (Maks. 10 MB). Otomatis dioptimalkan.'),
+                            ->helperText('💡 Rekomendasi Ukuran: 2048 × 768 px (Rasio 8:3 Landscape Lebar). Format: JPG, PNG, atau WebP (Maks. 5 MB). Otomatis dioptimalkan.'),
                         Grid::make(2)->schema([
                             Toggle::make('is_active')
                                 ->label('Aktif')
@@ -141,10 +142,10 @@ class HeroBannerResource extends Resource
                         'class' => 'object-cover rounded-lg shadow-xs cursor-pointer hover:opacity-80 transition',
                         'title' => 'Klik untuk preview gambar',
                     ])
-                    ->defaultImageUrl(asset('banner1.png'))
+                    ->defaultImageUrl(asset('images/banner1.png'))
                     ->action(
                         Action::make('preview_banner')
-                            ->modalHeading(fn (HeroBanner $record) => 'Preview Banner: ' . $record->title)
+                            ->modalHeading(fn (HeroBanner $record) => 'Preview Banner: '.$record->title)
                             ->modalSubmitAction(false)
                             ->modalCancelActionLabel('Tutup')
                             ->modalContent(fn (HeroBanner $record) => new HtmlString("

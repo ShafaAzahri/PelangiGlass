@@ -33,17 +33,11 @@ class InquiryController extends Controller
             $request->userAgent()
         );
 
-        $waNumber = Setting::get('whatsapp', '6281390288875');
-        $cleanPhone = preg_replace('/[^0-9]/', '', $waNumber);
-        if (str_starts_with($cleanPhone, '0')) {
-            $cleanPhone = '62' . substr($cleanPhone, 1);
-        }
-
-        $waText = urlencode("Halo Pelangi Glass, saya {$validated['name']} ({$validated['phone_number']}). Saya ingin berkonsultasi:\n\n\"{$validated['message']}\"");
-        $redirectUrl = "https://wa.me/{$cleanPhone}?text={$waText}";
+        $waMessage = "Halo Pelangi Glass, saya {$validated['name']} ({$validated['phone_number']}). Saya ingin berkonsultasi:\n\n\"{$validated['message']}\"";
+        $redirectUrl = Setting::whatsappUrl($waMessage);
 
         return redirect('/#kontak')
-            ->with('success', 'Terima kasih, ' . $validated['name'] . '! Pesan Anda telah berhasil terkirim ke sistem kami. Tim Pelangi Glass akan segera menghubungi Anda.')
+            ->with('success', 'Terima kasih, '.$validated['name'].'! Pesan Anda telah berhasil terkirim ke sistem kami. Tim Pelangi Glass akan segera menghubungi Anda.')
             ->with('wa_url', $redirectUrl);
     }
 }

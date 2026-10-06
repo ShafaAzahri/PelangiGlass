@@ -133,10 +133,11 @@ class PromoResource extends Resource
                         Placeholder::make('current_image_preview')
                             ->label('Foto Promo Saat Ini')
                             ->content(function (?Promo $record): ?HtmlString {
-                                if (!$record || empty($record->image_url)) {
+                                if (! $record || empty($record->image_url)) {
                                     return null;
                                 }
                                 $url = e($record->image_url);
+
                                 return new HtmlString("
                                     <div style='display: flex; align-items: center; gap: 12px; padding: 10px; background: rgba(30, 41, 59, 0.7); border: 1px solid rgba(255, 255, 255, 0.12); border-radius: 10px; margin-bottom: 8px;'>
                                         <a href='{$url}' target='_blank' rel='noopener noreferrer' title='Klik untuk melihat foto ukuran penuh' style='display: block; cursor: pointer;'>
@@ -151,7 +152,7 @@ class PromoResource extends Resource
                                     </div>
                                 ");
                             })
-                            ->visible(fn (?Promo $record) => $record !== null && !empty($record->image_url)),
+                            ->visible(fn (?Promo $record) => $record !== null && ! empty($record->image_url)),
                         FileUpload::make('img')
                             ->label('Upload / Ganti Foto Promo')
                             ->image()
@@ -163,7 +164,7 @@ class PromoResource extends Resource
                             ->openable()
                             ->downloadable()
                             ->dehydrated(fn ($state) => filled($state))
-                            ->helperText('Format: JPG, PNG, atau WebP (Maks. 10 MB). Otomatis dioptimalkan.'),
+                            ->helperText('💡 Rekomendasi Ukuran: 800 × 600 px (Rasio 4:3) atau 1200 × 675 px (16:9). Format: JPG, PNG, atau WebP (Maks. 5 MB).'),
                         Toggle::make('is_active')
                             ->label('Aktif / Tampilkan di Web')
                             ->default(true),
@@ -190,7 +191,7 @@ class PromoResource extends Resource
                     ->defaultImageUrl(fn (Promo $record) => $record->image_url)
                     ->action(
                         Action::make('preview_promo_img')
-                            ->modalHeading(fn (Promo $record) => 'Preview Promo: ' . $record->name)
+                            ->modalHeading(fn (Promo $record) => 'Preview Promo: '.$record->name)
                             ->modalSubmitAction(false)
                             ->modalCancelActionLabel('Tutup')
                             ->modalContent(fn (Promo $record) => new HtmlString("
@@ -207,7 +208,7 @@ class PromoResource extends Resource
                     ->searchable()
                     ->sortable()
                     ->weight('bold')
-                    ->description(fn (Promo $record) => 'Kode: ' . ($record->code ?? '-')),
+                    ->description(fn (Promo $record) => 'Kode: '.($record->code ?? '-')),
                 TextColumn::make('category')
                     ->label('Kategori')
                     ->badge()
@@ -219,7 +220,7 @@ class PromoResource extends Resource
                     ->color('gray'),
                 TextColumn::make('promo_price')
                     ->label('Harga Promo')
-                    ->description(fn (Promo $record) => $record->original_price ? 'Normal: ' . $record->original_price : null),
+                    ->description(fn (Promo $record) => $record->original_price ? 'Normal: '.$record->original_price : null),
                 TextColumn::make('valid_until')
                     ->label('Masa Berlaku')
                     ->badge()
@@ -243,8 +244,8 @@ class PromoResource extends Resource
                     ->color('gray')
                     ->excludeAttributes(['slug'])
                     ->beforeReplicaSaved(function (Promo $replica): void {
-                        $replica->name = $replica->name . ' (Copy)';
-                        $replica->slug = Str::slug($replica->name . '-' . Str::random(5));
+                        $replica->name = $replica->name.' (Copy)';
+                        $replica->slug = Str::slug($replica->name.'-'.Str::random(5));
                     }),
                 EditAction::make()->label('Ubah')->color('gray'),
                 DeleteAction::make()->label('Hapus')->color('gray'),

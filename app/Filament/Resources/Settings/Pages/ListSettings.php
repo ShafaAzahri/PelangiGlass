@@ -1,9 +1,10 @@
 <?php
 
 namespace App\Filament\Resources\Settings\Pages;
+
 use App\Filament\Resources\Settings\SettingResource;
-use Filament\Resources\Pages\ListRecords;
 use App\Models\Setting;
+use Filament\Resources\Pages\ListRecords;
 use Filament\Schemas\Components\Tabs\Tab;
 use Filament\Support\Icons\Heroicon;
 use Illuminate\Database\Eloquent\Builder;
