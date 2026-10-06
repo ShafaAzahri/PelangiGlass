@@ -73,8 +73,8 @@
             @foreach($articlesPreview as $a)
                 @php $cStyle = $catColors[$a['category']] ?? ['bg' => '#f1f5f9', 'color' => '#475569']; @endphp
                 <div class="rounded-2xl overflow-hidden flex flex-col transition-all duration-300 group bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-xs hover:border-blue-300 dark:hover:border-blue-700 hover:-translate-y-1 hover:shadow-md">
-                    <div class="overflow-hidden shrink-0" style="height: 200px;">
-                        <img src="{{ $a['img'] }}" alt="{{ $a['title'] }}" loading="lazy" decoding="async" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105">
+                    <div class="overflow-hidden shrink-0 w-full h-[220px] relative bg-slate-100 dark:bg-slate-800">
+                        <img src="{{ $a['img'] }}" alt="{{ $a['title'] }}" loading="lazy" decoding="async" class="w-full h-full object-cover object-top transition-transform duration-500 group-hover:scale-105">
                     </div>
                     <div class="p-6 flex flex-col flex-1">
                         <div class="flex items-center gap-2 mb-3 flex-wrap">

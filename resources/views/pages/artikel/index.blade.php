@@ -140,11 +140,11 @@
         <!-- Featured Article (matching Artikel.tsx exactly) -->
         <template x-if="featured">
             <div class="mb-6">
-                <div class="rounded-2xl overflow-hidden flex flex-col lg:flex-row transition-all duration-300 group bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-xs hover:border-blue-300 dark:hover:border-blue-700">
-                    <div class="overflow-hidden shrink-0 lg:w-2/5" style="min-height: 220px;">
-                        <img :src="featured.img" :alt="featured.title" loading="lazy" decoding="async" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105">
+                <div class="rounded-2xl overflow-hidden flex flex-col lg:flex-row lg:h-[320px] transition-all duration-300 group bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-xs hover:border-blue-300 dark:hover:border-blue-700">
+                    <div class="overflow-hidden shrink-0 w-full lg:w-[42%] h-60 sm:h-72 lg:h-full relative bg-slate-100 dark:bg-slate-800">
+                        <img :src="featured.img" :alt="featured.title" loading="lazy" decoding="async" class="w-full h-full object-cover object-top transition-transform duration-500 group-hover:scale-105">
                     </div>
-                    <div class="p-6 flex flex-col flex-1">
+                    <div class="p-6 sm:p-8 flex flex-col flex-1 justify-between">
                         <div class="flex items-center gap-2 mb-3 flex-wrap">
                             <span class="text-xs px-2.5 py-1 rounded-full font-medium" :style="catStyle(featured.category)" x-text="featured.category"></span>
                             <span class="flex items-center gap-1 text-xs" style="color: #94a3b8; font-family: 'Plus Jakarta Sans', sans-serif;">
@@ -168,8 +168,8 @@
         <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-5" x-show="visibleRest.length > 0">
             <template x-for="artikel in visibleRest" :key="artikel.id">
                 <div class="rounded-2xl overflow-hidden flex flex-col transition-all duration-300 group bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-xs hover:border-blue-300 dark:hover:border-blue-700">
-                    <div class="overflow-hidden shrink-0" style="height: 200px;">
-                        <img :src="artikel.img" :alt="artikel.title" loading="lazy" decoding="async" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105">
+                    <div class="overflow-hidden shrink-0 w-full h-[220px] relative bg-slate-100 dark:bg-slate-800">
+                        <img :src="artikel.img" :alt="artikel.title" loading="lazy" decoding="async" class="w-full h-full object-cover object-top transition-transform duration-500 group-hover:scale-105">
                     </div>
                     <div class="p-6 flex flex-col flex-1">
                         <div class="flex items-center gap-2 mb-3 flex-wrap">

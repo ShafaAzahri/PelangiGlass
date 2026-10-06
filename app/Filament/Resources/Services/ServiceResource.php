@@ -143,7 +143,7 @@ class ServiceResource extends Resource
                             ->openable()
                             ->downloadable()
                             ->dehydrated(fn ($state) => filled($state))
-                            ->helperText('💡 Rekomendasi Ukuran: 800 × 600 px (Rasio 4:3). Format: JPG, PNG, atau WebP (Maks. 5 MB). Otomatis dioptimalkan.'),
+                            ->helperText('Rekomendasi ukuran: 800 x 600 piksel (rasio 4:3). Format yang didukung: JPG, JPEG, PNG, WebP. Ukuran file maksimal: 10 MB.'),
                         Toggle::make('is_featured')
                             ->label('Layanan Unggulan (Beranda)')
                             ->default(false),

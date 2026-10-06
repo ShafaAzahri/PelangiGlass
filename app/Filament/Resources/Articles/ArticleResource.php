@@ -130,7 +130,7 @@ class ArticleResource extends Resource
                             ->openable()
                             ->downloadable()
                             ->dehydrated(fn ($state) => filled($state))
-                            ->helperText('💡 Rekomendasi Ukuran: 1200 × 675 px atau 800 × 450 px (Rasio 16:9 Landscape). Format: JPG, PNG, atau WebP (Maks. 5 MB).'),
+                            ->helperText('Rekomendasi ukuran: 1200 x 675 piksel atau 800 x 450 piksel (rasio 16:9 landscape). Format yang didukung: JPG, JPEG, PNG, WebP. Ukuran file maksimal: 10 MB.'),
                         Select::make('status')
                             ->label('Status Publikasi')
                             ->options(ArticleStatus::class)

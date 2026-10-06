@@ -31,8 +31,8 @@
 
                 <!-- Featured Image -->
                 @if($article->featured_image)
-                    <div class="rounded-3xl overflow-hidden shadow-md mb-10 border border-slate-200 dark:border-slate-800 bg-slate-100 dark:bg-slate-900 max-h-[460px]">
-                        <img src="{{ $article->image_url }}" alt="{{ $article->title }}" loading="lazy" decoding="async" class="w-full h-full object-cover">
+                    <div class="rounded-3xl overflow-hidden shadow-md mb-10 border border-slate-200 dark:border-slate-800 bg-slate-100 dark:bg-slate-900 h-64 sm:h-80 md:h-[400px] w-full">
+                        <img src="{{ $article->image_url }}" alt="{{ $article->title }}" loading="lazy" decoding="async" class="w-full h-full object-cover object-top">
                     </div>
                 @endif
 

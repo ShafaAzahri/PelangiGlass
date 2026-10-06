@@ -114,7 +114,7 @@ class HeroBannerResource extends Resource
                             ->downloadable()
                             ->required(fn (string $operation, ?HeroBanner $record) => $operation === 'create' && empty($record?->image_path))
                             ->dehydrated(fn ($state) => filled($state))
-                            ->helperText('💡 Rekomendasi Ukuran: 2048 × 768 px (Rasio 8:3 Landscape Lebar). Format: JPG, PNG, atau WebP (Maks. 5 MB). Otomatis dioptimalkan.'),
+                            ->helperText('Rekomendasi ukuran: 2048 x 768 piksel (rasio 8:3 landscape). Format yang didukung: JPG, JPEG, PNG, WebP. Ukuran file maksimal: 10 MB.'),
                         Grid::make(2)->schema([
                             Toggle::make('is_active')
                                 ->label('Aktif')

@@ -119,7 +119,7 @@ class GalleryItemResource extends Resource
                             ->downloadable()
                             ->required(fn (string $operation, ?GalleryItem $record) => $operation === 'create' && empty($record?->image_path))
                             ->dehydrated(fn ($state) => filled($state))
-                            ->helperText('💡 Rekomendasi Ukuran: 600 × 800 px atau 900 × 1200 px (Rasio 3:4 Vertikal/Potret Carousel). Format: JPG, PNG, atau WebP (Maks. 5 MB).'),
+                            ->helperText('Rekomendasi ukuran: 600 x 800 piksel atau 900 x 1200 piksel (rasio 3:4 vertikal). Format yang didukung: JPG, JPEG, PNG, WebP. Ukuran file maksimal: 10 MB.'),
                         Grid::make(2)->schema([
                             Toggle::make('is_active')
                                 ->label('Aktif di Web')

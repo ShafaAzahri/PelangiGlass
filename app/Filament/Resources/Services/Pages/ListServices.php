@@ -34,7 +34,7 @@ class ListServices extends ListRecords
                             <div style='padding: 10px 14px; background: #f8fafc; border: 1px solid #e2e8f0; border-left: 3px solid #64748b; border-radius: 6px; font-size: 13px; line-height: 1.5; color: #334155;'>
                                 Format kolom spreadsheet: <strong>nama_layanan, kategori, garansi, durasi, deskripsi</strong>.<br>
                                 <a href='/admin/template/services-csv' target='_blank' style='color: #2563eb; font-weight: 700; text-decoration: underline; margin-top: 6px; display: inline-block;'>
-                                    📥 Unduh Contoh Template CSV Layanan
+                                    Unduh Contoh Template CSV Layanan
                                 </a>
                             </div>
                         ")),

@@ -144,7 +144,7 @@ class ProductResource extends Resource
                             ->openable()
                             ->downloadable()
                             ->dehydrated(fn ($state) => filled($state))
-                            ->helperText('💡 Rekomendasi Ukuran: 800 × 600 px (Rasio 4:3) atau 800 × 800 px (1:1). Format: JPG, PNG, atau WebP (Maks. 5 MB).'),
+                            ->helperText('Rekomendasi ukuran: 800 x 600 piksel (rasio 4:3) atau 800 x 800 piksel (rasio 1:1). Format yang didukung: JPG, JPEG, PNG, WebP. Ukuran file maksimal: 10 MB.'),
                         FileUpload::make('gallery_images')
                             ->label('Galeri Foto Tambahan')
                             ->multiple()
@@ -158,7 +158,7 @@ class ProductResource extends Resource
                             ->openable()
                             ->downloadable()
                             ->dehydrated(fn ($state) => filled($state))
-                            ->helperText('💡 Rekomendasi Ukuran: 800 × 600 px (Rasio 4:3). Format: JPG, PNG, atau WebP (Maks. 5 MB).'),
+                            ->helperText('Rekomendasi ukuran: 800 x 600 piksel (rasio 4:3). Format yang didukung: JPG, JPEG, PNG, WebP. Ukuran file maksimal: 10 MB per foto.'),
                         Toggle::make('is_active')
                             ->label('Aktif / Tampilkan di Web')
                             ->default(true),

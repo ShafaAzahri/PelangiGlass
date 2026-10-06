@@ -164,7 +164,7 @@ class PromoResource extends Resource
                             ->openable()
                             ->downloadable()
                             ->dehydrated(fn ($state) => filled($state))
-                            ->helperText('💡 Rekomendasi Ukuran: 800 × 600 px (Rasio 4:3) atau 1200 × 675 px (16:9). Format: JPG, PNG, atau WebP (Maks. 5 MB).'),
+                            ->helperText('Rekomendasi ukuran: 800 x 600 piksel (rasio 4:3) atau 1200 x 675 piksel (rasio 16:9). Format yang didukung: JPG, JPEG, PNG, WebP. Ukuran file maksimal: 10 MB.'),
                         Toggle::make('is_active')
                             ->label('Aktif / Tampilkan di Web')
                             ->default(true),
