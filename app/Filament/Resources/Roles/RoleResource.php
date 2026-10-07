@@ -46,6 +46,21 @@ class RoleResource extends Resource
         return false;
     }
 
+    public static function canViewAny(): bool
+    {
+        return auth()->user()?->role === 'admin' || auth()->user()?->hasRole('admin');
+    }
+
+    public static function shouldRegisterNavigation(): bool
+    {
+        return auth()->user()?->role === 'admin' || auth()->user()?->hasRole('admin');
+    }
+
+    public static function canAccess(): bool
+    {
+        return auth()->user()?->role === 'admin' || auth()->user()?->hasRole('admin');
+    }
+
     #[Override]
     public static function form(Schema $schema): Schema
     {

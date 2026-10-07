@@ -148,6 +148,19 @@ class FilamentAdminTest extends TestCase
         $response->assertStatus(403);
     }
 
+    public function test_staff_user_cannot_access_shield_roles_resource(): void
+    {
+        $staff = User::where('role', 'staff')->first() ?? User::create([
+            'name' => 'Staf Shield Check',
+            'email' => 'staff-shield-check@pelangiglass.com',
+            'password' => bcrypt('password'),
+            'role' => 'staff',
+        ]);
+
+        $response = $this->actingAs($staff)->get('/admin/shield/roles');
+        $response->assertStatus(403);
+    }
+
     public function test_staff_user_can_access_allowed_resources_like_articles_and_gallery(): void
     {
         $staffRole = Role::firstOrCreate(['name' => 'staff', 'guard_name' => 'web']);

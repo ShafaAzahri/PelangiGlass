@@ -14,32 +14,32 @@ class RolePolicy
 
     public function viewAny(AuthUser $authUser): bool
     {
-        return $authUser->can('ViewAny:Role');
+        return $authUser->role === 'admin' || $authUser->hasRole('admin');
     }
 
     public function view(AuthUser $authUser, Role $role): bool
     {
-        return $authUser->can('View:Role');
+        return $authUser->role === 'admin' || $authUser->hasRole('admin');
     }
 
     public function create(AuthUser $authUser): bool
     {
-        return $authUser->can('Create:Role');
+        return $authUser->role === 'admin' || $authUser->hasRole('admin');
     }
 
     public function update(AuthUser $authUser, Role $role): bool
     {
-        return $authUser->can('Update:Role');
+        return $authUser->role === 'admin' || $authUser->hasRole('admin');
     }
 
     public function delete(AuthUser $authUser, Role $role): bool
     {
-        return $authUser->can('Delete:Role');
+        return $authUser->role === 'admin' || $authUser->hasRole('admin');
     }
 
     public function deleteAny(AuthUser $authUser): bool
     {
-        return $authUser->can('DeleteAny:Role');
+        return $authUser->role === 'admin' || $authUser->hasRole('admin');
     }
 
     public function restore(AuthUser $authUser, Role $role): bool
