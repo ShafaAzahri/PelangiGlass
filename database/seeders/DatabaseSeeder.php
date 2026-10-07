@@ -22,6 +22,7 @@ use App\Models\User;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
+use Spatie\Permission\Models\Role;
 
 class DatabaseSeeder extends Seeder
 {
@@ -37,6 +38,9 @@ class DatabaseSeeder extends Seeder
             ]
         );
 
+        $adminRole = Role::firstOrCreate(['name' => 'admin', 'guard_name' => 'web']);
+        Role::firstOrCreate(['name' => 'staff', 'guard_name' => 'web']);
+        $admin->assignRole($adminRole);
         // 2. Settings
         $settings = [
             ['key' => 'site_name', 'value' => 'Pelangi Glass Purwokerto', 'group' => 'general'],

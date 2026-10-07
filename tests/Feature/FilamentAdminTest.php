@@ -121,4 +121,28 @@ class FilamentAdminTest extends TestCase
         $response->assertStatus(200);
         $response->assertSee('Tentang Kami');
     }
+
+    public function test_authenticated_admin_can_access_shield_roles_resource(): void
+    {
+        $admin = User::where('email', 'admin@pelangiglass.com')->first();
+        $this->assertNotNull($admin, 'Admin user should be seeded');
+
+        $response = $this->actingAs($admin)->get('/admin/shield/roles');
+        $response->assertStatus(200);
+    }
+
+    public function test_staff_user_is_restricted_from_settings_resource(): void
+    {
+        $staff = User::firstOrCreate(
+            ['email' => 'staff-test-unique@pelangiglass.com'],
+            [
+                'name' => 'Staf Test',
+                'password' => bcrypt('password'),
+                'role' => 'staff',
+            ]
+        );
+
+        $response = $this->actingAs($staff)->get('/admin/settings');
+        $response->assertStatus(403);
+    }
 }

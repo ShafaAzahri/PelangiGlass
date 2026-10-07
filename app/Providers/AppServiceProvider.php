@@ -3,6 +3,7 @@
 namespace App\Providers;
 
 use App\Models\Setting;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\ServiceProvider;
 
@@ -21,6 +22,14 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        Gate::before(function ($user, $ability) {
+            if ($user->role === 'admin' || $user->hasRole('admin')) {
+                return true;
+            }
+
+            return null;
+        });
+
         View::composer('*', function ($view) {
             $view->with('siteSettings', Setting::allKeyed());
         });

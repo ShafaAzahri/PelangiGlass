@@ -7,10 +7,11 @@ use Filament\Panel;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Spatie\Permission\Traits\HasRoles;
 
 class User extends Authenticatable implements FilamentUser
 {
-    use HasFactory, Notifiable;
+    use HasFactory, HasRoles, Notifiable;
 
     protected $fillable = [
         'name',
@@ -30,6 +31,29 @@ class User extends Authenticatable implements FilamentUser
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
         ];
+    }
+
+    protected static function booted(): void
+    {
+        static::saved(function (User $user) {
+            if ($user->role && in_array($user->role, ['admin', 'staff'])) {
+                try {
+                    $user->syncRoles([$user->role]);
+                } catch (\Throwable $e) {
+                    // Ignore during early migrations
+                }
+            }
+        });
+    }
+
+    public function isAdmin(): bool
+    {
+        return $this->hasRole('admin') || $this->role === 'admin';
+    }
+
+    public function isStaff(): bool
+    {
+        return $this->hasRole('staff') || $this->role === 'staff';
     }
 
     public function canAccessPanel(Panel $panel): bool
