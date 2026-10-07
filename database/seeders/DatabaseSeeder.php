@@ -22,6 +22,7 @@ use App\Models\User;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
+use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
 
 class DatabaseSeeder extends Seeder
@@ -39,8 +40,24 @@ class DatabaseSeeder extends Seeder
         );
 
         $adminRole = Role::firstOrCreate(['name' => 'admin', 'guard_name' => 'web']);
-        Role::firstOrCreate(['name' => 'staff', 'guard_name' => 'web']);
+        $staffRole = Role::firstOrCreate(['name' => 'staff', 'guard_name' => 'web']);
         $admin->assignRole($adminRole);
+
+        $staffPermissions = Permission::where(function ($q) {
+            $q->where('name', 'like', '%:Article%')
+                ->orWhere('name', 'like', '%:Gallery%')
+                ->orWhere('name', 'like', 'View%:Product%')
+                ->orWhere('name', 'like', 'View%:Service%')
+                ->orWhere('name', 'like', 'View%:Inquiry%')
+                ->orWhere('name', 'like', 'Update:Inquiry')
+                ->orWhere('name', 'like', 'View%:Promo%');
+        })->where('name', 'not like', 'Delete%')
+            ->where('name', 'not like', 'ForceDelete%')
+            ->get();
+
+        if ($staffPermissions->isNotEmpty()) {
+            $staffRole->syncPermissions($staffPermissions);
+        }
         // 2. Settings
         $settings = [
             ['key' => 'site_name', 'value' => 'Pelangi Glass Purwokerto', 'group' => 'general'],

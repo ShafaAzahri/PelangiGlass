@@ -3,6 +3,8 @@
 namespace Tests\Feature;
 
 use App\Models\User;
+use Spatie\Permission\Models\Permission;
+use Spatie\Permission\Models\Role;
 use Tests\TestCase;
 
 class FilamentAdminTest extends TestCase
@@ -144,5 +146,29 @@ class FilamentAdminTest extends TestCase
 
         $response = $this->actingAs($staff)->get('/admin/settings');
         $response->assertStatus(403);
+    }
+
+    public function test_staff_user_can_access_allowed_resources_like_articles_and_gallery(): void
+    {
+        $staffRole = Role::firstOrCreate(['name' => 'staff', 'guard_name' => 'web']);
+        $permArt = Permission::firstOrCreate(['name' => 'ViewAny:Article', 'guard_name' => 'web']);
+        $permGal = Permission::firstOrCreate(['name' => 'ViewAny:GalleryItem', 'guard_name' => 'web']);
+        $staffRole->givePermissionTo([$permArt, $permGal]);
+
+        $staff = User::firstOrCreate(
+            ['email' => 'staff-allowed-test@pelangiglass.com'],
+            [
+                'name' => 'Staf Allowed Test',
+                'password' => bcrypt('password'),
+                'role' => 'staff',
+            ]
+        );
+        $staff->assignRole($staffRole);
+
+        $resArt = $this->actingAs($staff)->get('/admin/articles');
+        $resArt->assertStatus(200);
+
+        $resGal = $this->actingAs($staff)->get('/admin/gallery-items');
+        $resGal->assertStatus(200);
     }
 }

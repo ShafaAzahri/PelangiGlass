@@ -7,6 +7,7 @@ use Filament\Panel;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Spatie\Permission\PermissionRegistrar;
 use Spatie\Permission\Traits\HasRoles;
 
 class User extends Authenticatable implements FilamentUser
@@ -39,6 +40,7 @@ class User extends Authenticatable implements FilamentUser
             if ($user->role && in_array($user->role, ['admin', 'staff'])) {
                 try {
                     $user->syncRoles([$user->role]);
+                    app(PermissionRegistrar::class)->forgetCachedPermissions();
                 } catch (\Throwable $e) {
                     // Ignore during early migrations
                 }
