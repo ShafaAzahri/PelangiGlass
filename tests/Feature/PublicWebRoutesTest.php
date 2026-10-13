@@ -5,6 +5,7 @@ namespace Tests\Feature;
 use App\Enums\InquiryStatus;
 use App\Models\Article;
 use App\Models\Product;
+use App\Models\Promo;
 use App\Models\Service;
 use App\Models\Setting;
 use Inertia\Testing\AssertableInertia as Assert;
@@ -146,7 +147,18 @@ class PublicWebRoutesTest extends TestCase
 
     public function test_promo_detail_page_renders_successfully(): void
     {
-        $response = $this->get('/promo/promo-kaca-film-v-kool-3m');
+        $promo = Promo::first() ?? Promo::create([
+            'name' => 'Diskon Kaca Film V-KOOL & 3M',
+            'slug' => 'promo-kaca-film-v-kool-3m',
+            'category' => 'Kaca Film',
+            'desc' => 'Diskon hingga 25% paket full body kaca film.',
+            'original_price' => 'Rp 2.800.000',
+            'discount_percent' => '25%',
+            'promo_price' => 'Rp 2.100.000',
+            'is_active' => true,
+        ]);
+
+        $response = $this->get("/promo/{$promo->slug}");
 
         $response->assertStatus(200);
         $response->assertInertia(fn (Assert $page) => $page

@@ -3,11 +3,15 @@ import { ref, computed, onMounted, onUnmounted } from 'vue';
 import { Head } from '@inertiajs/vue3';
 import AppLayout from '@/Layouts/AppLayout.vue';
 import PromoCard from '@/Components/Cards/PromoCard.vue';
+import EmptyState from '@/Components/UI/EmptyState.vue';
+import { useWhatsApp } from '@/Composables/useWhatsApp';
+
+const { buildUrl } = useWhatsApp();
 
 const props = defineProps({
     promos: {
         type: Array,
-        required: true,
+        default: () => [],
     },
     categories: {
         type: Array,
@@ -15,118 +19,8 @@ const props = defineProps({
     },
 });
 
-const defaultPromos = [
-    {
-        id: 1,
-        slug: 'promo-kaca-film-v-kool-3m',
-        name: 'Diskon Kaca Film V-KOOL & 3M',
-        category: 'Kaca Film',
-        desc: 'Diskon hingga 25% paket full body kaca film premium anti panas ...',
-        img: 'https://images.unsplash.com/photo-1526459915562-c5ca724b1d02?w=400&h=300&fit=crop&auto=format',
-        badge: 'Terlaris',
-        original_price: 'Rp 2.800.000',
-        promo_price: 'Rp 2.100.000',
-        discount: '-25%',
-        code: 'FILMPREMIUM25',
-    },
-    {
-        id: 2,
-        slug: 'ganti-kaca-depan-free-wiper',
-        name: 'Ganti Kaca Depan + Free Wiper',
-        category: 'Ganti Kaca',
-        desc: 'Penggantian kaca depan original OEM presisi tinggi, gratis 1 set wiper Bos...',
-        img: 'https://images.unsplash.com/photo-1699897483215-a66a9ca292b3?w=400&h=300&fit=crop&auto=format',
-        badge: null,
-        original_price: 'Rp 1.630.000',
-        promo_price: 'Rp 1.450.000',
-        discount: '-11%',
-        code: 'KACAWIPER',
-    },
-    {
-        id: 3,
-        slug: 'servis-kaca-retak-baret',
-        name: 'Servis Kaca Retak & Baret',
-        category: 'Perbaikan Kaca',
-        desc: 'Perbaikan retak koin dan bintang dengan resin optik US Glass Repa...',
-        img: 'https://images.unsplash.com/photo-1608259243654-70c070e0f6ed?w=400&h=300&fit=crop&auto=format',
-        badge: null,
-        original_price: 'Rp 400.000',
-        promo_price: 'Rp 250.000',
-        discount: '-37%',
-        code: 'HEMATRETAK',
-    },
-    {
-        id: 4,
-        slug: 'coating-kaca-anti-jamur',
-        name: 'Coating Kaca & Anti Jamur',
-        category: 'Perawatan',
-        desc: 'Pembersihan kerak jamur membandel dan aplikasi nano coating hidrofob...',
-        img: 'https://images.unsplash.com/photo-1618934116136-16d28f184b10?w=400&h=300&fit=crop&auto=format',
-        badge: null,
-        original_price: 'Rp 500.000',
-        promo_price: 'Rp 350.000',
-        discount: '-30%',
-        code: 'KACAJERNIH',
-    },
-    {
-        id: 5,
-        slug: 'voucher-booking-website',
-        name: 'Voucher Booking Website',
-        category: 'Perawatan',
-        desc: 'Potongan harga langsung tanpa diundi khusus reservasi jadwal lewat websi...',
-        img: 'https://images.unsplash.com/photo-1708805282706-f44730b7e527?w=400&h=300&fit=crop&auto=format',
-        badge: null,
-        original_price: 'Rp 1.000.000',
-        promo_price: 'Rp 900.000',
-        discount: '-10%',
-        code: 'WEBBOOKING10',
-    },
-    {
-        id: 6,
-        slug: 'paket-hemat-solar-gard',
-        name: 'Paket Hemat Solar Gard',
-        category: 'Kaca Film',
-        desc: 'Kaca film tolak panas teruji dengan perlindungan UV 99% dan harga pali...',
-        img: 'https://images.unsplash.com/photo-1651084296894-105edab05b26?w=400&h=300&fit=crop&auto=format',
-        badge: null,
-        original_price: 'Rp 1.500.000',
-        promo_price: 'Rp 1.200.000',
-        discount: '-20%',
-        code: 'SOLARGARD20',
-    },
-    {
-        id: 7,
-        slug: 'paket-kaca-samping-belakang',
-        name: 'Paket Kaca Samping & Belakang',
-        category: 'Ganti Kaca',
-        desc: 'Pemasangan kaca pintu samping dan bagasi belakang original temper...',
-        img: 'https://images.unsplash.com/photo-1764428950296-be81c8decb97?w=400&h=300&fit=crop&auto=format',
-        badge: null,
-        original_price: 'Rp 1.100.000',
-        promo_price: 'Rp 935.000',
-        discount: '-15%',
-        code: 'KACABELAKANG',
-    },
-    {
-        id: 8,
-        slug: 'servis-seal-kaca-bocor-rembes',
-        name: 'Servis Seal Kaca Bocor / Rembes',
-        category: 'Perawatan',
-        desc: 'Penanganan kaca mobil bocor atau rembes air saat hujan dengan seala...',
-        img: 'https://images.unsplash.com/photo-1651084296894-105edab05b26?w=400&h=300&fit=crop&auto=format',
-        badge: null,
-        original_price: 'Rp 350.000',
-        promo_price: 'Rp 275.000',
-        discount: '-21%',
-        code: 'ANTIBOCOR',
-    },
-];
-
 const allPromos = computed(() => {
-    if (props.promos && props.promos.length > 0) {
-        return props.promos;
-    }
-    return defaultPromos;
+    return Array.isArray(props.promos) ? props.promos : [];
 });
 
 const defaultCategories = ['Semua', 'Kaca Film', 'Ganti Kaca', 'Perbaikan Kaca', 'Aksesoris & Perawatan'];
@@ -243,9 +137,14 @@ onUnmounted(() => {
                 </div>
 
                 <!-- Promos 4-Column Grid (matching Image #3) -->
-                <div v-if="filteredPromos.length === 0" class="text-center py-20 text-slate-400">
-                    Promo tidak ditemukan.
-                </div>
+                <!-- Empty State -->
+                <EmptyState
+                    v-if="filteredPromos.length === 0"
+                    title="Belum Ada Promo Aktif"
+                    message="Saat ini belum ada penawaran promo khusus di katalog. Silakan hubungi kami via WhatsApp untuk konsultasi harga terbaik atau penawaran spesial langsung dari teknisi kami."
+                    action-label="Konsultasi Penawaran via WhatsApp"
+                    :action-href="buildUrl('Halo Pelangi Glass, saya ingin menanyakan penawaran spesial atau promo yang sedang berlangsung.')"
+                />
 
                 <div v-else class="grid sm:grid-cols-2 lg:grid-cols-4 gap-5 items-stretch">
                     <PromoCard
