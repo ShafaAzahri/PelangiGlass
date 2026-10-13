@@ -7,58 +7,6 @@ const props = defineProps({
         default: () => [],
     },
 });
-
-const defaultTestimonials = [
-    {
-        name: 'Budi Santoso',
-        role: 'Pengusaha',
-        car: 'Toyota Innova Zenix',
-        rating: 5,
-        text: 'Sudah lebih dari 10 tahun langganan di Pelangi Glass untuk semua mobil operasional kantor. Hasil pemasangan kaca depan sangat rapi, tidak ada bocor saat hujan deras, dan harganya sangat fair serta transparan.',
-        color: '#2563eb',
-    },
-    {
-        name: 'dr. Rina Wijayanti',
-        role: 'Dokter Umum',
-        car: 'Honda CR-V Turbo',
-        rating: 5,
-        text: 'Pasang kaca film V-Kool di sini pelayanannya luar biasa ramah dan teliti. Ruang tunggu ber-AC sangat nyaman. Setelah pasang, kabin mobil jauh lebih adem walau parkir di terik siang.',
-        color: '#059669',
-    },
-    {
-        name: 'Hendro Prasetyo',
-        role: 'Karyawan Swasta',
-        car: 'Mitsubishi Pajero Sport',
-        rating: 5,
-        text: 'Kaca depan kena kerikil di tol dan langsung retak panjang. Teknisi Pelangi Glass sangat cekatan, dalam waktu 2 jam kaca sudah diganti baru dengan presisi OEM pabrik. Sangat direkomendasikan!',
-        color: '#d97706',
-    },
-    {
-        name: 'Siti Nurhaliza',
-        role: 'Ibu Rumah Tangga',
-        car: 'Toyota Raize',
-        rating: 5,
-        text: 'Awalnya bingung pilih persentase kegelapan kaca film yang aman untuk malam hari. Konsultasinya sangat membantu dan tidak memaksakan produk termahal. Hasilnya pas banget sesuai kebutuhan!',
-        color: '#7c3aed',
-    },
-    {
-        name: 'Bambang Kusuma',
-        role: 'Arsitek',
-        car: 'Mazda CX-5',
-        rating: 5,
-        text: 'Sangat detail dalam proses pengerjaan. Sealant dipasang rapi tanpa blepotan sama sekali. Sensor hujan dan kamera ADAS di kaca depan juga berfungsi normal tanpa kendala kalibrasi.',
-        color: '#dc2626',
-    },
-    {
-        name: 'Agus Setiawan',
-        role: 'Kolektor Mobil Klasik',
-        car: 'Toyota Land Cruiser VX80',
-        rating: 5,
-        text: 'Mencari kaca mobil langka untuk seri jadul di Purwokerto awalnya ragu, tapi di Pelangi Glass bisa dipesan dan dipasang dengan presisi tinggi. Reputasi sejak 1992 memang terbukti nyata!',
-        color: '#0891b2',
-    },
-];
-
 const list = computed(() => {
     if (props.testimonials && props.testimonials.length > 0) {
         return props.testimonials.map((t) => ({
@@ -70,7 +18,7 @@ const list = computed(() => {
             color: t.avatar_color || '#2563eb',
         }));
     }
-    return defaultTestimonials;
+    return [];
 });
 
 const doubledList = computed(() => [...list.value, ...list.value]);
@@ -156,7 +104,7 @@ onUnmounted(() => {
 </script>
 
 <template>
-    <section class="py-24 overflow-hidden bg-slate-900">
+    <section v-if="list.length > 0" class="py-24 overflow-hidden bg-slate-900">
         <div class="max-w-6xl mx-auto px-6">
             <div class="flex items-end justify-between mb-12 flex-wrap gap-4">
                 <div>

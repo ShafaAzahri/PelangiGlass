@@ -2,7 +2,7 @@
 import { ref, computed, onMounted, onUnmounted } from 'vue';
 import { Head, Link } from '@inertiajs/vue3';
 import AppLayout from '@/Layouts/AppLayout.vue';
-
+import EmptyState from '@/Components/UI/EmptyState.vue';
 const props = defineProps({
     articles: {
         type: [Object, Array],
@@ -14,69 +14,6 @@ const props = defineProps({
     },
 });
 
-const defaultArticles = [
-    {
-        id: 1,
-        slug: '5-cara-merawat-kaca-mobil-agar-tetap-jernih-dan-tahan-lama',
-        title: '5 Cara Merawat Kaca Mobil Agar Tetap Jernih dan Tahan Lama',
-        excerpt: 'Kaca mobil yang kotor dan baret bisa mengganggu visibilitas saat berkendara. Berikut tips perawatan rutin yang bisa Anda lakukan sendiri di rumah.',
-        category: 'Tips Perawatan',
-        date: '02 Sep 2026',
-        readTime: '4 menit',
-        img: 'https://images.unsplash.com/photo-1618934116136-16d28f184b10?w=600&h=400&fit=crop&auto=format',
-    },
-    {
-        id: 2,
-        slug: 'kaca-film-atau-tanpa-film-perbedaan-yang-perlu-anda-tahu',
-        title: 'Kaca Film atau Tanpa Film? Ini Perbedaan yang Perlu Anda Tahu',
-        excerpt: 'Banyak pemilik kendaraan masih bingung antara manfaat kaca film dan tanpa film. Kami jelaskan keuntungan, kekurangan, dan rekomendasinya.',
-        category: 'Edukasi',
-        date: '28 Aug 2026',
-        readTime: '5 menit',
-        img: 'https://images.unsplash.com/photo-1526459915562-c5ca724b1d02?w=600&h=400&fit=crop&auto=format',
-    },
-    {
-        id: 3,
-        slug: '7-tanda-kaca-mobil-anda-sudah-harus-diganti-sekarang',
-        title: '7 Tanda Kaca Mobil Anda Sudah Harus Diganti Sekarang',
-        excerpt: 'Keretakan kecil sering diabaikan, padahal bisa berkembang menjadi bahaya besar. Kenali tanda-tanda kaca yang wajib segera diganti.',
-        category: 'Keselamatan',
-        date: '20 Aug 2026',
-        readTime: '3 menit',
-        img: 'https://images.unsplash.com/photo-1608259243654-70c070e0f6ed?w=600&h=400&fit=crop&auto=format',
-    },
-    {
-        id: 4,
-        slug: 'panduan-memilih-kaca-film-v-kool-3m-atau-solar-gard',
-        title: 'Panduan Memilih Kaca Film: V-Kool, 3M, atau Solar Gard?',
-        excerpt: 'Tiga merek ini sering jadi pilihan utama. Kami bandingkan performa, harga, dan garansi masing-masing agar Anda bisa memilih yang paling sesuai.',
-        category: 'Panduan Produk',
-        date: '15 Aug 2026',
-        readTime: '6 menit',
-        img: 'https://images.unsplash.com/photo-1651084296894-105edab05b26?w=600&h=400&fit=crop&auto=format',
-    },
-    {
-        id: 5,
-        slug: 'kapan-waktu-tepat-mengganti-kaca-depan-retak',
-        title: 'Kapan Waktu yang Tepat Mengganti Kaca Depan Mobil yang Retak?',
-        excerpt: 'Jangan tunda perbaikan retakan kaca depan. Kenali batasan retak yang masih bisa direparasi dan kondisi keretakan yang sudah wajib diganti demi keselamatan keluarga.',
-        category: 'Keselamatan',
-        date: '05 Aug 2026',
-        readTime: '5 menit',
-        img: 'https://images.unsplash.com/photo-1699897483215-a66a9ca292b3?w=600&h=400&fit=crop&auto=format',
-    },
-    {
-        id: 6,
-        slug: 'cara-membersihkan-jamur-kaca-mobil-tanpa-baret',
-        title: 'Cara Aman Membersihkan Jamur Kaca Mobil Tanpa Baret',
-        excerpt: 'Kerak jamur membandel kerap membiaskan cahaya di malam hari. Ikuti langkah mudah dan aman membersihkan jamur kaca dengan bahan yang tepat.',
-        category: 'Tips Perawatan',
-        date: '01 Aug 2026',
-        readTime: '4 menit',
-        img: 'https://images.unsplash.com/photo-1764428950296-be81c8decb97?w=600&h=400&fit=crop&auto=format',
-    },
-];
-
 const allArticles = computed(() => {
     const list = props.articles?.data || (Array.isArray(props.articles) ? props.articles : []);
     if (list.length > 0) {
@@ -86,21 +23,20 @@ const allArticles = computed(() => {
             title: a.title,
             excerpt: a.excerpt || a.short_description || '',
             category: a.category?.name || a.category || 'Edukasi',
+            category_color: a.category?.color_scheme,
             date: a.published_at ? new Date(a.published_at).toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric' }) : 'Terbaru',
             readTime: `${a.read_time_minutes || 4} menit`,
             img: a.image_url || a.img || a.featured_image || '/images/default-article.webp',
         }));
     }
-    return defaultArticles;
+    return [];
 });
-
-const defaultCategories = ['Semua', 'Tips Perawatan', 'Edukasi', 'Keselamatan', 'Panduan Produk', 'Panduan'];
 
 const categoryList = computed(() => {
     if (props.categories && props.categories.length > 0) {
-        return ['Semua', ...props.categories.map((c) => c.name)];
+        return ['Semua', ...props.categories.map((c) => c.name || c)];
     }
-    return defaultCategories;
+    return ['Semua'];
 });
 
 const activeCategory = ref('Semua');
@@ -259,9 +195,11 @@ onUnmounted(() => {
                 </div>
 
                 <!-- Empty State -->
-                <div v-if="filteredArticles.length === 0" class="text-center py-20 text-slate-400">
-                    Tidak ada artikel di kategori ini.
-                </div>
+                <EmptyState
+                    v-if="filteredArticles.length === 0"
+                    title="Belum Ada Artikel"
+                    message="Saat ini belum ada artikel yang diterbitkan di kategori ini. Silakan cek kategori lain atau baca tips dan panduan kami nanti."
+                />
 
                 <!-- Grid Remaining Articles (matching Image #4) -->
                 <div v-else-if="visibleRest.length > 0" class="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">

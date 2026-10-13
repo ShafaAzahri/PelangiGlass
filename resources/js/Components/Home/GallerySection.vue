@@ -13,19 +13,6 @@ const props = defineProps({
     },
 });
 
-const defaultItems = [
-    { cat: 'Kaca Depan', img: '/storage/gallery/avanza-gen-1.png' },
-    { cat: 'Workshop', img: '/storage/gallery/bus-aneka-bintang.png' },
-    { cat: 'Film Kaca', img: '/storage/gallery/brio-merah-s.png' },
-    { cat: 'Kaca Depan', img: '/storage/gallery/innova.png' },
-    { cat: 'Aksesoris', img: '/storage/gallery/granmax-belakang-4.png' },
-    { cat: 'Workshop', img: '/storage/gallery/hino-dutro-putih.png' },
-    { cat: 'Film Kaca', img: '/storage/gallery/crv-gen-3-s1.png' },
-    { cat: 'Kaca Depan', img: '/storage/gallery/fortuner-gen-2.png' },
-    { cat: 'Workshop', img: '/storage/gallery/isuzu-elf-4.png' },
-    { cat: 'Film Kaca', img: '/storage/gallery/bmw-e-91.png' },
-];
-
 const items = computed(() => {
     if (props.galleryItems && props.galleryItems.length > 0) {
         return props.galleryItems.map((g) => ({
@@ -33,7 +20,7 @@ const items = computed(() => {
             img: g.image_url,
         }));
     }
-    return defaultItems;
+    return [];
 });
 
 const categories = computed(() => {
@@ -161,7 +148,7 @@ onUnmounted(() => {
 </script>
 
 <template>
-    <section id="galeri" class="py-24 bg-slate-100 dark:bg-slate-950 transition-colors">
+    <section v-if="items.length > 0" id="galeri" class="py-24 bg-slate-100 dark:bg-slate-950 transition-colors">
         <div class="max-w-6xl mx-auto px-6">
             <div class="flex items-end justify-between mb-6">
                 <div>

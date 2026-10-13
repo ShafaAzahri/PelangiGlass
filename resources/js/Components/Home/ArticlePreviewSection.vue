@@ -12,36 +12,6 @@ const props = defineProps({
 
 const { formatDate } = useFormatters();
 
-const defaultArticles = [
-    {
-        slug: 'cara-membersihkan-jamur-kaca-mobil',
-        title: 'Cara Efektif Membersihkan Jamur Kaca Mobil Sendiri di Rumah',
-        excerpt: 'Jamur kaca dan kerak air sering mengganggu visibilitas saat berkendara di malam hari atau hujan deras. Simak cara aman membersihkannya tanpa merusak lapisan kaca.',
-        category: 'Tips Perawatan',
-        date: '2 Sep 2026',
-        readTime: '4 menit',
-        img: '/storage/articles/bersihkan-kaca-dari-jamur.png',
-    },
-    {
-        slug: 'panduan-merawat-kabin-dan-kaca-mobil',
-        title: 'Panduan Merawat Kebersihan Kabin & Kaca Mobil Agar Bebas Bau dan Lembap',
-        excerpt: 'Kabin yang bersih dan kaca bebas embun membuat perjalanan jauh lebih nyaman. Pelajari tips perawatan sirkulasi AC, pembersihan karpet, dan perawatan kaca film.',
-        category: 'Tips Perawatan',
-        date: '28 Agu 2026',
-        readTime: '5 menit',
-        img: '/storage/articles/cara-merawat-kabin-mobil.png',
-    },
-    {
-        slug: 'penyebab-alarm-mobil-bunyi-terus-dan-solusinya',
-        title: 'Penyebab Alarm Mobil Bunyi Terus Menerus dan Cara Mengatasinya',
-        excerpt: 'Alarm mobil tiba-tiba berbunyi tanpa sebab di tengah malam? Kenali faktor penyebabnya mulai dari baterai remote, switch pintu, sensor getar kaca, hingga modul alarm.',
-        category: 'Edukasi',
-        date: '20 Agu 2026',
-        readTime: '4 menit',
-        img: '/storage/articles/alarm-mobil-nyala-terus.png',
-    },
-];
-
 const articlesList = computed(() => {
     if (props.articles && props.articles.length > 0) {
         return props.articles.map((a) => ({
@@ -54,12 +24,12 @@ const articlesList = computed(() => {
             img: a.image_url || '/images/default-article.webp',
         }));
     }
-    return defaultArticles;
+    return [];
 });
 </script>
 
 <template>
-    <section class="py-24 bg-slate-50 dark:bg-slate-950 transition-colors">
+    <section v-if="articlesList.length > 0" class="py-24 bg-slate-50 dark:bg-slate-950 transition-colors">
         <div class="max-w-6xl mx-auto px-6">
             <div class="flex items-end justify-between mb-12 flex-wrap gap-4">
                 <div>

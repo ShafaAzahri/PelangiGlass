@@ -11,15 +11,6 @@ const props = defineProps({
 
 const { buildUrl } = useWhatsApp();
 
-const defaultFaqs = [
-    { q: 'Berapa lama proses penggantian kaca mobil?', a: 'Umumnya 2–3 jam untuk kaca depan atau belakang. Untuk kaca samping bisa lebih cepat, sekitar 1–1,5 jam. Kami akan informasikan estimasi waktu yang lebih tepat setelah melihat kondisi kendaraan Anda.' },
-    { q: 'Apakah ada garansi setelah penggantian kaca?', a: 'Ya, kami memberikan garansi kebocoran 1 tahun untuk setiap penggantian kaca. Jika ada kebocoran dalam periode garansi, kami akan perbaiki tanpa biaya tambahan.' },
-    { q: 'Merek kaca apa saja yang tersedia?', a: 'Kami menyediakan kaca original OEM dan berbagai merek aftermarket berkualitas seperti Asahimas, AGC, Pilkington, dan lainnya. Pilihan disesuaikan dengan kebutuhan dan anggaran Anda.' },
-    { q: 'Apakah bisa dipanggil ke lokasi (mobile service)?', a: 'Untuk kondisi tertentu kami dapat melayani kunjungan ke lokasi di area Purwokerto dan sekitarnya. Hubungi kami via WhatsApp untuk konfirmasi ketersediaan dan area jangkauan.' },
-    { q: 'Merek film kaca apa yang direkomendasikan?', a: 'Kami merekomendasikan V-Kool, 3M, dan Solar Gard — merek premium dengan teknologi penolak panas dan UV terbaik. Semua dilengkapi garansi film 3–5 tahun dan sertifikat keaslian.' },
-    { q: 'Apakah asuransi kendaraan bisa digunakan?', a: 'Kami dapat membantu proses klaim asuransi untuk penggantian kaca. Bawa serta dokumen kendaraan dan polis asuransi Anda, tim kami akan membantu prosesnya.' },
-];
-
 const faqsList = computed(() => {
     if (props.faqs && props.faqs.length > 0) {
         return props.faqs.map((f) => ({
@@ -27,7 +18,7 @@ const faqsList = computed(() => {
             a: f.answer,
         }));
     }
-    return defaultFaqs;
+    return [];
 });
 
 const openIndex = ref(0);
@@ -38,7 +29,7 @@ const toggle = (idx) => {
 </script>
 
 <template>
-    <section class="py-24 bg-slate-50 dark:bg-slate-950 transition-colors">
+    <section v-if="faqsList.length > 0" class="py-24 bg-slate-50 dark:bg-slate-950 transition-colors">
         <div class="max-w-6xl mx-auto px-6">
             <div class="flex flex-col lg:flex-row gap-12 lg:gap-20">
                 <!-- Left: Title & Help Note -->

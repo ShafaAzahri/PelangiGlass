@@ -8,11 +8,6 @@ const props = defineProps({
     },
 });
 
-const defaultBanners = [
-    { img: '/images/banner1.png', alt: 'Kaca Mobil Jernih Perjalanan Lebih Aman', url: '/servis', title: 'Kaca Mobil Jernih Perjalanan Lebih Aman' },
-    { img: '/images/banner2.png', alt: 'Pelayanan Cepat, Rapi & Standar Pabrik', url: '/#kontak', title: 'Pelayanan Cepat, Rapi & Standar Pabrik' },
-];
-
 const bannerList = computed(() => {
     if (props.banners && props.banners.length > 0) {
         return props.banners.map((b) => {
@@ -35,7 +30,7 @@ const bannerList = computed(() => {
             };
         });
     }
-    return defaultBanners;
+    return [];
 });
 
 const totalBanners = computed(() => bannerList.value.length);
@@ -86,6 +81,7 @@ onUnmounted(() => {
 
 <template>
     <section
+        v-if="bannerList.length > 0"
         id="beranda"
         class="relative overflow-hidden bg-white dark:bg-slate-950 transition-colors"
         @mouseenter="isPaused = true"

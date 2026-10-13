@@ -3,6 +3,7 @@ import { ref, computed, onMounted, onUnmounted } from 'vue';
 import { Head, Link } from '@inertiajs/vue3';
 import AppLayout from '@/Layouts/AppLayout.vue';
 import ServiceCard from '@/Components/Cards/ServiceCard.vue';
+import EmptyState from '@/Components/UI/EmptyState.vue';
 import { useWhatsApp } from '@/Composables/useWhatsApp';
 
 const props = defineProps({
@@ -22,81 +23,6 @@ const props = defineProps({
 
 const { buildUrl } = useWhatsApp();
 
-const defaultServices = [
-    {
-        id: 1,
-        slug: 'penggantian-kaca-depan-oem',
-        name: 'Paket Ganti Kaca Depan',
-        category: 'Ganti Kaca',
-        desc: 'Penggantian kaca depan retak/pecah dengan kaca original OEM presisi dan standar lem sealant anti-bocor.',
-        img: 'https://images.unsplash.com/photo-1618934116136-16d28f184b10?w=400&h=300&fit=crop&auto=format',
-        badge: 'Terlaris',
-    },
-    {
-        id: 2,
-        slug: 'ganti-kaca-samping-belakang',
-        name: 'Ganti Kaca Samping & Belakang',
-        category: 'Ganti Kaca',
-        desc: 'Penggantian kaca pintu samping, ventilasi segitiga, dan kaca bagasi belakang untuk semua merek mobil.',
-        img: 'https://images.unsplash.com/photo-1699897483215-a66a9ca292b3?w=400&h=300&fit=crop&auto=format',
-        badge: 'Bergaransi',
-    },
-    {
-        id: 3,
-        slug: 'pemasangan-kaca-film-v-kool',
-        name: 'Pasang Kaca Film V-KOOL',
-        category: 'Kaca Film',
-        desc: 'Pemasangan kaca film tolak panas premium V-KOOL berteknologi multi-layer dengan garansi resmi 5 tahun.',
-        img: 'https://images.unsplash.com/photo-1526459915562-c5ca724b1d02?w=400&h=300&fit=crop&auto=format',
-        badge: 'Premium',
-    },
-    {
-        id: 4,
-        slug: 'pasang-kaca-film-3m-solar-gard',
-        name: 'Pasang Kaca Film 3M & Solar Gard',
-        category: 'Kaca Film',
-        desc: 'Kaca film penolak UV dan panas tinggi dengan beragam pilihan kegelapan (40%, 60%, 80%) original bergaransi.',
-        img: 'https://images.unsplash.com/photo-1708805282706-f44730b7e527?w=400&h=300&fit=crop&auto=format',
-        badge: null,
-    },
-    {
-        id: 5,
-        slug: 'perbaikan-kaca-retak-chip',
-        name: 'Reparasi Kaca Retak & Chip',
-        category: 'Perbaikan Kaca',
-        desc: 'Perbaikan keretakan titik (chip) dan baret dengan teknologi injeksi resin khusus tanpa harus ganti kaca baru.',
-        img: 'https://images.unsplash.com/photo-1608259243654-70c070e0f6ed?w=400&h=300&fit=crop&auto=format',
-        badge: 'Hemat',
-    },
-    {
-        id: 6,
-        slug: 'kalibrasi-kaca-bocor',
-        name: 'Kalibrasi & Perbaikan Kaca Bocor',
-        category: 'Perbaikan Kaca',
-        desc: 'Pembersihan sealant lama dan pemasangan ulang kaca berstandar pabrik untuk mengatasi rembesan air saat hujan.',
-        img: 'https://images.unsplash.com/photo-1651084296894-105edab05b26?w=400&h=300&fit=crop&auto=format',
-        badge: 'Bergaransi',
-    },
-    {
-        id: 7,
-        slug: 'penggantian-karet-seal-kaca',
-        name: 'Ganti Karet Seal & Pelipit Kaca',
-        category: 'Aksesoris & Perawatan',
-        desc: 'Penggantian karet channel kaca mati, pelipit pintu, dan weatherstrip agar kabin kembali senyap dan kedap.',
-        img: 'https://images.unsplash.com/photo-1618934116136-16d28f184b10?w=400&h=300&fit=crop&auto=format',
-        badge: null,
-    },
-    {
-        id: 8,
-        slug: 'poles-kaca-dan-rain-repellent',
-        name: 'Poles Kaca & Rain Repellent',
-        category: 'Aksesoris & Perawatan',
-        desc: 'Pembersihan jamur kaca membandel disertai lapisan hidrofobik efek daun talas untuk visibilitas maksimal saat hujan.',
-        img: 'https://images.unsplash.com/photo-1764428950296-be81c8decb97?w=400&h=300&fit=crop&auto=format',
-        badge: 'Baru',
-    },
-];
-
 const allServices = computed(() => {
     const list = props.services?.data || (Array.isArray(props.services) ? props.services : []);
     if (list.length > 0) {
@@ -106,20 +32,18 @@ const allServices = computed(() => {
             name: s.name,
             category: s.category?.name || s.category || 'Ganti Kaca',
             desc: s.short_description || s.description || s.desc || '',
-            img: s.image_url || s.img || s.image_path || 'https://images.unsplash.com/photo-1618934116136-16d28f184b10?w=400&h=300&fit=crop&auto=format',
+            img: s.image_url || s.img || s.image_path || '/images/workshop-illustration.jpg',
             badge: s.badge?.value || s.badge || (s.warranty_period ? 'Bergaransi' : null),
         }));
     }
-    return defaultServices;
+    return [];
 });
-
-const defaultCategories = ['Semua', 'Ganti Kaca', 'Kaca Film', 'Perbaikan Kaca', 'Aksesoris & Perawatan'];
 
 const categoryList = computed(() => {
     if (props.categories && props.categories.length > 0) {
-        return ['Semua', ...props.categories.map((c) => c.name)];
+        return ['Semua', ...props.categories.map((c) => c.name || c)];
     }
-    return defaultCategories;
+    return ['Semua'];
 });
 
 const activeCategory = ref('Semua');
@@ -226,9 +150,14 @@ onUnmounted(() => {
                 </div>
 
                 <!-- Services 4-Column Grid (matching Image #2) -->
-                <div v-if="filteredServices.length === 0" class="text-center py-20 text-slate-400">
-                    Layanan tidak ditemukan.
-                </div>
+                <!-- Empty State -->
+                <EmptyState
+                    v-if="filteredServices.length === 0"
+                    title="Belum Ada Layanan Ditampilkan"
+                    message="Saat ini belum ada layanan aktif di katalog atau layanan yang cocok dengan pencarian Anda. Silakan hubungi kami untuk konsultasi layanan dan estimasi biaya gratis."
+                    action-label="Konsultasi via WhatsApp"
+                    :action-href="buildUrl('Halo Pelangi Glass, saya ingin konsultasi mengenai layanan spesialis kaca mobil.')"
+                />
 
                 <div v-else class="grid sm:grid-cols-2 lg:grid-cols-4 gap-5 items-stretch">
                     <ServiceCard

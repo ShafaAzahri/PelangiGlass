@@ -3,6 +3,7 @@ import { ref, computed, onMounted, onUnmounted } from 'vue';
 import { Head, Link } from '@inertiajs/vue3';
 import AppLayout from '@/Layouts/AppLayout.vue';
 import ProductCard from '@/Components/Cards/ProductCard.vue';
+import EmptyState from '@/Components/UI/EmptyState.vue';
 import { useWhatsApp } from '@/Composables/useWhatsApp';
 
 const props = defineProps({
@@ -22,81 +23,6 @@ const props = defineProps({
 
 const { buildUrl } = useWhatsApp();
 
-const defaultProducts = [
-    {
-        id: 1,
-        slug: 'kaca-film-v-kool-vk-40',
-        name: 'Kaca Film V-KOOL VK 40',
-        category: 'Kaca Film',
-        desc: 'Film premium anti UV & panas. Garansi 5 tahun. Transmisi cahaya 40%.',
-        img: 'https://images.unsplash.com/photo-1526459915562-c5ca724b1d02?w=400&h=300&fit=crop&auto=format',
-        badge: 'Terlaris',
-    },
-    {
-        id: 2,
-        slug: 'kaca-film-3m-crystalline',
-        name: 'Kaca Film 3M Crystalline',
-        category: 'Kaca Film',
-        desc: 'Teknologi multi-layer nano. Blokir 97% panas inframerah. Original 3M.',
-        img: 'https://images.unsplash.com/photo-1708805282706-f44730b7e527?w=400&h=300&fit=crop&auto=format',
-        badge: 'Premium',
-    },
-    {
-        id: 3,
-        slug: 'kaca-depan-avanza-gen-3',
-        name: 'Kaca Depan Avanza Gen 3',
-        category: 'Kaca Mobil',
-        desc: 'Kaca depan original OEM presisi. Cocok untuk Toyota Avanza 201...',
-        img: 'https://images.unsplash.com/photo-1699897483215-a66a9ca292b3?w=400&h=300&fit=crop&auto=format',
-        badge: null,
-    },
-    {
-        id: 4,
-        slug: 'kaca-depan-xpander',
-        name: 'Kaca Depan Xpander',
-        category: 'Kaca Mobil',
-        desc: 'Kaca depan original OEM Mitsubishi Xpander 2018–2024.',
-        img: 'https://images.unsplash.com/photo-1618934116136-16d28f184b10?w=400&h=300&fit=crop&auto=format',
-        badge: null,
-    },
-    {
-        id: 5,
-        slug: 'rain-repellent-soft99',
-        name: 'Rain Repellent Soft99',
-        category: 'Perawatan',
-        desc: 'Cairan anti hujan Jepang. Tahan hingga 3 bulan. Efek daun talas instan.',
-        img: 'https://images.unsplash.com/photo-1764428950296-be81c8decb97?w=400&h=300&fit=crop&auto=format',
-        badge: 'Baru',
-    },
-    {
-        id: 6,
-        slug: 'wiper-bosch-aerotwin',
-        name: 'Wiper Bosch Aerotwin',
-        category: 'Aksesoris',
-        desc: 'Wiper flat beam tanpa rangka. Sapuan bersih & merata. Tersedia sem...',
-        img: 'https://images.unsplash.com/photo-1526459915562-c5ca724b1d02?w=400&h=300&fit=crop&auto=format',
-        badge: null,
-    },
-    {
-        id: 7,
-        slug: 'karet-seal-kaca-universal',
-        name: 'Karet Seal Kaca Universal',
-        category: 'Aksesoris',
-        desc: 'Karet seal kaca presisi tinggi. Anti bocor & anti debu. Senyap kab...',
-        img: 'https://images.unsplash.com/photo-1618934116136-16d28f184b10?w=400&h=300&fit=crop&auto=format',
-        badge: null,
-    },
-    {
-        id: 8,
-        slug: 'cairan-pembersih-kaca-pro',
-        name: 'Cairan Pembersih Kaca Pro',
-        category: 'Perawatan',
-        desc: 'Formula khusus tanpa alkohol. Aman untuk semua jenis kaca film dan ka...',
-        img: 'https://images.unsplash.com/photo-1651084296894-105edab05b26?w=400&h=300&fit=crop&auto=format',
-        badge: null,
-    },
-];
-
 const allProducts = computed(() => {
     const list = props.products?.data || (Array.isArray(props.products) ? props.products : []);
     if (list.length > 0) {
@@ -110,16 +36,14 @@ const allProducts = computed(() => {
             badge: p.badge?.value || p.badge || null,
         }));
     }
-    return defaultProducts;
+    return [];
 });
-
-const defaultCategories = ['Semua', 'Kaca Film', 'Kaca Mobil', 'Aksesoris', 'Perawatan'];
 
 const categoryList = computed(() => {
     if (props.categories && props.categories.length > 0) {
-        return ['Semua', ...props.categories.map((c) => c.name)];
+        return ['Semua', ...props.categories.map((c) => c.name || c)];
     }
-    return defaultCategories;
+    return ['Semua'];
 });
 
 const activeCategory = ref('Semua');
@@ -226,9 +150,14 @@ onUnmounted(() => {
                 </div>
 
                 <!-- Products 4-Column Grid -->
-                <div v-if="filteredProducts.length === 0" class="text-center py-20 text-slate-400">
-                    Produk tidak ditemukan.
-                </div>
+                <!-- Empty State -->
+                <EmptyState
+                    v-if="filteredProducts.length === 0"
+                    title="Belum Ada Produk Ditampilkan"
+                    message="Saat ini belum ada produk aktif di katalog atau produk yang cocok dengan pencarian Anda. Silakan hubungi kami untuk informasi ketersediaan stok."
+                    action-label="Tanya Stok via WhatsApp"
+                    :action-href="buildUrl('Halo Pelangi Glass, saya ingin tanya ketersediaan stok produk kaca mobil.')"
+                />
 
                 <div v-else class="grid sm:grid-cols-2 lg:grid-cols-4 gap-5 items-stretch">
                     <ProductCard
