@@ -2,14 +2,13 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Setting;
+use Inertia\Inertia;
+use Inertia\Response;
 
 class AboutController extends Controller
 {
-    public function index()
+    public function index(): Response
     {
-        $settings = Setting::all()->pluck('value', 'key');
-
-        return view('pages.tentang.index', compact('settings'));
+        return Inertia::render('Tentang/Index');
     }
 }

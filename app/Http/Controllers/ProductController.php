@@ -4,12 +4,13 @@ namespace App\Http\Controllers;
 
 use App\Models\Product;
 use App\Models\ProductCategory;
-use App\Models\Setting;
 use Illuminate\Http\Request;
+use Inertia\Inertia;
+use Inertia\Response;
 
 class ProductController extends Controller
 {
-    public function index(Request $request)
+    public function index(Request $request): Response
     {
         $categories = ProductCategory::where('is_active', true)->orderBy('sort_order')->get();
 
@@ -24,19 +25,25 @@ class ProductController extends Controller
         if ($request->filled('q')) {
             $search = $request->q;
             $query->where(function ($q) use ($search) {
-                $q->where('name', 'ilike', "%{$search}%")
-                    ->orWhere('vehicle_compatibility', 'ilike', "%{$search}%")
-                    ->orWhere('short_description', 'ilike', "%{$search}%");
+                $q->where('name', 'like', "%{$search}%")
+                    ->orWhere('vehicle_compatibility', 'like', "%{$search}%")
+                    ->orWhere('short_description', 'like', "%{$search}%");
             });
         }
 
         $products = $query->paginate(12)->withQueryString();
-        $settings = Setting::all()->pluck('value', 'key');
 
-        return view('pages.produk.index', compact('products', 'categories', 'settings'));
+        return Inertia::render('Produk/Index', [
+            'products' => $products,
+            'categories' => $categories,
+            'filters' => [
+                'kategori' => $request->kategori,
+                'q' => $request->q,
+            ],
+        ]);
     }
 
-    public function show(string $slug)
+    public function show(string $slug): Response
     {
         $product = Product::active()->where('slug', $slug)->with('category')->firstOrFail();
         $relatedProducts = Product::active()
@@ -46,8 +53,9 @@ class ProductController extends Controller
             ->take(4)
             ->get();
 
-        $settings = Setting::all()->pluck('value', 'key');
-
-        return view('pages.produk.show', compact('product', 'relatedProducts', 'settings'));
+        return Inertia::render('Produk/Show', [
+            'product' => $product,
+            'relatedProducts' => $relatedProducts,
+        ]);
     }
 }

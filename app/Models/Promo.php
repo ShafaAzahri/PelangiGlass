@@ -6,6 +6,7 @@ use App\Traits\HasAutoCleanupFiles;
 use App\Traits\LogsActivity;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Promo extends Model
 {
@@ -15,7 +16,10 @@ class Promo extends Model
 
     protected array $fileFields = ['img'];
 
+    protected $appends = ['image_url'];
+
     protected $fillable = [
+        'product_id',
         'name',
         'slug',
         'category',
@@ -28,6 +32,8 @@ class Promo extends Model
         'discount',
         'code',
         'valid_until',
+        'start_date',
+        'end_date',
         'vehicle_compatibility',
         'benefits',
         'is_active',
@@ -38,9 +44,16 @@ class Promo extends Model
     {
         return [
             'benefits' => 'array',
+            'start_date' => 'date',
+            'end_date' => 'date',
             'is_active' => 'boolean',
             'sort_order' => 'integer',
         ];
+    }
+
+    public function product(): BelongsTo
+    {
+        return $this->belongsTo(Product::class, 'product_id');
     }
 
     public function scopeActive($query)
@@ -51,7 +64,7 @@ class Promo extends Model
     public function getImageUrlAttribute(): string
     {
         if (empty($this->img)) {
-            return asset('images/banner1.png');
+            return '/images/banner1.png';
         }
 
         if (str_starts_with($this->img, 'http://') || str_starts_with($this->img, 'https://')) {
@@ -61,13 +74,13 @@ class Promo extends Model
         $cleanPath = ltrim($this->img, '/');
 
         if (file_exists(public_path('storage/'.$cleanPath))) {
-            return asset('storage/'.$cleanPath);
+            return '/storage/'.$cleanPath;
         }
 
         if (file_exists(public_path($cleanPath))) {
-            return asset($cleanPath);
+            return '/'.$cleanPath;
         }
 
-        return asset('storage/'.$cleanPath);
+        return '/storage/'.$cleanPath;
     }
 }

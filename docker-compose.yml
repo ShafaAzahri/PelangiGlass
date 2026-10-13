@@ -6,14 +6,16 @@ services:
       target: production
     container_name: pelangiglass-app
     restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
     ports:
-      - "${APP_PORT:-48729}:48729"
+      - "${APP_PORT:-48730}:48730"
     environment: &default-env
       APP_NAME: "${APP_NAME:-Pelangi Glass}"
       APP_ENV: "${APP_ENV:-production}"
       APP_KEY: "${APP_KEY}"
       APP_DEBUG: "${APP_DEBUG:-false}"
-      APP_URL: "${APP_URL:-http://localhost:48729}"
+      APP_URL: "${APP_URL:-http://localhost:48730}"
       LOG_CHANNEL: stderr
       LOG_LEVEL: warning
       DB_CONNECTION: pgsql
@@ -47,7 +49,8 @@ services:
       target: production
     container_name: pelangiglass-scheduler
     restart: unless-stopped
-    command: ["php", "artisan", "schedule:work"]
+    security_opt:
+      - no-new-privileges:true
     environment:
       <<: *default-env
       RUN_MIGRATIONS: "false"
@@ -74,7 +77,8 @@ services:
       target: production
     container_name: pelangiglass-queue
     restart: unless-stopped
-    command: ["php", "artisan", "queue:work", "--tries=3", "--timeout=90", "--sleep=3", "--max-jobs=500", "--max-time=3600"]
+    security_opt:
+      - no-new-privileges:true
     environment:
       <<: *default-env
       RUN_MIGRATIONS: "false"
@@ -98,6 +102,8 @@ services:
     image: postgres:17-alpine
     container_name: pelangiglass-db
     restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
     environment:
       POSTGRES_DB: "${DB_DATABASE:-pelangiglass}"
       POSTGRES_USER: "${DB_USERNAME:-pelangiglass}"
@@ -118,7 +124,7 @@ services:
       - "-c"
       - "wal_buffers=1MB"
     ports:
-      - "127.0.0.1:${FORWARD_DB_PORT:-54829}:5432"
+      - "127.0.0.1:${FORWARD_DB_PORT:-54830}:5432"
     volumes:
       - pgdata:/var/lib/postgresql/data
     healthcheck:

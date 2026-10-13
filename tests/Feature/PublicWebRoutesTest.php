@@ -7,6 +7,7 @@ use App\Models\Article;
 use App\Models\Product;
 use App\Models\Service;
 use App\Models\Setting;
+use Inertia\Testing\AssertableInertia as Assert;
 use Tests\TestCase;
 
 class PublicWebRoutesTest extends TestCase
@@ -16,8 +17,12 @@ class PublicWebRoutesTest extends TestCase
         $response = $this->get('/');
 
         $response->assertStatus(200);
-        $response->assertSee('Pelangi Glass');
-        $response->assertSee('Konsultasi Gratis');
+        $response->assertInertia(fn (Assert $page) => $page
+            ->component('Home/Index')
+            ->has('banners')
+            ->has('featuredServices')
+            ->has('galleryItems')
+        );
     }
 
     public function test_about_page_renders_successfully(): void
@@ -25,8 +30,9 @@ class PublicWebRoutesTest extends TestCase
         $response = $this->get('/tentang');
 
         $response->assertStatus(200);
-        $response->assertSee('Tentang Pelangi Glass');
-        $response->assertSee('Visi Perusahaan');
+        $response->assertInertia(fn (Assert $page) => $page
+            ->component('Tentang/Index')
+        );
     }
 
     public function test_product_catalog_renders_successfully(): void
@@ -34,7 +40,11 @@ class PublicWebRoutesTest extends TestCase
         $response = $this->get('/produk');
 
         $response->assertStatus(200);
-        $response->assertSee('Katalog Produk');
+        $response->assertInertia(fn (Assert $page) => $page
+            ->component('Produk/Index')
+            ->has('products')
+            ->has('categories')
+        );
     }
 
     public function test_product_detail_page_renders_for_existing_product(): void
@@ -45,7 +55,10 @@ class PublicWebRoutesTest extends TestCase
         $response = $this->get("/produk/{$product->slug}");
 
         $response->assertStatus(200);
-        $response->assertSee($product->name);
+        $response->assertInertia(fn (Assert $page) => $page
+            ->component('Produk/Show')
+            ->where('product.slug', $product->slug)
+        );
     }
 
     public function test_product_detail_page_returns_404_for_missing_product(): void
@@ -60,7 +73,11 @@ class PublicWebRoutesTest extends TestCase
         $response = $this->get('/servis');
 
         $response->assertStatus(200);
-        $response->assertSee('Layanan');
+        $response->assertInertia(fn (Assert $page) => $page
+            ->component('Servis/Index')
+            ->has('services')
+            ->has('categories')
+        );
     }
 
     public function test_service_detail_page_renders_for_existing_service(): void
@@ -71,7 +88,10 @@ class PublicWebRoutesTest extends TestCase
         $response = $this->get("/servis/{$service->slug}");
 
         $response->assertStatus(200);
-        $response->assertSee($service->name);
+        $response->assertInertia(fn (Assert $page) => $page
+            ->component('Servis/Show')
+            ->where('service.slug', $service->slug)
+        );
     }
 
     public function test_service_detail_page_returns_404_for_missing_service(): void
@@ -86,7 +106,10 @@ class PublicWebRoutesTest extends TestCase
         $response = $this->get('/artikel');
 
         $response->assertStatus(200);
-        $response->assertSee('Artikel');
+        $response->assertInertia(fn (Assert $page) => $page
+            ->component('Artikel/Index')
+            ->has('articles')
+        );
     }
 
     public function test_article_detail_page_renders_for_existing_article(): void
@@ -97,7 +120,10 @@ class PublicWebRoutesTest extends TestCase
         $response = $this->get("/artikel/{$article->slug}");
 
         $response->assertStatus(200);
-        $response->assertSee($article->title);
+        $response->assertInertia(fn (Assert $page) => $page
+            ->component('Artikel/Show')
+            ->where('article.slug', $article->slug)
+        );
     }
 
     public function test_article_detail_page_returns_404_for_missing_article(): void
@@ -112,8 +138,10 @@ class PublicWebRoutesTest extends TestCase
         $response = $this->get('/promo');
 
         $response->assertStatus(200);
-        $response->assertSee('Diskon Kaca Film V-KOOL & 3M');
-        $response->assertSee('Terlaris');
+        $response->assertInertia(fn (Assert $page) => $page
+            ->component('Promo/Index')
+            ->has('promos')
+        );
     }
 
     public function test_promo_detail_page_renders_successfully(): void
@@ -121,8 +149,10 @@ class PublicWebRoutesTest extends TestCase
         $response = $this->get('/promo/promo-kaca-film-v-kool-3m');
 
         $response->assertStatus(200);
-        $response->assertSee('Diskon Kaca Film V-KOOL & 3M');
-        $response->assertSee('FILMPREMIUM25');
+        $response->assertInertia(fn (Assert $page) => $page
+            ->component('Promo/Show')
+            ->has('promo')
+        );
     }
 
     public function test_promo_detail_returns_404_for_missing_promo(): void
@@ -157,7 +187,7 @@ class PublicWebRoutesTest extends TestCase
             'status' => InquiryStatus::NEW->value,
         ]);
 
-        $response->assertRedirect('/#kontak');
+        $response->assertRedirect();
         $response->assertSessionHas('success');
         $response->assertSessionHas('wa_url');
     }
@@ -199,25 +229,12 @@ class PublicWebRoutesTest extends TestCase
         $response->assertStatus(429);
     }
 
-    public function test_layout_includes_turbo_and_alpine_intersect_plugins(): void
+    public function test_layout_includes_dark_mode_anti_fouc(): void
     {
         $response = $this->get('/');
         $response->assertStatus(200);
-        $response->assertSee('@alpinejs/intersect', false);
-        $response->assertSee('@hotwired/turbo', false);
-    }
-
-    public function test_catalogs_render_incremental_lazy_loading_and_image_lazy_load(): void
-    {
-        $productResponse = $this->get('/produk');
-        $productResponse->assertStatus(200);
-        $productResponse->assertSee('x-intersect', false);
-        $productResponse->assertSee('loading="lazy"', false);
-
-        $serviceResponse = $this->get('/servis');
-        $serviceResponse->assertStatus(200);
-        $serviceResponse->assertSee('x-intersect', false);
-        $serviceResponse->assertSee('loading="lazy"', false);
+        // Anti-FOUC theme script on root shell
+        $response->assertSee('localStorage.getItem(\'theme\')', false);
     }
 
     public function test_setting_caching_and_whatsapp_helpers_work_correctly(): void
@@ -234,34 +251,15 @@ class PublicWebRoutesTest extends TestCase
         $this->assertStringContainsString('text=Test+Message', $waUrl);
     }
 
-    public function test_home_page_renders_clickable_banners(): void
+    public function test_shared_inertia_props_contain_site_settings_and_contact(): void
     {
         $response = $this->get('/');
         $response->assertStatus(200);
-        // Banner link should be present on home page
-        $response->assertSee('href="/servis"', false);
-    }
 
-    public function test_layout_includes_dark_mode_anti_fouc_and_toggle_switch(): void
-    {
-        $response = $this->get('/');
-        $response->assertStatus(200);
-        // Anti-FOUC theme script
-        $response->assertSee('localStorage.getItem(\'theme\')', false);
-        // Theme toggle button
-        $response->assertSee('aria-label="Toggle theme"', false);
-    }
-
-    public function test_years_experience_synchronizes_between_home_and_about_pages(): void
-    {
-        Setting::set('years_experience', '30+', 'general');
-
-        $homeRes = $this->get('/');
-        $homeRes->assertStatus(200);
-        $homeRes->assertSee('30+');
-
-        $aboutRes = $this->get('/tentang');
-        $aboutRes->assertStatus(200);
-        $aboutRes->assertSee('30+');
+        $response->assertInertia(fn (Assert $page) => $page
+            ->has('settings')
+            ->has('contact.whatsapp')
+            ->has('contact.phone_display')
+        );
     }
 }

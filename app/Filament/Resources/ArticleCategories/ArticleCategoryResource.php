@@ -10,6 +10,7 @@ use BackedEnum;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
+use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
@@ -49,10 +50,20 @@ class ArticleCategoryResource extends Resource
                     ->required()
                     ->unique(ignoreRecord: true)
                     ->maxLength(120),
-                TextInput::make('color_scheme')
-                    ->label('Warna Label (CSS/Tailwind)')
+                Select::make('color_scheme')
+                    ->label('Warna Label')
+                    ->options([
+                        'blue' => 'Biru',
+                        'emerald' => 'Hijau',
+                        'rose' => 'Merah',
+                        'amber' => 'Kuning / Oranye',
+                        'purple' => 'Ungu',
+                        'sky' => 'Biru Muda',
+                        'indigo' => 'Indigo',
+                        'gray' => 'Abu-abu',
+                    ])
                     ->default('blue')
-                    ->maxLength(50),
+                    ->required(),
                 TextInput::make('sort_order')
                     ->label('Urutan')
                     ->numeric()
@@ -77,7 +88,26 @@ class ArticleCategoryResource extends Resource
                     ->badge()
                     ->color('gray'),
                 TextColumn::make('color_scheme')
-                    ->label('Skema Warna'),
+                    ->label('Warna Label')
+                    ->badge()
+                    ->formatStateUsing(fn ($state) => match ($state) {
+                        'blue' => 'Biru',
+                        'emerald', 'green' => 'Hijau',
+                        'rose', 'red' => 'Merah',
+                        'amber' => 'Kuning',
+                        'purple' => 'Ungu',
+                        'sky' => 'Biru Muda',
+                        'indigo' => 'Indigo',
+                        default => ucfirst($state ?? 'Biru'),
+                    })
+                    ->color(fn ($state) => match ($state) {
+                        'emerald', 'green' => 'success',
+                        'rose', 'red' => 'danger',
+                        'amber' => 'warning',
+                        'blue', 'sky', 'indigo' => 'info',
+                        'purple' => 'primary',
+                        default => 'gray',
+                    }),
             ])
             ->recordActions([
                 EditAction::make(),

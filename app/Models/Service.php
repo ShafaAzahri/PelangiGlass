@@ -18,6 +18,8 @@ class Service extends Model
 
     protected array $fileFields = ['image_path'];
 
+    protected $appends = ['image_url'];
+
     protected $fillable = [
         'category_id',
         'name',
@@ -61,7 +63,7 @@ class Service extends Model
     public function getImageUrlAttribute(): string
     {
         if (empty($this->image_path)) {
-            return asset('images/banner1.png');
+            return '/images/banner1.png';
         }
 
         if (str_starts_with($this->image_path, 'http://') || str_starts_with($this->image_path, 'https://')) {
@@ -71,13 +73,13 @@ class Service extends Model
         $cleanPath = ltrim($this->image_path, '/');
 
         if (file_exists(public_path('storage/'.$cleanPath))) {
-            return asset('storage/'.$cleanPath);
+            return '/storage/'.$cleanPath;
         }
 
         if (file_exists(public_path($cleanPath))) {
-            return asset($cleanPath);
+            return '/'.$cleanPath;
         }
 
-        return asset('storage/'.$cleanPath);
+        return '/storage/'.$cleanPath;
     }
 }

@@ -1,29 +1,74 @@
 .git
 .github
+.gitignore
+.gitattributes
+
+# IDE & Editor files
 .idea
 .vscode
 .zed
 .cursor
 .codex
+*.swp
+*.swo
+
+# AI & Developer configs
+.claude
+.mcp.json
+boost.json
+.ai
+
+# Environment & Secret files
+.env
+.env.*
+!.env.example
+auth.json
+*.key
+*.pem
+*.crt
+*.pfx
+*.p12
+
+# Dependencies (Installed cleanly inside Docker build stages)
 node_modules
 vendor
+
+# Frontend dev files & builds (compiled in Dockerfile)
 public/build
 public/hot
 public/storage
 public/css/filament
 public/js/filament
 public/fonts/filament
-storage/logs/*.log
-storage/framework/cache/data/*
+
+# Storage & Logs (Keep local logs/sessions out of the image)
+storage/logs/*
+!storage/logs/.gitignore
+storage/framework/cache/*
+!storage/framework/cache/.gitignore
 storage/framework/sessions/*
-storage/framework/views/*.php
+!storage/framework/sessions/.gitignore
+storage/framework/views/*
+!storage/framework/views/.gitignore
+storage/app/*
+!storage/app/.gitignore
+storage/inertia-devtools
+
+# Databases & Backups
 database/*.sqlite*
-.env
-.env.*
-!.env.example
+*.sql
+*.sql.gz
+*.dump
+*.bak
+
+# Tests & Documentation
+tests
+phpunit.xml
 .phpunit.cache
 .phpunit.result.cache
-tests
 *.md
+
+# Docker-related files
 docker-compose*.yml
-Dockerfile
+Dockerfile*
+.dockerignore

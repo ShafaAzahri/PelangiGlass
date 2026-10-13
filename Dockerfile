@@ -82,6 +82,6 @@ RUN mkdir -p \
     && php artisan filament:assets --ansi \
     && chown -R www-data:www-data /app/storage /app/bootstrap/cache
 
-EXPOSE 48729
+EXPOSE 48730
 
 ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]

@@ -4,12 +4,13 @@ namespace App\Http\Controllers;
 
 use App\Models\Article;
 use App\Models\ArticleCategory;
-use App\Models\Setting;
 use Illuminate\Http\Request;
+use Inertia\Inertia;
+use Inertia\Response;
 
 class ArticleController extends Controller
 {
-    public function index(Request $request)
+    public function index(Request $request): Response
     {
         $categories = ArticleCategory::orderBy('sort_order')->get();
 
@@ -24,18 +25,24 @@ class ArticleController extends Controller
         if ($request->filled('q')) {
             $search = $request->q;
             $query->where(function ($q) use ($search) {
-                $q->where('title', 'ilike', "%{$search}%")
-                    ->orWhere('excerpt', 'ilike', "%{$search}%");
+                $q->where('title', 'like', "%{$search}%")
+                    ->orWhere('excerpt', 'like', "%{$search}%");
             });
         }
 
         $articles = $query->paginate(9)->withQueryString();
-        $settings = Setting::all()->pluck('value', 'key');
 
-        return view('pages.artikel.index', compact('articles', 'categories', 'settings'));
+        return Inertia::render('Artikel/Index', [
+            'articles' => $articles,
+            'categories' => $categories,
+            'filters' => [
+                'kategori' => $request->kategori,
+                'q' => $request->q,
+            ],
+        ]);
     }
 
-    public function show(string $slug)
+    public function show(string $slug): Response
     {
         $article = Article::published()->where('slug', $slug)->with(['category', 'author'])->firstOrFail();
         $relatedArticles = Article::published()
@@ -44,8 +51,9 @@ class ArticleController extends Controller
             ->take(3)
             ->get();
 
-        $settings = Setting::all()->pluck('value', 'key');
-
-        return view('pages.artikel.show', compact('article', 'relatedArticles', 'settings'));
+        return Inertia::render('Artikel/Show', [
+            'article' => $article,
+            'relatedArticles' => $relatedArticles,
+        ]);
     }
 }

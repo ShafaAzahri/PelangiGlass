@@ -8,6 +8,7 @@ use App\Traits\LogsActivity;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Product extends Model
@@ -17,6 +18,8 @@ class Product extends Model
     protected string $activitySubjectName = 'Produk';
 
     protected array $fileFields = ['main_image', 'gallery_images'];
+
+    protected $appends = ['image_url'];
 
     protected $fillable = [
         'category_id',
@@ -49,6 +52,11 @@ class Product extends Model
         return $this->belongsTo(ProductCategory::class, 'category_id');
     }
 
+    public function promos(): HasMany
+    {
+        return $this->hasMany(Promo::class, 'product_id');
+    }
+
     public function scopeActive($query)
     {
         return $query->where('is_active', true)->orderBy('sort_order');
@@ -57,7 +65,7 @@ class Product extends Model
     public function getImageUrlAttribute(): string
     {
         if (empty($this->main_image)) {
-            return asset('images/banner1.png');
+            return '/images/banner1.png';
         }
 
         if (str_starts_with($this->main_image, 'http://') || str_starts_with($this->main_image, 'https://')) {
@@ -67,13 +75,13 @@ class Product extends Model
         $cleanPath = ltrim($this->main_image, '/');
 
         if (file_exists(public_path('storage/'.$cleanPath))) {
-            return asset('storage/'.$cleanPath);
+            return '/storage/'.$cleanPath;
         }
 
         if (file_exists(public_path($cleanPath))) {
-            return asset($cleanPath);
+            return '/'.$cleanPath;
         }
 
-        return asset('storage/'.$cleanPath);
+        return '/storage/'.$cleanPath;
     }
 }

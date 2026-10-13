@@ -6,9 +6,23 @@
     auto_https off
 }
 
-:48729 {
+:48730 {
     root * /app/public
     encode zstd br gzip
+
+    # Block access to hidden files/directories (e.g. .env, .git)
+    @dotfiles path */.*
+    respond @dotfiles 404
+
+    # Security Headers
+    header {
+        X-Content-Type-Options "nosniff"
+        X-Frame-Options "SAMEORIGIN"
+        X-XSS-Protection "1; mode=block"
+        Referrer-Policy "strict-origin-when-cross-origin"
+        Permissions-Policy "camera=(), microphone=(), geolocation=()"
+        -Server
+    }
 
     php_server {
         resolve_root_symlink false

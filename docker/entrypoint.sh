@@ -8,6 +8,10 @@ mkdir -p \
     /app/storage/logs \
     /app/bootstrap/cache
 
+# Enforce secure permissions for runtime directories
+chown -R www-data:www-data /app/storage /app/bootstrap/cache
+chmod -R 775 /app/storage /app/bootstrap/cache
+
 # Wait for PostgreSQL if DB_CONNECTION is pgsql
 if [ "${DB_CONNECTION:-pgsql}" = "pgsql" ]; then
     echo "Waiting for PostgreSQL at ${DB_HOST:-postgres}:${DB_PORT:-5432}..."

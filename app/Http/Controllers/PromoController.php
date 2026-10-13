@@ -3,8 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Models\Promo;
-use App\Models\Setting;
 use Illuminate\Http\Request;
+use Inertia\Inertia;
 
 class PromoController extends Controller
 {
@@ -187,12 +187,19 @@ class PromoController extends Controller
 
     public function index(Request $request)
     {
-        $categories = ['Semua', 'Kaca Film', 'Ganti Kaca', 'Perbaikan Kaca', 'Aksesoris & Perawatan'];
-        $dbPromos = Promo::active()->get();
+        $dbPromos = Promo::active()->with('product')->get();
+
+        $categories = array_values(array_unique(array_merge(
+            ['Semua', 'Kaca Film', 'Ganti Kaca', 'Perbaikan Kaca', 'Aksesoris & Perawatan'],
+            $dbPromos->pluck('category')->filter()->toArray()
+        )));
 
         $promos = $dbPromos->count() > 0
             ? $dbPromos->map(fn ($p) => [
                 'id' => $p->id,
+                'product_id' => $p->product_id,
+                'product_slug' => $p->product?->slug,
+                'product_name' => $p->product?->name,
                 'slug' => $p->slug,
                 'name' => $p->name,
                 'category' => $p->category,
@@ -210,18 +217,22 @@ class PromoController extends Controller
             ])->toArray()
             : $this->promos;
 
-        $settings = Setting::all()->pluck('value', 'key');
-
-        return view('pages.promo.index', compact('promos', 'categories', 'settings'));
+        return Inertia::render('Promo/Index', [
+            'promos' => $promos,
+            'categories' => $categories,
+        ]);
     }
 
     public function show(string $slug)
     {
-        $dbPromo = Promo::where('slug', $slug)->first();
+        $dbPromo = Promo::where('slug', $slug)->with('product')->first();
 
         if ($dbPromo) {
             $promo = [
                 'id' => $dbPromo->id,
+                'product_id' => $dbPromo->product_id,
+                'product_slug' => $dbPromo->product?->slug,
+                'product_name' => $dbPromo->product?->name,
                 'slug' => $dbPromo->slug,
                 'name' => $dbPromo->name,
                 'category' => $dbPromo->category,
@@ -243,8 +254,8 @@ class PromoController extends Controller
 
         abort_if(! $promo, 404);
 
-        $settings = Setting::all()->pluck('value', 'key');
-
-        return view('pages.promo.show', compact('promo', 'settings'));
+        return Inertia::render('Promo/Show', [
+            'promo' => $promo,
+        ]);
     }
 }

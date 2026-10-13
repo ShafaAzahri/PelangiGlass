@@ -2,7 +2,11 @@
 
 namespace Tests\Feature;
 
+use App\Filament\Pages\ManageFacilities;
+use App\Filament\Resources\Promos\PromoResource;
+use App\Models\Setting;
 use App\Models\User;
+use Livewire\Livewire;
 use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
 use Tests\TestCase;
@@ -122,6 +126,94 @@ class FilamentAdminTest extends TestCase
         $response = $this->actingAs($admin)->get('/admin/manage-about');
         $response->assertStatus(200);
         $response->assertSee('Tentang Kami');
+    }
+
+    public function test_authenticated_admin_can_access_manage_facilities_page(): void
+    {
+        $admin = User::where('email', 'admin@pelangiglass.com')->first();
+        $this->assertNotNull($admin, 'Admin user should be seeded');
+
+        $response = $this->actingAs($admin)->get('/admin/manage-facilities');
+        $response->assertStatus(200);
+        $response->assertSee('Fasilitas Ruang Tunggu');
+        $response->assertSee('Free Coffee & Teh');
+    }
+
+    public function test_authenticated_admin_can_access_promo_resource_and_see_product_selection(): void
+    {
+        $admin = User::where('email', 'admin@pelangiglass.com')->first();
+        $this->assertNotNull($admin, 'Admin user should be seeded');
+
+        $indexRes = $this->actingAs($admin)->get('/admin/promos');
+        $indexRes->assertStatus(200);
+        $indexRes->assertSee('Promo');
+
+        $createRes = $this->actingAs($admin)->get('/admin/promos/create');
+        $createRes->assertStatus(200);
+        $createRes->assertSee('Pilih Produk yang Ingin Dipromosikan');
+        $createRes->assertSee('Mulai Berlaku Dari Tanggal');
+        $createRes->assertSee('Berlaku Sampai Tanggal');
+        $createRes->assertSee('Potongan Diskon (%)');
+        $createRes->assertDontSee('Badge Khusus');
+        $createRes->assertDontSee('Keterangan Hemat');
+        $createRes->assertDontSee('Kode Kupon');
+    }
+
+    public function test_admin_can_update_facilities_settings(): void
+    {
+        $admin = User::where('email', 'admin@pelangiglass.com')->first();
+        $this->assertNotNull($admin, 'Admin user should be seeded');
+
+        Livewire::actingAs($admin)
+            ->test(ManageFacilities::class)
+            ->set('data.waiting_room_facilities_title', 'FASILITAS BENGKEL PELANGI')
+            ->call('save')
+            ->assertHasNoErrors();
+
+        $this->assertEquals('FASILITAS BENGKEL PELANGI', Setting::get('waiting_room_facilities_title'));
+
+        // Reset to default
+        Setting::set('waiting_room_facilities_title', 'FASILITAS RUANG TUNGGU PELANGGAN', 'general');
+        Setting::clearCache();
+    }
+
+    public function test_promo_discount_calculator_computes_clean_promo_price(): void
+    {
+        $setValues = [];
+        $set = function ($key, $value) use (&$setValues) {
+            $setValues[$key] = $value;
+        };
+
+        PromoResource::calculateDiscount($set, 'Rp 2.000.000', '25');
+
+        $this->assertEquals('Rp 1.500.000', $setValues['promo_price']);
+        $this->assertEquals('25%', $setValues['discount_percent']);
+        $this->assertEquals('25%', $setValues['badge']);
+        $this->assertNull($setValues['discount']);
+    }
+
+    public function test_promo_date_synchronizer_formats_valid_until_properly(): void
+    {
+        $setValues = [];
+        $set = function ($key, $value) use (&$setValues) {
+            $setValues[$key] = $value;
+        };
+
+        PromoResource::syncValidUntil($set, '2026-10-01', '2026-11-01');
+
+        $this->assertStringContainsString('2026', $setValues['valid_until']);
+        $this->assertStringContainsString('s/d', $setValues['valid_until']);
+    }
+
+    public function test_authenticated_admin_can_access_article_category_create_with_color_dropdown(): void
+    {
+        $admin = User::where('email', 'admin@pelangiglass.com')->first();
+        $this->assertNotNull($admin, 'Admin user should be seeded');
+
+        $createRes = $this->actingAs($admin)->get('/admin/article-categories/create');
+        $createRes->assertStatus(200);
+        $createRes->assertSee('Warna Label');
+        $createRes->assertDontSee('CSS/Tailwind');
     }
 
     public function test_authenticated_admin_can_access_shield_roles_resource(): void

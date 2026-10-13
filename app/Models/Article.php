@@ -15,6 +15,8 @@ class Article extends Model
 
     protected array $fileFields = ['featured_image'];
 
+    protected $appends = ['image_url'];
+
     protected $fillable = [
         'category_id',
         'author_id',
@@ -60,7 +62,7 @@ class Article extends Model
     public function getImageUrlAttribute(): string
     {
         if (empty($this->featured_image)) {
-            return asset('images/banner1.png');
+            return '/images/banner1.png';
         }
 
         if (str_starts_with($this->featured_image, 'http://') || str_starts_with($this->featured_image, 'https://')) {
@@ -70,13 +72,13 @@ class Article extends Model
         $cleanPath = ltrim($this->featured_image, '/');
 
         if (file_exists(public_path('storage/'.$cleanPath))) {
-            return asset('storage/'.$cleanPath);
+            return '/storage/'.$cleanPath;
         }
 
         if (file_exists(public_path($cleanPath))) {
-            return asset($cleanPath);
+            return '/'.$cleanPath;
         }
 
-        return asset('storage/'.$cleanPath);
+        return '/storage/'.$cleanPath;
     }
 }

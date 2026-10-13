@@ -13,6 +13,8 @@ class GalleryItem extends Model
 
     protected array $fileFields = ['image_path'];
 
+    protected $appends = ['image_url'];
+
     protected $fillable = [
         'category_id',
         'title',
@@ -44,7 +46,7 @@ class GalleryItem extends Model
     public function getImageUrlAttribute(): string
     {
         if (empty($this->image_path)) {
-            return asset('images/workshop-illustration.jpg');
+            return '/images/workshop-illustration.jpg';
         }
 
         if (str_starts_with($this->image_path, 'http://') || str_starts_with($this->image_path, 'https://')) {
@@ -54,13 +56,13 @@ class GalleryItem extends Model
         $cleanPath = ltrim($this->image_path, '/');
 
         if (file_exists(public_path('storage/'.$cleanPath))) {
-            return asset('storage/'.$cleanPath);
+            return '/storage/'.$cleanPath;
         }
 
         if (file_exists(public_path($cleanPath))) {
-            return asset($cleanPath);
+            return '/'.$cleanPath;
         }
 
-        return asset('storage/'.$cleanPath);
+        return '/storage/'.$cleanPath;
     }
 }

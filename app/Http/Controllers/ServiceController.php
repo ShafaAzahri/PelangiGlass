@@ -4,12 +4,13 @@ namespace App\Http\Controllers;
 
 use App\Models\Service;
 use App\Models\ServiceCategory;
-use App\Models\Setting;
 use Illuminate\Http\Request;
+use Inertia\Inertia;
+use Inertia\Response;
 
 class ServiceController extends Controller
 {
-    public function index(Request $request)
+    public function index(Request $request): Response
     {
         $categories = ServiceCategory::where('is_active', true)->orderBy('sort_order')->get();
 
@@ -22,12 +23,17 @@ class ServiceController extends Controller
         }
 
         $services = $query->paginate(12)->withQueryString();
-        $settings = Setting::all()->pluck('value', 'key');
 
-        return view('pages.servis.index', compact('services', 'categories', 'settings'));
+        return Inertia::render('Servis/Index', [
+            'services' => $services,
+            'categories' => $categories,
+            'filters' => [
+                'kategori' => $request->kategori,
+            ],
+        ]);
     }
 
-    public function show(string $slug)
+    public function show(string $slug): Response
     {
         $service = Service::active()->where('slug', $slug)->with('category')->firstOrFail();
         $otherServices = Service::active()
@@ -36,8 +42,9 @@ class ServiceController extends Controller
             ->take(3)
             ->get();
 
-        $settings = Setting::all()->pluck('value', 'key');
-
-        return view('pages.servis.show', compact('service', 'otherServices', 'settings'));
+        return Inertia::render('Servis/Show', [
+            'service' => $service,
+            'otherServices' => $otherServices,
+        ]);
     }
 }

@@ -9,12 +9,13 @@ use App\Models\GalleryItem;
 use App\Models\HeroBanner;
 use App\Models\Product;
 use App\Models\Service;
-use App\Models\Setting;
 use App\Models\Testimonial;
+use Inertia\Inertia;
+use Inertia\Response;
 
 class HomeController extends Controller
 {
-    public function index()
+    public function index(): Response
     {
         $banners = HeroBanner::active()->get();
         $featuredServices = Service::featured()->with('category')->take(6)->get();
@@ -25,18 +26,15 @@ class HomeController extends Controller
         $faqs = Faq::active()->get();
         $products = Product::active()->with('category')->take(4)->get();
 
-        $settings = Setting::all()->pluck('value', 'key');
-
-        return view('pages.home.index', compact(
-            'banners',
-            'featuredServices',
-            'galleryCategories',
-            'galleryItems',
-            'testimonials',
-            'articles',
-            'faqs',
-            'products',
-            'settings'
-        ));
+        return Inertia::render('Home/Index', [
+            'banners' => $banners,
+            'featuredServices' => $featuredServices,
+            'galleryCategories' => $galleryCategories,
+            'galleryItems' => $galleryItems,
+            'testimonials' => $testimonials,
+            'articles' => $articles,
+            'faqs' => $faqs,
+            'products' => $products,
+        ]);
     }
 }

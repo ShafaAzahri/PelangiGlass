@@ -4,11 +4,15 @@ namespace App\Filament\Pages;
 
 use App\Models\Setting;
 use BackedEnum;
+use Filament\Actions\Action;
 use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Notifications\Notification;
 use Filament\Pages\Page;
+use Filament\Schemas\Components\Actions;
+use Filament\Schemas\Components\EmbeddedSchema;
+use Filament\Schemas\Components\Form;
 use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Components\Tabs;
@@ -18,8 +22,6 @@ use Filament\Support\Icons\Heroicon;
 
 class ManageAbout extends Page
 {
-    protected string $view = 'filament.pages.manage-about';
-
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedInformationCircle;
 
     protected static string|\UnitEnum|null $navigationGroup = 'Manajemen Konten';
@@ -31,6 +33,36 @@ class ManageAbout extends Page
     protected static ?int $navigationSort = 1;
 
     public ?array $data = [];
+
+    public function content(Schema $schema): Schema
+    {
+        return $schema
+            ->components([
+                Form::make([EmbeddedSchema::make('form')])
+                    ->id('form')
+                    ->livewireSubmitHandler('save')
+                    ->footer([
+                        Actions::make($this->getFormActions())
+                            ->alignment($this->getFormActionsAlignment())
+                            ->key('form-actions'),
+                    ]),
+            ]);
+    }
+
+    protected function getFormActions(): array
+    {
+        return [
+            $this->getSaveFormAction(),
+        ];
+    }
+
+    protected function getSaveFormAction(): Action
+    {
+        return Action::make('save')
+            ->label('Simpan Perubahan')
+            ->submit('save')
+            ->keyBindings(['mod+s']);
+    }
 
     public function mount(): void
     {
