@@ -2,7 +2,7 @@
 
 namespace Tests\Feature;
 
-use App\Filament\Pages\ManageFacilities;
+use App\Filament\Pages\ManageAbout;
 use App\Filament\Resources\Promos\PromoResource;
 use App\Models\Setting;
 use App\Models\User;
@@ -125,16 +125,7 @@ class FilamentAdminTest extends TestCase
 
         $response = $this->actingAs($admin)->get('/admin/manage-about');
         $response->assertStatus(200);
-        $response->assertSee('Tentang Kami');
-    }
-
-    public function test_authenticated_admin_can_access_manage_facilities_page(): void
-    {
-        $admin = User::where('email', 'admin@pelangiglass.com')->first();
-        $this->assertNotNull($admin, 'Admin user should be seeded');
-
-        $response = $this->actingAs($admin)->get('/admin/manage-facilities');
-        $response->assertStatus(200);
+        $response->assertSee('Profil Bengkel');
         $response->assertSee('Fasilitas Ruang Tunggu');
         $response->assertSee('Free Coffee & Teh');
     }
@@ -165,7 +156,7 @@ class FilamentAdminTest extends TestCase
         $this->assertNotNull($admin, 'Admin user should be seeded');
 
         Livewire::actingAs($admin)
-            ->test(ManageFacilities::class)
+            ->test(ManageAbout::class)
             ->set('data.waiting_room_facilities_title', 'FASILITAS BENGKEL PELANGI')
             ->call('save')
             ->assertHasNoErrors();
@@ -175,6 +166,17 @@ class FilamentAdminTest extends TestCase
         // Reset to default
         Setting::set('waiting_room_facilities_title', 'FASILITAS RUANG TUNGGU PELANGGAN', 'general');
         Setting::clearCache();
+    }
+
+    public function test_settings_resource_excludes_raw_json_facilities_and_about_keys(): void
+    {
+        $admin = User::where('email', 'admin@pelangiglass.com')->first();
+        $this->assertNotNull($admin, 'Admin user should be seeded');
+
+        $response = $this->actingAs($admin)->get('/admin/settings');
+        $response->assertStatus(200);
+        $response->assertDontSee('Waiting Room Facilities');
+        $response->assertDontSee('waiting_room_facilities');
     }
 
     public function test_promo_discount_calculator_computes_clean_promo_price(): void

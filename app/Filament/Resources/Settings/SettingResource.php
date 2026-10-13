@@ -86,6 +86,12 @@ class SettingResource extends Resource
     public static function table(Table $table): Table
     {
         return $table
+            ->modifyQueryUsing(fn ($query) => $query->whereNotIn('key', [
+                'waiting_room_facilities',
+                'waiting_room_facilities_title',
+                'about_vision_pillars',
+                'about_missions',
+            ]))
             ->columns([
                 TextColumn::make('key')
                     ->label('Nama Pengaturan')
