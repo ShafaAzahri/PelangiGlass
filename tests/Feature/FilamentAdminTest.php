@@ -177,8 +177,9 @@ class FilamentAdminTest extends TestCase
         Livewire::actingAs($admin)
             ->test(ListSettings::class)
             ->set('activeTab', 'general')
-            ->assertSee('Waiting Room Facilities')
-            ->assertSee('Free Coffee');
+            ->assertSee('Fasilitas Ruang Tunggu Pelanggan')
+            ->assertSee('Free Coffee')
+            ->assertDontSee('Waiting Room Facilities Title');
     }
 
     public function test_promo_discount_calculator_computes_clean_promo_price(): void

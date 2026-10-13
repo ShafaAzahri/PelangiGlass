@@ -99,6 +99,7 @@ class Setting extends Model
             'youtube' => 'Channel YouTube',
             'google_maps_embed' => 'Link Peta Google Maps',
             'years_experience' => 'Lama Pengalaman Workshop (Beranda & Tentang)',
+            'waiting_room_facilities' => 'Fasilitas Ruang Tunggu Pelanggan',
             default => ucwords(str_replace('_', ' ', $key)),
         };
     }
@@ -118,6 +119,7 @@ class Setting extends Model
             'youtube' => 'Tautan / link ke channel YouTube resmi bengkel',
             'google_maps_embed' => 'URL sematan (embed) peta lokasi workshop dari Google Maps',
             'years_experience' => 'Lama pengalaman bengkel melayani pelanggan (contoh: 30+). Otomatis sinkron di halaman Beranda dan Tentang Kami.',
+            'waiting_room_facilities' => 'Judul dan daftar fasilitas ruang tunggu workshop yang tampil di halaman beranda',
             default => 'Pengaturan konfigurasi website',
         };
     }

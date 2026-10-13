@@ -92,6 +92,7 @@ class SettingResource extends Resource
     {
         return $table
             ->modifyQueryUsing(fn ($query) => $query->whereNotIn('key', [
+                'waiting_room_facilities_title',
                 'about_vision_pillars',
                 'about_missions',
             ]))
@@ -154,12 +155,13 @@ class SettingResource extends Resource
                     ->modalHeading(fn (Setting $record): string => 'Ubah: '.Setting::humanName($record->key))
                     ->modalDescription(fn (Setting $record): string => Setting::humanDescription($record->key))
                     ->modalSubmitActionLabel('Simpan Perubahan')
-                    ->modalWidth(fn (?Setting $record): string => $record?->key === 'waiting_room_facilities' ? '2xl' : 'lg')
+                    ->modalWidth(fn (?Setting $record): string => $record?->key === 'waiting_room_facilities' ? '4xl' : 'lg')
                     ->fillForm(function (Setting $record): array {
                         if ($record->key === 'waiting_room_facilities') {
                             $raw = json_decode($record->value, true) ?: [];
 
                             return [
+                                'title' => Setting::get('waiting_room_facilities_title', 'FASILITAS RUANG TUNGGU PELANGGAN'),
                                 'facilities' => $raw,
                             ];
                         }
@@ -172,6 +174,9 @@ class SettingResource extends Resource
                         if ($record->key === 'waiting_room_facilities') {
                             $rawFacilities = array_values($data['facilities'] ?? []);
                             $record->update(['value' => json_encode($rawFacilities)]);
+                            if (! empty($data['title'])) {
+                                Setting::set('waiting_room_facilities_title', (string) $data['title'], 'general');
+                            }
                         } else {
                             $record->update(['value' => $data['value'] ?? '']);
                         }
@@ -185,14 +190,21 @@ class SettingResource extends Resource
                                 Placeholder::make('info')
                                     ->label('Petunjuk Pengaturan')
                                     ->content(new HtmlString("
-                                        <div style='padding: 10px 14px; background: rgba(37, 99, 235, 0.08); border-left: 4px solid #2563eb; border-radius: 6px; font-size: 13px; color: #1e293b; line-height: 1.45;'>
-                                            <div style='font-weight: 700; color: #1e40af; margin-bottom: 2px;'>Fasilitas Ruang Tunggu Pelanggan</div>
-                                            <div style='color: #475569;'>Tambah fasilitas baru, pilih ikon, atau atur urutan fasilitas ruang tunggu yang tampil di beranda website.</div>
+                                        <div style='padding: 12px 16px; background: rgba(37, 99, 235, 0.08); border-left: 4px solid #2563eb; border-radius: 8px; font-size: 13px; color: #1e293b; line-height: 1.5;'>
+                                            <div style='font-weight: 700; color: #1e40af; margin-bottom: 2px;'>Kelola Fasilitas Ruang Tunggu & Judul Seksi</div>
+                                            <div style='color: #475569;'>Atur judul teks dan daftar fasilitas yang tampil pada bagian beranda website. Klik tiap item untuk mengubah atau gunakan tombol tambah di bawah.</div>
                                         </div>
                                     ")),
+                                TextInput::make('title')
+                                    ->label('Judul Bagian Fasilitas')
+                                    ->placeholder('FASILITAS RUANG TUNGGU PELANGGAN')
+                                    ->default('FASILITAS RUANG TUNGGU PELANGGAN')
+                                    ->required()
+                                    ->helperText('Teks judul yang tampil di atas kartu fasilitas beranda.'),
                                 Repeater::make('facilities')
-                                    ->label('Daftar Fasilitas')
+                                    ->label('Daftar Item Fasilitas')
                                     ->addActionLabel('+ Tambah Fasilitas Baru')
+                                    ->collapsed()
                                     ->schema([
                                         Grid::make(12)->schema([
                                             TextInput::make('name')
