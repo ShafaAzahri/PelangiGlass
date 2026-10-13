@@ -21,8 +21,8 @@ services:
       DB_CONNECTION: pgsql
       DB_HOST: postgres
       DB_PORT: 5432
-      DB_DATABASE: "${DB_DATABASE:-pelangiglass}"
-      DB_USERNAME: "${DB_USERNAME:-pelangiglass}"
+      DB_DATABASE: "${DB_DATABASE}"
+      DB_USERNAME: "${DB_USERNAME}"
       DB_PASSWORD: "${DB_PASSWORD}"
       SESSION_DRIVER: database
       CACHE_STORE: database
@@ -105,9 +105,9 @@ services:
     security_opt:
       - no-new-privileges:true
     environment:
-      POSTGRES_DB: "${DB_DATABASE:-pelangiglass}"
-      POSTGRES_USER: "${DB_USERNAME:-pelangiglass}"
-      POSTGRES_PASSWORD: "${DB_PASSWORD:-secret}"
+      POSTGRES_DB: "${DB_DATABASE}"
+      POSTGRES_USER: "${DB_USERNAME}"
+      POSTGRES_PASSWORD: "${DB_PASSWORD}"
       PGDATA: /var/lib/postgresql/data/pgdata
     command:
       - "postgres"
@@ -128,7 +128,7 @@ services:
     volumes:
       - pgdata:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${DB_USERNAME:-pelangiglass} -d ${DB_DATABASE:-pelangiglass}"]
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
       interval: 5s
       timeout: 3s
       retries: 5

@@ -15,7 +15,7 @@ chmod -R 775 /app/storage /app/bootstrap/cache
 # Wait for PostgreSQL if DB_CONNECTION is pgsql
 if [ "${DB_CONNECTION:-pgsql}" = "pgsql" ]; then
     echo "Waiting for PostgreSQL at ${DB_HOST:-postgres}:${DB_PORT:-5432}..."
-    until php -r "try { new PDO('pgsql:host=' . (getenv('DB_HOST') ?: 'postgres') . ';port=' . (getenv('DB_PORT') ?: '5432') . ';dbname=' . (getenv('DB_DATABASE') ?: 'pelangiglass'), getenv('DB_USERNAME') ?: 'pelangiglass', getenv('DB_PASSWORD') ?: 'secret'); exit(0); } catch (Throwable \$e) { exit(1); }" 2>/dev/null; do
+    until php -r "try { new PDO('pgsql:host=' . (getenv('DB_HOST') ?: 'postgres') . ';port=' . (getenv('DB_PORT') ?: '5432') . ';dbname=' . getenv('DB_DATABASE'), getenv('DB_USERNAME'), getenv('DB_PASSWORD')); exit(0); } catch (Throwable \$e) { exit(1); }" 2>/dev/null; do
         sleep 1
     done
     echo "PostgreSQL is ready."
