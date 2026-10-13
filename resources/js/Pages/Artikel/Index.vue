@@ -143,7 +143,10 @@ const filterCategory = (c) => {
     limit.value = pageSize;
 };
 
-const catStyle = (cat) => {
+const catStyle = (cat, colorScheme) => {
+    if (colorScheme && colorScheme.startsWith('#')) {
+        return `background-color: ${colorScheme}18; color: ${colorScheme}; border: 1px solid ${colorScheme}35;`;
+    }
     const colors = {
         'Tips Perawatan': { bg: '#eff6ff', color: '#1d4ed8' },
         'Edukasi': { bg: '#f0fdf4', color: '#15803d' },
@@ -151,8 +154,8 @@ const catStyle = (cat) => {
         'Panduan Produk': { bg: '#fef3c7', color: '#92400e' },
         'Panduan': { bg: '#f5f3ff', color: '#6d28d9' },
     };
-    const c = colors[cat] || { bg: '#f1f5f9', color: '#475569' };
-    return `background: ${c.bg}; color: ${c.color};`;
+    const c = colors[cat] || { bg: '#eff6ff', color: '#1d4ed8' };
+    return `background-color: ${c.bg}; color: ${c.color};`;
 };
 
 // Intersection Observer for auto infinite scroll / lazy loading
@@ -223,7 +226,7 @@ onUnmounted(() => {
                                 <div class="flex items-center gap-2 mb-3 flex-wrap">
                                     <span
                                         class="text-xs px-2.5 py-1 rounded-full font-medium"
-                                        :style="catStyle(featuredArticle.category)"
+                                        :style="catStyle(featuredArticle.category, featuredArticle.category_color || featuredArticle.category?.color_scheme)"
                                     >
                                         {{ featuredArticle.category }}
                                     </span>

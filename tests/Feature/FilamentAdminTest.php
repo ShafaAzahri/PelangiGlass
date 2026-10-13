@@ -205,14 +205,14 @@ class FilamentAdminTest extends TestCase
         $this->assertStringContainsString('s/d', $setValues['valid_until']);
     }
 
-    public function test_authenticated_admin_can_access_article_category_create_with_color_dropdown(): void
+    public function test_authenticated_admin_can_access_article_category_create_with_color_picker(): void
     {
         $admin = User::where('email', 'admin@pelangiglass.com')->first();
         $this->assertNotNull($admin, 'Admin user should be seeded');
 
         $createRes = $this->actingAs($admin)->get('/admin/article-categories/create');
         $createRes->assertStatus(200);
-        $createRes->assertSee('Warna Label');
+        $createRes->assertSee('Warna Badge');
         $createRes->assertDontSee('CSS/Tailwind');
     }
 

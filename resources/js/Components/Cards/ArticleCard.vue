@@ -18,6 +18,7 @@ const categoryTitle = computed(() => props.article.category?.name || props.artic
 const imageUrl = computed(() => props.article.image_url || props.article.image || '/images/default-article.webp');
 const articleExcerpt = computed(() => props.article.excerpt || props.article.short_description || '');
 const publishDate = computed(() => formatDate(props.article.published_at || props.article.created_at));
+const categoryColor = computed(() => props.article.category?.color_scheme || '#2563eb');
 </script>
 
 <template>
@@ -32,7 +33,10 @@ const publishDate = computed(() => formatDate(props.article.published_at || prop
                 class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
             >
             <div class="absolute top-3 left-3">
-                <span class="inline-block px-2.5 py-1 text-[11px] font-bold text-blue-700 dark:text-blue-300 bg-white/95 dark:bg-slate-900/95 backdrop-blur-xs rounded-lg shadow-xs">
+                <span
+                    class="inline-block px-2.5 py-1 text-[11px] font-bold rounded-lg shadow-xs backdrop-blur-xs select-none"
+                    :style="`background-color: ${categoryColor}; color: #ffffff;`"
+                >
                     {{ categoryTitle }}
                 </span>
             </div>
