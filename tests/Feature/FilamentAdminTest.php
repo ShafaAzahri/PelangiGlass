@@ -4,6 +4,7 @@ namespace Tests\Feature;
 
 use App\Filament\Pages\ManageAbout;
 use App\Filament\Resources\Promos\PromoResource;
+use App\Filament\Resources\Settings\Pages\ListSettings;
 use App\Models\Setting;
 use App\Models\User;
 use Livewire\Livewire;
@@ -125,7 +126,7 @@ class FilamentAdminTest extends TestCase
 
         $response = $this->actingAs($admin)->get('/admin/manage-about');
         $response->assertStatus(200);
-        $response->assertSee('Profil Bengkel');
+        $response->assertSee('Tentang Kami');
         $response->assertSee('Fasilitas Ruang Tunggu');
         $response->assertSee('Free Coffee & Teh');
     }
@@ -168,15 +169,16 @@ class FilamentAdminTest extends TestCase
         Setting::clearCache();
     }
 
-    public function test_settings_resource_excludes_raw_json_facilities_and_about_keys(): void
+    public function test_settings_resource_includes_facilities_with_formatted_value(): void
     {
         $admin = User::where('email', 'admin@pelangiglass.com')->first();
         $this->assertNotNull($admin, 'Admin user should be seeded');
 
-        $response = $this->actingAs($admin)->get('/admin/settings');
-        $response->assertStatus(200);
-        $response->assertDontSee('Waiting Room Facilities');
-        $response->assertDontSee('waiting_room_facilities');
+        Livewire::actingAs($admin)
+            ->test(ListSettings::class)
+            ->set('activeTab', 'general')
+            ->assertSee('Waiting Room Facilities')
+            ->assertSee('Free Coffee');
     }
 
     public function test_promo_discount_calculator_computes_clean_promo_price(): void

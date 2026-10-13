@@ -28,11 +28,11 @@ class ManageAbout extends Page
 
     protected static string|\UnitEnum|null $navigationGroup = 'Manajemen Konten';
 
-    protected static ?string $navigationLabel = 'Profil Bengkel';
+    protected static ?string $navigationLabel = 'Tentang Kami';
 
-    protected static ?string $title = 'Kelola Profil Bengkel';
+    protected static ?string $title = 'Kelola Konten Tentang Kami';
 
-    protected static ?int $navigationSort = 2;
+    protected static ?int $navigationSort = 1;
 
     public ?array $data = [];
 

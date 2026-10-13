@@ -15,6 +15,17 @@ class Setting extends Model
         'group',
     ];
 
+    protected static function booted(): void
+    {
+        static::saved(function (): void {
+            static::clearCache();
+        });
+
+        static::deleted(function (): void {
+            static::clearCache();
+        });
+    }
+
     /** @var array<string, string|null>|null */
     protected static ?array $cachedSettings = null;
 
