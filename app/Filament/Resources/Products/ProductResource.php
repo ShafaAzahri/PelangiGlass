@@ -81,7 +81,7 @@ class ProductResource extends Resource
                                 ->unique(ignoreRecord: true)
                                 ->maxLength(220),
                         ]),
-                        Grid::make(2)->schema([
+                        Grid::make(3)->schema([
                             Select::make('badge')
                                 ->label('Badge / Status')
                                 ->options(ProductBadge::class),
@@ -89,6 +89,12 @@ class ProductResource extends Resource
                                 ->label('Kesesuaian Mobil')
                                 ->placeholder('Contoh: Toyota Avanza / Semua Mobil')
                                 ->maxLength(255),
+                            TextInput::make('estimated_price')
+                                ->label('Harga Estimasi (Rp)')
+                                ->numeric()
+                                ->prefix('Rp')
+                                ->placeholder('Opsional')
+                                ->helperText('Hanya untuk acuan internal & kalkulasi promo. Tidak ditampilkan di website publik.'),
                         ]),
                         Textarea::make('short_description')
                             ->label('Deskripsi Singkat')
@@ -205,6 +211,11 @@ class ProductResource extends Resource
                 TextColumn::make('badge')
                     ->label('Badge')
                     ->badge(),
+                TextColumn::make('estimated_price')
+                    ->label('Harga Estimasi')
+                    ->money('IDR', locale: 'id')
+                    ->placeholder('-')
+                    ->toggleable(isToggledHiddenByDefault: true),
                 ToggleColumn::make('is_active')
                     ->label('Aktif'),
                 TextColumn::make('sort_order')

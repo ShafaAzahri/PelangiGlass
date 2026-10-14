@@ -21,8 +21,6 @@ const list = computed(() => {
     return [];
 });
 
-const doubledList = computed(() => [...list.value, ...list.value]);
-
 const testitrackRef = ref(null);
 const isPaused = ref(false);
 const isDown = ref(false);
@@ -82,12 +80,12 @@ onMounted(() => {
     if (!track) return;
 
     const step = () => {
-        if (!isPaused.value && !isDown.value && track) {
+        if (!isPaused.value && !isDown.value && track && list.value.length > 2) {
             pos += speed;
-            const half = track.scrollWidth / 2;
-            if (half > 0 && pos >= half) {
-                pos -= half;
-                track.scrollLeft = pos;
+            const maxScroll = track.scrollWidth - track.clientWidth;
+            if (maxScroll > 0 && pos >= maxScroll) {
+                pos = 0;
+                track.scrollLeft = 0;
             } else {
                 track.scrollLeft = pos;
             }
@@ -119,7 +117,7 @@ onUnmounted(() => {
                     <span class="hidden sm:inline-block text-xs text-slate-400">
                         Geser untuk melihat testimoni lainnya
                     </span>
-                    <div class="flex gap-2">
+                    <div v-if="list.length > 1" class="flex gap-2">
                         <button
                             @click="scroll(-1)"
                             type="button"
@@ -144,6 +142,7 @@ onUnmounted(() => {
         <div
             ref="testitrackRef"
             class="flex gap-5 px-6 pb-4 cursor-grab active:cursor-grabbing select-none no-scrollbar overflow-x-auto"
+            :class="list.length === 1 ? 'justify-center' : ''"
             @mouseenter="isPaused = true"
             @mouseleave="handleMouseLeave"
             @mousedown="onMouseDown"
@@ -151,7 +150,7 @@ onUnmounted(() => {
             @mouseup="onMouseUp"
         >
             <div
-                v-for="(t, idx) in doubledList"
+                v-for="(t, idx) in list"
                 :key="idx"
                 class="shrink-0 rounded-2xl p-7 sm:p-8 flex flex-col justify-between w-[min(400px,84vw)] bg-slate-800/90 border border-white/10"
             >

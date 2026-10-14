@@ -60,7 +60,7 @@ const breadcrumbItems = computed(() => [
                 <Breadcrumbs :items="breadcrumbItems" />
 
                 <!-- Product Detail Top Grid -->
-                <div class="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-14 items-start">
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-14 items-stretch">
                     <!-- Left: Main Image & Interactive Gallery Thumbnails -->
                     <div class="lg:col-span-6 space-y-4">
                         <div class="rounded-3xl overflow-hidden border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm relative">
@@ -99,7 +99,9 @@ const breadcrumbItems = computed(() => [
                     </div>
 
                     <!-- Right: Info -->
-                    <div class="lg:col-span-6 space-y-6">
+                    <!-- Right: Info (Flex column stretched to match left image height) -->
+                    <div class="lg:col-span-6 flex flex-col justify-between h-full">
+                        <div class="space-y-6">
                         <div>
                             <span class="text-xs font-bold text-blue-600 dark:text-blue-400 uppercase tracking-wider block mb-1">
                                 {{ product.category?.name || 'Kaca Mobil' }}
@@ -122,9 +124,9 @@ const breadcrumbItems = computed(() => [
                                 {{ product.short_description }}
                             </p>
                         </div>
-
-                        <!-- WhatsApp Action CTA -->
-                        <div class="pt-4 border-t border-slate-200 dark:border-slate-800">
+                        </div>
+                        <!-- WhatsApp Action CTA (Aligned flush with bottom of left column) -->
+                        <div class="pt-6 mt-6 lg:mt-auto border-t border-slate-200 dark:border-slate-800">
                             <BaseButton
                                 as="a"
                                 :href="productInquiryUrl(product.name)"
