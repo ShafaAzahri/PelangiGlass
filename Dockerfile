@@ -80,6 +80,7 @@ RUN mkdir -p \
     /app/bootstrap/cache \
     && php artisan package:discover --ansi \
     && php artisan filament:assets --ansi \
+    && php artisan storage:link --force \
     && chown -R www-data:www-data /app/storage /app/bootstrap/cache
 
 EXPOSE 48730
