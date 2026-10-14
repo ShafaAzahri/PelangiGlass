@@ -31,7 +31,19 @@ class ImageOptimizerService
         $dir = dirname($absolutePath);
         $filenameWithoutExt = pathinfo($absolutePath, PATHINFO_FILENAME);
         $newWebpPath = $dir.DIRECTORY_SEPARATOR.$filenameWithoutExt.'.webp';
+        // 1. Primary Engine: Native PHP GD (Zero subprocess overhead, standard in Docker runtime)
+        if (function_exists('imagewebp') && function_exists('imagecreatetruecolor')) {
+            $converted = static::convertUsingGd($absolutePath, $newWebpPath, $maxWidth, $maxHeight, $quality);
+            if ($converted) {
+                if (realpath($absolutePath) !== realpath($newWebpPath) && file_exists($newWebpPath)) {
+                    @unlink($absolutePath);
+                }
 
+                return $newWebpPath;
+            }
+        }
+
+        // 2. Fallback Engine: Python3 with Pillow (Local environment / advanced Lanczos)
         $pythonScript = <<<'PYTHON'
 import sys, os
 from PIL import Image, ImageOps
@@ -90,6 +102,62 @@ PYTHON;
         }
 
         return $newWebpPath;
+    }
+
+    /**
+     * Converts image to WebP using native PHP GD library.
+     */
+    protected static function convertUsingGd(string $src, string $dest, int $maxWidth, int $maxHeight, int $quality): bool
+    {
+        try {
+            $info = @getimagesize($src);
+            if (! $info) {
+                return false;
+            }
+
+            [$width, $height, $type] = $info;
+
+            $image = match ($type) {
+                IMAGETYPE_JPEG => @imagecreatefromjpeg($src),
+                IMAGETYPE_PNG => @imagecreatefrompng($src),
+                IMAGETYPE_WEBP => @imagecreatefromwebp($src),
+                IMAGETYPE_BMP => @imagecreatefrombmp($src),
+                default => null,
+            };
+
+            if (! $image) {
+                return false;
+            }
+
+            if (in_array($type, [IMAGETYPE_PNG, IMAGETYPE_WEBP])) {
+                imagepalettetotruecolor($image);
+                imagealphablending($image, true);
+                imagesavealpha($image, true);
+            }
+
+            if ($width > $maxWidth || $height > $maxHeight) {
+                $ratio = min($maxWidth / $width, $maxHeight / $height);
+                $newWidth = (int) round($width * $ratio);
+                $newHeight = (int) round($height * $ratio);
+
+                $resized = imagecreatetruecolor($newWidth, $newHeight);
+                if (in_array($type, [IMAGETYPE_PNG, IMAGETYPE_WEBP])) {
+                    imagealphablending($resized, false);
+                    imagesavealpha($resized, true);
+                }
+
+                imagecopyresampled($resized, $image, 0, 0, 0, 0, $newWidth, $newHeight, $width, $height);
+                imagedestroy($image);
+                $image = $resized;
+            }
+
+            $success = @imagewebp($image, $dest, $quality);
+            imagedestroy($image);
+
+            return $success && file_exists($dest);
+        } catch (\Throwable $e) {
+            return false;
+        }
     }
 
     /**

@@ -8,7 +8,7 @@ const page = usePage();
 const { displayPhone, cleanNumber } = useWhatsApp();
 
 const address = computed(() => page.props.contact?.address || 'Purwokerto, Banyumas, Jawa Tengah');
-const operationalHours = computed(() => page.props.contact?.operational_hours || 'Senin – Jumat, 08.30 – 16.30 WIB');
+const operationalHours = computed(() => page.props.contact?.operational_hours || 'Senin – Sabtu, 08.30 – 16.30 WIB');
 const instagramUrl = computed(() => page.props.contact?.instagram || 'https://www.instagram.com/pelangiglassofficial');
 const mapsEmbedUrl = computed(() => page.props.settings?.google_maps_embed || 'https://maps.google.com/maps?q=pelangi+glass+purwokerto&t=&z=15&ie=UTF8&iwloc=&output=embed');
 

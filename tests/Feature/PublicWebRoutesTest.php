@@ -8,6 +8,7 @@ use App\Models\Product;
 use App\Models\Promo;
 use App\Models\Service;
 use App\Models\Setting;
+use App\Services\ImageOptimizerService;
 use Inertia\Testing\AssertableInertia as Assert;
 use Tests\TestCase;
 
@@ -273,5 +274,20 @@ class PublicWebRoutesTest extends TestCase
             ->has('contact.whatsapp')
             ->has('contact.phone_display')
         );
+    }
+
+    public function test_image_optimizer_converts_images_to_webp_and_reduces_size(): void
+    {
+        $b64 = 'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=';
+        $testPath = storage_path('app/public/test_verify_min.png');
+        file_put_contents($testPath, base64_decode($b64));
+
+        $webpPath = ImageOptimizerService::convertToWebP($testPath);
+
+        $this->assertNotNull($webpPath);
+        $this->assertStringEndsWith('.webp', $webpPath);
+        $this->assertFileExists($webpPath);
+
+        @unlink($webpPath);
     }
 }

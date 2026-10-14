@@ -376,8 +376,8 @@ const scrollToTop = () => {
                                     <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6l4 2"/>
                                 </svg>
                                 <div>
-                                    <div class="text-slate-200 font-medium">{{ page.props.contact?.operational_hours || 'Senin – Jumat: 08.30 – 16.30 WIB' }}</div>
-                                    <div class="text-slate-400 text-xs mt-0.5">{{ page.props.contact?.operational_hours_weekend || 'Sabtu & Minggu: Tutup (Janji Temu via WA)' }}</div>
+                                    <div class="text-slate-200 font-medium">{{ page.props.contact?.operational_hours || 'Senin – Sabtu, 08.30 – 16.30 WIB' }}</div>
+                                    <div class="text-slate-400 text-xs mt-0.5">{{ page.props.contact?.operational_hours_weekend || 'Minggu: Tutup' }}</div>
                                 </div>
                             </div>
 

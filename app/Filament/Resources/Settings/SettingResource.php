@@ -80,8 +80,8 @@ class SettingResource extends Resource
                             'phone' => 'Nomor telepon kantor, contoh: +62 813-9028-8875.',
                             'google_maps_embed' => 'Link URL sematan iframe dari Google Maps (biasanya diawali https://maps.google.com/...).',
                             'years_experience' => 'Lama pengalaman bengkel, contoh: 30+ atau 32 Tahun.',
-                            'operational_hours' => 'Jam operasional hari kerja, contoh: Senin – Jumat, 08.30 – 16.30 WIB.',
-                            'operational_hours_weekend' => 'Jam operasional akhir pekan, contoh: Sabtu & Minggu: Tutup (Janji Temu via WA).',
+                            'operational_hours' => 'Jam operasional bengkel, contoh: Senin – Sabtu, 08.30 – 16.30 WIB.',
+                            'operational_hours_weekend' => 'Status hari libur/Minggu, contoh: Minggu: Tutup.',
                             'instagram' => 'Username atau link Instagram, contoh: @pelangiglassofficial.',
                             default => 'Teks ini akan otomatis tersimpan dan langsung tampil di website utama.',
                         };
@@ -382,8 +382,8 @@ class SettingResource extends Resource
                                         'phone' => 'Nomor telepon kantor, contoh: +62 813-9028-8875.',
                                         'google_maps_embed' => 'Link URL sematan iframe dari Google Maps (biasanya diawali https://maps.google.com/...).',
                                         'years_experience' => 'Lama pengalaman bengkel, contoh: 30+ atau 32 Tahun.',
-                                        'operational_hours' => 'Jam operasional hari kerja, contoh: Senin – Jumat, 08.30 – 16.30 WIB.',
-                                        'operational_hours_weekend' => 'Jam operasional akhir pekan, contoh: Sabtu & Minggu: Tutup (Janji Temu via WA).',
+                                        'operational_hours' => 'Jam operasional bengkel, contoh: Senin – Sabtu, 08.30 – 16.30 WIB.',
+                                        'operational_hours_weekend' => 'Status hari libur/Minggu, contoh: Minggu: Tutup.',
                                         'instagram' => 'Username atau link Instagram, contoh: @pelangiglassofficial.',
                                         default => 'Teks ini akan otomatis tersimpan dan langsung tampil di website utama.',
                                     };
