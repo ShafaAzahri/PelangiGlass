@@ -1,5 +1,10 @@
 <script setup>
-const beresValues = [
+import { computed } from 'vue';
+import { usePage } from '@inertiajs/vue3';
+
+const page = usePage();
+
+const defaultValues = [
     {
         letter: 'B',
         title: 'Bersih & Presisi',
@@ -31,27 +36,74 @@ const beresValues = [
         img: '/images/safety.png',
     },
 ];
+
+const badge = computed(() => page.props.settings?.why_us_badge || 'KEUNGGULAN');
+const title = computed(() => page.props.settings?.why_us_title || 'KENAPA HARUS PILIH KAMI?');
+
+const beresValues = computed(() => {
+    const raw = page.props.settings?.why_us_items;
+    if (!raw) return defaultValues;
+    try {
+        const parsed = typeof raw === 'string' ? JSON.parse(raw) : raw;
+        if (Array.isArray(parsed) && parsed.length > 0) {
+            return parsed
+                .filter((item) => item.is_active !== false)
+                .map((item) => {
+                    let img = item.img || '/images/bersih.png';
+                    if (img && !img.startsWith('/') && !img.startsWith('http')) {
+                        img = `/storage/${img}`;
+                    }
+                    return {
+                        letter: item.letter || '',
+                        title: item.title,
+                        desc: item.desc,
+                        img,
+                    };
+                });
+        }
+    } catch (e) {}
+    return defaultValues;
+});
+
+const row1 = computed(() => {
+    return beresValues.value.length >= 3 ? beresValues.value.slice(0, 3) : beresValues.value;
+});
+
+const row2 = computed(() => {
+    return beresValues.value.length > 3 ? beresValues.value.slice(3) : [];
+});
 </script>
 
 <template>
-    <section class="py-24 bg-white dark:bg-slate-900 transition-colors">
+    <section v-if="beresValues.length > 0" class="py-24 bg-white dark:bg-slate-900 transition-colors">
         <div class="max-w-6xl mx-auto px-6">
             <!-- Header -->
             <div class="text-center mb-12">
                 <div class="text-xs font-semibold tracking-[0.2em] uppercase mb-3 text-blue-600 dark:text-blue-400">
-                    KEUNGGULAN
+                    {{ badge }}
                 </div>
                 <h2 class="uppercase mb-3 text-slate-900 dark:text-slate-100 text-3xl sm:text-4xl md:text-5xl font-extrabold leading-tight tracking-tight">
-                    KENAPA HARUS <span class="text-blue-600 dark:text-blue-400">PILIH KAMI?</span>
+                    <template v-if="title.toUpperCase().includes('PILIH KAMI')">
+                        {{ title.substring(0, title.toUpperCase().indexOf('PILIH KAMI')) }}
+                        <span class="text-blue-600 dark:text-blue-400">
+                            {{ title.substring(title.toUpperCase().indexOf('PILIH KAMI')) }}
+                        </span>
+                    </template>
+                    <template v-else>
+                        {{ title }}
+                    </template>
                 </h2>
             </div>
 
             <!-- Cards -->
             <div class="flex flex-col gap-5">
-                <!-- Baris 1: 3 card -->
-                <div class="grid grid-cols-1 sm:grid-cols-3 gap-5">
+                <!-- Baris 1 -->
+                <div
+                    class="grid grid-cols-1 gap-5"
+                    :class="row1.length === 1 ? 'sm:grid-cols-1 max-w-md mx-auto w-full' : (row1.length === 2 ? 'sm:grid-cols-2 max-w-3xl mx-auto w-full' : 'sm:grid-cols-3')"
+                >
                     <div
-                        v-for="(v, idx) in beresValues.slice(0, 3)"
+                        v-for="(v, idx) in row1"
                         :key="idx"
                         class="rounded-3xl flex flex-col overflow-hidden transition-all duration-300 bg-slate-50 dark:bg-slate-800 border-2 border-slate-200 dark:border-slate-700 hover:border-blue-400 dark:hover:border-blue-500 hover:-translate-y-1"
                     >
@@ -69,10 +121,14 @@ const beresValues = [
                     </div>
                 </div>
 
-                <!-- Baris 2: 2 card -->
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                <!-- Baris 2 -->
+                <div
+                    v-if="row2.length > 0"
+                    class="grid grid-cols-1 gap-5"
+                    :class="row2.length === 1 ? 'sm:grid-cols-1 max-w-md mx-auto w-full' : 'sm:grid-cols-2'"
+                >
                     <div
-                        v-for="(v, idx) in beresValues.slice(3, 5)"
+                        v-for="(v, idx) in row2"
                         :key="idx"
                         class="rounded-3xl flex flex-col overflow-hidden transition-all duration-300 bg-slate-50 dark:bg-slate-800 border-2 border-slate-200 dark:border-slate-700 hover:border-blue-400 dark:hover:border-blue-500 hover:-translate-y-1"
                     >

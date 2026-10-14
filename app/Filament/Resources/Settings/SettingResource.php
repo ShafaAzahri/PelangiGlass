@@ -95,6 +95,9 @@ class SettingResource extends Resource
                 'waiting_room_facilities_title',
                 'about_vision_pillars',
                 'about_missions',
+                'why_us_items',
+                'why_us_title',
+                'why_us_badge',
             ]))
             ->columns([
                 TextColumn::make('key')

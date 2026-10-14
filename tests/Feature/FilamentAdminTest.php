@@ -129,6 +129,8 @@ class FilamentAdminTest extends TestCase
         $response->assertSee('Tentang Kami');
         $response->assertSee('Fasilitas Ruang Tunggu');
         $response->assertSee('Free Coffee & Teh');
+        $response->assertSee('Keunggulan (Pilih Kami)');
+        $response->assertSee('Bersih & Presisi');
     }
 
     public function test_authenticated_admin_can_access_promo_resource_and_see_product_selection(): void
@@ -166,6 +168,24 @@ class FilamentAdminTest extends TestCase
 
         // Reset to default
         Setting::set('waiting_room_facilities_title', 'FASILITAS RUANG TUNGGU PELANGGAN', 'general');
+        Setting::clearCache();
+    }
+
+    public function test_admin_can_update_why_us_settings(): void
+    {
+        $admin = User::where('email', 'admin@pelangiglass.com')->first();
+        $this->assertNotNull($admin, 'Admin user should be seeded');
+
+        Livewire::actingAs($admin)
+            ->test(ManageAbout::class)
+            ->set('data.why_us_title', 'MENGAPA MEMILIH KAMI?')
+            ->call('save')
+            ->assertHasNoErrors();
+
+        $this->assertEquals('MENGAPA MEMILIH KAMI?', Setting::get('why_us_title'));
+
+        // Reset
+        Setting::set('why_us_title', 'KENAPA HARUS PILIH KAMI?', 'general');
         Setting::clearCache();
     }
 

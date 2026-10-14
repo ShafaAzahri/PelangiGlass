@@ -5,6 +5,7 @@ namespace App\Filament\Pages;
 use App\Models\Setting;
 use BackedEnum;
 use Filament\Actions\Action;
+use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
@@ -103,6 +104,46 @@ class ManageAbout extends Page
         $rawFacilities = $settings['waiting_room_facilities'] ?? null;
         $facilities = $rawFacilities ? json_decode($rawFacilities, true) : $defaultFacilities;
 
+        $defaultWhyUs = [
+            [
+                'letter' => 'B',
+                'title' => 'Bersih & Presisi',
+                'desc' => 'Mengerjakan setiap layanan dengan rapi, detail, dan akurat.',
+                'img' => '/images/bersih.png',
+                'is_active' => true,
+            ],
+            [
+                'letter' => 'E',
+                'title' => 'Efisien & Cepat',
+                'desc' => 'Menghargai waktu pelanggan dan bekerja dengan ritme produktif.',
+                'img' => '/images/efisien_dan_cepat.png',
+                'is_active' => true,
+            ],
+            [
+                'letter' => 'R',
+                'title' => 'Ramah & Nyaman',
+                'desc' => 'Melayani dengan sikap baik agar pelanggan merasa dihargai dan tenang.',
+                'img' => '/images/ramah.png',
+                'is_active' => true,
+            ],
+            [
+                'letter' => 'E',
+                'title' => 'Edukatif',
+                'desc' => 'Membimbing pelanggan agar memahami kondisi kaca dan solusi yang tepat secara jujur dan jelas.',
+                'img' => '/images/edukatif.png',
+                'is_active' => true,
+            ],
+            [
+                'letter' => 'S',
+                'title' => 'Safety First',
+                'desc' => 'Menjadikan keamanan dan keselamatan teknis operasional bagi karyawan dan pelanggan sebagai prioritas utama dalam setiap langkah kerja.',
+                'img' => '/images/safety.png',
+                'is_active' => true,
+            ],
+        ];
+        $rawWhyUs = $settings['why_us_items'] ?? null;
+        $whyUs = $rawWhyUs ? json_decode($rawWhyUs, true) : $defaultWhyUs;
+
         $this->form->fill([
             // Tab 1: Sejarah & Metrik
             'about_story_title' => $settings['about_story_title'] ?? 'Lebih dari '.($settings['years_experience'] ?? '30+').' Tahun Melayani Purwokerto',
@@ -117,12 +158,17 @@ class ManageAbout extends Page
             'waiting_room_facilities_title' => $settings['waiting_room_facilities_title'] ?? 'FASILITAS RUANG TUNGGU PELANGGAN',
             'waiting_room_facilities' => is_array($facilities) ? $facilities : $defaultFacilities,
 
-            // Tab 3: Visi Perusahaan
+            // Tab 3: Keunggulan (Pilih Kami)
+            'why_us_badge' => $settings['why_us_badge'] ?? 'KEUNGGULAN',
+            'why_us_title' => $settings['why_us_title'] ?? 'KENAPA HARUS PILIH KAMI?',
+            'why_us_items' => is_array($whyUs) ? $whyUs : $defaultWhyUs,
+
+            // Tab 4: Visi Perusahaan
             'about_vision_title' => $settings['about_vision_title'] ?? 'Visi Kami',
             'about_vision_statement' => $settings['about_vision_statement'] ?? 'Menjadi perusahaan kaca otomotif terdepan, terbesar, dan terpercaya di Jawa Tengah melalui inovasi teknologi dan standar pelayanan unggul, dengan komitmen pada kualitas layanan dan kesejahteraan karyawan.',
             'about_vision_pillars' => is_array($pillars) ? $pillars : $defaultPillars,
 
-            // Tab 4: Misi Perusahaan
+            // Tab 5: Misi Perusahaan
             'about_mission_title' => $settings['about_mission_title'] ?? 'Misi Kami',
             'about_missions' => is_array($missions) ? $missions : $defaultMissions,
         ]);
@@ -268,6 +314,85 @@ class ManageAbout extends Page
                                     ]),
                             ]),
 
+                        // Tab 3: Keunggulan (Kenapa Pilih Kami / B-E-R-E-S)
+                        Tab::make('Keunggulan (Pilih Kami)')
+                            ->icon(Heroicon::OutlinedShieldCheck)
+                            ->schema([
+                                Section::make('Judul & Tagline Seksi')
+                                    ->description('Teks judul bagian keunggulan yang tampil di halaman beranda')
+                                    ->icon(Heroicon::OutlinedDocumentText)
+                                    ->schema([
+                                        Grid::make(2)->schema([
+                                            TextInput::make('why_us_badge')
+                                                ->label('Label Tagline Atas')
+                                                ->placeholder('KEUNGGULAN')
+                                                ->default('KEUNGGULAN')
+                                                ->required(),
+                                            TextInput::make('why_us_title')
+                                                ->label('Judul Utama')
+                                                ->placeholder('KENAPA HARUS PILIH KAMI?')
+                                                ->default('KENAPA HARUS PILIH KAMI?')
+                                                ->required(),
+                                        ]),
+                                    ]),
+
+                                Section::make('5 Nilai Keunggulan (B-E-R-E-S)')
+                                    ->description('Kartu-kartu nilai keunggulan workshop dengan foto dan deskripsi')
+                                    ->icon(Heroicon::OutlinedSparkles)
+                                    ->schema([
+                                        Repeater::make('why_us_items')
+                                            ->label('Daftar Kartu Keunggulan')
+                                            ->addActionLabel('+ Tambah Kartu Keunggulan')
+                                            ->itemLabel(function (array $state): ?string {
+                                                $letter = $state['letter'] ?? '';
+                                                $title = $state['title'] ?? 'Keunggulan';
+                                                $prefix = $letter ? "[{$letter}] " : '';
+                                                $status = isset($state['is_active']) && ! $state['is_active'] ? ' (Nonaktif)' : '';
+
+                                                return "{$prefix}{$title}{$status}";
+                                            })
+                                            ->schema([
+                                                Grid::make(12)->schema([
+                                                    TextInput::make('letter')
+                                                        ->label('Huruf Inisial')
+                                                        ->placeholder('B')
+                                                        ->maxLength(5)
+                                                        ->columnSpan(['default' => 12, 'sm' => 2]),
+                                                    TextInput::make('title')
+                                                        ->label('Judul Nilai')
+                                                        ->placeholder('Contoh: Bersih & Presisi')
+                                                        ->required()
+                                                        ->columnSpan(['default' => 12, 'sm' => 7]),
+                                                    Toggle::make('is_active')
+                                                        ->label('Tampilkan')
+                                                        ->default(true)
+                                                        ->columnSpan(['default' => 12, 'sm' => 3]),
+                                                    Textarea::make('desc')
+                                                        ->label('Penjelasan / Deskripsi')
+                                                        ->placeholder('Tuliskan ringkasan nilai keunggulan...')
+                                                        ->rows(2)
+                                                        ->required()
+                                                        ->columnSpan(12),
+                                                    FileUpload::make('img')
+                                                        ->label('Foto / Ilustrasi')
+                                                        ->image()
+                                                        ->disk('public')
+                                                        ->directory('why-us')
+                                                        ->imagePreviewHeight('140')
+                                                        ->acceptedFileTypes(['image/jpeg', 'image/png', 'image/webp'])
+                                                        ->maxSize(5120)
+                                                        ->helperText('Upload foto baru jika ingin mengganti ilustrasi bawaan.')
+                                                        ->columnSpan(12),
+                                                ]),
+                                            ])
+                                            ->reorderable()
+                                            ->collapsible()
+                                            ->collapsed()
+                                            ->cloneable()
+                                            ->defaultItems(5),
+                                    ]),
+                            ]),
+
                         // Tab 2: Visi & Nilai
                         Tab::make('Visi Perusahaan')
                             ->icon(Heroicon::OutlinedSparkles)
@@ -348,7 +473,14 @@ class ManageAbout extends Page
 
         foreach ($state as $key => $value) {
             $formattedValue = is_array($value) ? json_encode(array_values($value)) : (string) $value;
-            $group = in_array($key, ['years_experience', 'waiting_room_facilities', 'waiting_room_facilities_title']) ? 'general' : 'about';
+            $group = in_array($key, [
+                'years_experience',
+                'waiting_room_facilities',
+                'waiting_room_facilities_title',
+                'why_us_items',
+                'why_us_title',
+                'why_us_badge',
+            ]) ? 'general' : 'about';
             Setting::set($key, $formattedValue, $group);
         }
         Setting::clearCache();
