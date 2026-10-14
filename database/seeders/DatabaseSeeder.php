@@ -350,7 +350,7 @@ class DatabaseSeeder extends Seeder
                 'excerpt' => 'Jamur kaca dan kerak air sering mengganggu visibilitas saat berkendara di malam hari atau hujan deras. Simak cara aman membersihkannya tanpa merusak lapisan kaca.',
                 'category' => 'Tips Perawatan',
                 'read_time' => 4,
-                'img' => 'articles/bersihkan-kaca-dari-jamur.png',
+                'img' => 'articles/bersihkan-kaca-dari-jamur.webp',
                 'date' => '2026-09-02 09:00:00',
             ],
             [
@@ -359,7 +359,7 @@ class DatabaseSeeder extends Seeder
                 'excerpt' => 'Kabin yang bersih dan kaca bebas embun membuat perjalanan jauh lebih nyaman. Pelajari tips perawatan sirkulasi AC, pembersihan karpet, dan perawatan kaca film mobil.',
                 'category' => 'Tips Perawatan',
                 'read_time' => 5,
-                'img' => 'articles/cara-merawat-kabin-mobil.png',
+                'img' => 'articles/cara-merawat-kabin-mobil.webp',
                 'date' => '2026-08-28 10:30:00',
             ],
             [
@@ -368,7 +368,7 @@ class DatabaseSeeder extends Seeder
                 'excerpt' => 'Alarm mobil tiba-tiba berbunyi tanpa sebab di tengah malam? Kenali faktor penyebabnya mulai dari baterai remote, switch pintu, sensor getar kaca, hingga modul alarm.',
                 'category' => 'Edukasi',
                 'read_time' => 4,
-                'img' => 'articles/alarm-mobil-nyala-terus.png',
+                'img' => 'articles/alarm-mobil-nyala-terus.webp',
                 'date' => '2026-08-20 14:15:00',
             ],
             [
@@ -377,7 +377,7 @@ class DatabaseSeeder extends Seeder
                 'excerpt' => 'Mulai dari wiper frameless, talang air (door visor), karet seal kedap suara, hingga cairan rain repellent. Pilih aksesoris yang tepat untuk perlindungan kaca mobil Anda.',
                 'category' => 'Panduan Produk',
                 'read_time' => 4,
-                'img' => 'articles/aksesoris-mobil.png',
+                'img' => 'articles/aksesoris-mobil.webp',
                 'date' => '2026-08-15 11:00:00',
             ],
             [
@@ -386,7 +386,7 @@ class DatabaseSeeder extends Seeder
                 'excerpt' => 'Dari penggantian kaca depan OEM, seal ulang kaca rembes, injeksi kaca retak chip, hingga pemasangan kaca film tolak panas bergaransi resmi di Purwokerto.',
                 'category' => 'Panduan',
                 'read_time' => 6,
-                'img' => 'articles/layanan-spesialis-kaca-mobil.png',
+                'img' => 'articles/layanan-spesialis-kaca-mobil.webp',
                 'date' => '2026-08-10 08:45:00',
             ],
             [
@@ -395,7 +395,7 @@ class DatabaseSeeder extends Seeder
                 'excerpt' => 'Jangan tunda perbaikan retakan kaca depan. Kenali batasan retak yang masih bisa direparasi dan kondisi keretakan yang sudah wajib diganti demi keselamatan keluarga.',
                 'category' => 'Keselamatan',
                 'read_time' => 5,
-                'img' => 'articles/kapan-waktu-ganti-kaca-depan.png',
+                'img' => 'articles/kapan-waktu-ganti-kaca-depan.webp',
                 'date' => '2026-08-05 16:20:00',
             ],
         ];
@@ -432,16 +432,16 @@ class DatabaseSeeder extends Seeder
         }
 
         $galleryData = [
-            ['cat' => 'Kaca Depan', 'title' => 'Pemasangan Kaca Depan Toyota Avanza Gen 1', 'car' => 'Toyota Avanza Gen 1', 'img' => 'gallery/avanza-gen-1.png'],
-            ['cat' => 'Workshop', 'title' => 'Instalasi Kaca Bus Pariwisata Aneka Bintang', 'car' => 'Bus Aneka Bintang', 'img' => 'gallery/bus-aneka-bintang.png'],
-            ['cat' => 'Film Kaca', 'title' => 'Pasang Kaca Film Tolak Panas Honda Brio Merah', 'car' => 'Honda Brio Merah', 'img' => 'gallery/brio-merah-s.png'],
-            ['cat' => 'Kaca Depan', 'title' => 'Penggantian Kaca Depan Toyota Kijang Innova OEM', 'car' => 'Toyota Innova', 'img' => 'gallery/innova.png'],
-            ['cat' => 'Aksesoris', 'title' => 'Ganti Kaca Bagasi Belakang Daihatsu Granmax', 'car' => 'Daihatsu Granmax Belakang', 'img' => 'gallery/granmax-belakang-4.png'],
-            ['cat' => 'Workshop', 'title' => 'Pemasangan Kaca Truk Hino Dutro Presisi', 'car' => 'Hino Dutro Putih', 'img' => 'gallery/hino-dutro-putih.png'],
-            ['cat' => 'Film Kaca', 'title' => 'Pemasangan Kaca Film V-KOOL Honda CR-V Gen 3', 'car' => 'Honda CR-V Gen 3', 'img' => 'gallery/crv-gen-3-s1.png'],
-            ['cat' => 'Kaca Depan', 'title' => 'Ganti Kaca Depan Toyota Fortuner Gen 2 Asli', 'car' => 'Toyota Fortuner Gen 2', 'img' => 'gallery/fortuner-gen-2.png'],
-            ['cat' => 'Workshop', 'title' => 'Instalasi Kaca Isuzu Elf Microbus Bergaransi', 'car' => 'Isuzu Elf', 'img' => 'gallery/isuzu-elf-4.png'],
-            ['cat' => 'Film Kaca', 'title' => 'Pemasangan Kaca Film BMW E91 Touring', 'car' => 'BMW E91', 'img' => 'gallery/bmw-e-91.png'],
+            ['cat' => 'Kaca Depan', 'title' => 'Pemasangan Kaca Depan Toyota Avanza Gen 1', 'car' => 'Toyota Avanza Gen 1', 'img' => 'gallery/avanza-gen-1.webp'],
+            ['cat' => 'Workshop', 'title' => 'Instalasi Kaca Bus Pariwisata Aneka Bintang', 'car' => 'Bus Aneka Bintang', 'img' => 'gallery/bus-aneka-bintang.webp'],
+            ['cat' => 'Film Kaca', 'title' => 'Pasang Kaca Film Tolak Panas Honda Brio Merah', 'car' => 'Honda Brio Merah', 'img' => 'gallery/brio-merah-s.webp'],
+            ['cat' => 'Kaca Depan', 'title' => 'Penggantian Kaca Depan Toyota Kijang Innova OEM', 'car' => 'Toyota Innova', 'img' => 'gallery/innova.webp'],
+            ['cat' => 'Aksesoris', 'title' => 'Ganti Kaca Bagasi Belakang Daihatsu Granmax', 'car' => 'Daihatsu Granmax Belakang', 'img' => 'gallery/granmax-belakang-4.webp'],
+            ['cat' => 'Workshop', 'title' => 'Pemasangan Kaca Truk Hino Dutro Presisi', 'car' => 'Hino Dutro Putih', 'img' => 'gallery/hino-dutro-putih.webp'],
+            ['cat' => 'Film Kaca', 'title' => 'Pemasangan Kaca Film V-KOOL Honda CR-V Gen 3', 'car' => 'Honda CR-V Gen 3', 'img' => 'gallery/crv-gen-3-s1.webp'],
+            ['cat' => 'Kaca Depan', 'title' => 'Ganti Kaca Depan Toyota Fortuner Gen 2 Asli', 'car' => 'Toyota Fortuner Gen 2', 'img' => 'gallery/fortuner-gen-2.webp'],
+            ['cat' => 'Workshop', 'title' => 'Instalasi Kaca Isuzu Elf Microbus Bergaransi', 'car' => 'Isuzu Elf', 'img' => 'gallery/isuzu-elf-4.webp'],
+            ['cat' => 'Film Kaca', 'title' => 'Pemasangan Kaca Film BMW E91 Touring', 'car' => 'BMW E91', 'img' => 'gallery/bmw-e-91.webp'],
         ];
 
         GalleryItem::truncate();
