@@ -6,6 +6,7 @@ use App\Filament\Resources\Settings\Pages\ListSettings;
 use App\Models\Setting;
 use BackedEnum;
 use Filament\Actions\EditAction;
+use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Placeholder;
 use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Select;
@@ -95,7 +96,6 @@ class SettingResource extends Resource
                 'waiting_room_facilities_title',
                 'about_vision_pillars',
                 'about_missions',
-                'why_us_items',
                 'why_us_title',
                 'why_us_badge',
             ]))
@@ -124,6 +124,19 @@ class SettingResource extends Resource
                                 $names = array_column(array_filter($decoded, fn ($item) => ($item['is_active'] ?? true)), 'name');
 
                                 return implode(', ', $names).' ('.count($decoded).' Fasilitas)';
+                            }
+                        }
+
+                        if ($record->key === 'why_us_items') {
+                            $decoded = json_decode($state, true);
+                            if (is_array($decoded) && count($decoded) > 0) {
+                                $titles = array_map(function ($item) {
+                                    $p = ! empty($item['letter']) ? '['.$item['letter'].'] ' : '';
+
+                                    return $p.($item['title'] ?? '');
+                                }, array_filter($decoded, fn ($item) => ($item['is_active'] ?? true)));
+
+                                return implode(', ', $titles).' ('.count($decoded).' Nilai)';
                             }
                         }
 
@@ -158,8 +171,18 @@ class SettingResource extends Resource
                     ->modalHeading(fn (Setting $record): string => 'Ubah: '.Setting::humanName($record->key))
                     ->modalDescription(fn (Setting $record): string => Setting::humanDescription($record->key))
                     ->modalSubmitActionLabel('Simpan Perubahan')
-                    ->modalWidth(fn (?Setting $record): string => $record?->key === 'waiting_room_facilities' ? '4xl' : 'lg')
+                    ->modalWidth(fn (?Setting $record): string => in_array($record?->key, ['waiting_room_facilities', 'why_us_items']) ? '4xl' : 'lg')
                     ->fillForm(function (Setting $record): array {
+                        if ($record->key === 'why_us_items') {
+                            $raw = json_decode($record->value, true) ?: [];
+
+                            return [
+                                'why_us_badge' => Setting::get('why_us_badge', 'KEUNGGULAN'),
+                                'why_us_title' => Setting::get('why_us_title', 'KENAPA HARUS PILIH KAMI?'),
+                                'why_us_items' => $raw,
+                            ];
+                        }
+
                         if ($record->key === 'waiting_room_facilities') {
                             $raw = json_decode($record->value, true) ?: [];
 
@@ -174,7 +197,16 @@ class SettingResource extends Resource
                         ];
                     })
                     ->using(function (Setting $record, array $data): Setting {
-                        if ($record->key === 'waiting_room_facilities') {
+                        if ($record->key === 'why_us_items') {
+                            $rawItems = array_values($data['why_us_items'] ?? []);
+                            $record->update(['value' => json_encode($rawItems)]);
+                            if (! empty($data['why_us_badge'])) {
+                                Setting::set('why_us_badge', (string) $data['why_us_badge'], 'general');
+                            }
+                            if (! empty($data['why_us_title'])) {
+                                Setting::set('why_us_title', (string) $data['why_us_title'], 'general');
+                            }
+                        } elseif ($record->key === 'waiting_room_facilities') {
                             $rawFacilities = array_values($data['facilities'] ?? []);
                             $record->update(['value' => json_encode($rawFacilities)]);
                             if (! empty($data['title'])) {
@@ -255,6 +287,75 @@ class SettingResource extends Resource
 
                                         return "{$emoji} {$name}{$status}";
                                     })
+                                    ->reorderable()
+                                    ->collapsible()
+                                    ->cloneable(),
+                            ];
+                        }
+                        if ($record->key === 'why_us_items') {
+                            return [
+                                Placeholder::make('info')
+                                    ->label('Petunjuk Pengaturan')
+                                    ->content(new HtmlString("<div style='padding: 12px 16px; background: rgba(37, 99, 235, 0.08); border-left: 4px solid #2563eb; border-radius: 8px; font-size: 13px; color: #1e293b; line-height: 1.5;'><div style='font-weight: 700; color: #1e40af; margin-bottom: 2px;'>Kelola Keunggulan Bengkel (Nilai B-E-R-E-S)</div><div style='color: #475569;'>Atur judul tagline dan 5 kartu keunggulan nilai B-E-R-E-S dengan foto dan deskripsi yang tampil di beranda website.</div></div>")),
+                                Grid::make(2)->schema([
+                                    TextInput::make('why_us_badge')
+                                        ->label('Label Tagline Atas')
+                                        ->placeholder('KEUNGGULAN')
+                                        ->default('KEUNGGULAN')
+                                        ->required(),
+                                    TextInput::make('why_us_title')
+                                        ->label('Judul Utama')
+                                        ->placeholder('KENAPA HARUS PILIH KAMI?')
+                                        ->default('KENAPA HARUS PILIH KAMI?')
+                                        ->required(),
+                                ]),
+                                Repeater::make('why_us_items')
+                                    ->label('Daftar Kartu Keunggulan')
+                                    ->addActionLabel('+ Tambah Kartu Keunggulan')
+                                    ->collapsed()
+                                    ->itemLabel(function (array $state): ?string {
+                                        $letter = $state['letter'] ?? '';
+                                        $title = $state['title'] ?? 'Keunggulan';
+                                        $prefix = $letter ? "[{$letter}] " : '';
+                                        $status = isset($state['is_active']) && ! $state['is_active'] ? ' (Nonaktif)' : '';
+
+                                        return "{$prefix}{$title}{$status}";
+                                    })
+                                    ->schema([
+                                        Grid::make(12)->schema([
+                                            TextInput::make('letter')
+                                                ->label('Huruf Inisial')
+                                                ->placeholder('B')
+                                                ->maxLength(5)
+                                                ->columnSpan(['default' => 12, 'sm' => 2]),
+                                            TextInput::make('title')
+                                                ->label('Judul Nilai')
+                                                ->placeholder('Contoh: Bersih & Presisi')
+                                                ->required()
+                                                ->columnSpan(['default' => 12, 'sm' => 7]),
+                                            Toggle::make('is_active')
+                                                ->label('Tampilkan')
+                                                ->default(true)
+                                                ->inline(false)
+                                                ->columnSpan(['default' => 12, 'sm' => 3]),
+                                            Textarea::make('desc')
+                                                ->label('Penjelasan / Deskripsi')
+                                                ->placeholder('Tuliskan ringkasan nilai keunggulan...')
+                                                ->rows(2)
+                                                ->required()
+                                                ->columnSpan(12),
+                                            FileUpload::make('img')
+                                                ->label('Foto / Ilustrasi')
+                                                ->image()
+                                                ->disk('public')
+                                                ->directory('why-us')
+                                                ->imagePreviewHeight('140')
+                                                ->acceptedFileTypes(['image/jpeg', 'image/png', 'image/webp'])
+                                                ->maxSize(5120)
+                                                ->helperText('Upload foto baru jika ingin mengganti ilustrasi bawaan.')
+                                                ->columnSpan(12),
+                                        ]),
+                                    ])
                                     ->reorderable()
                                     ->collapsible()
                                     ->cloneable(),

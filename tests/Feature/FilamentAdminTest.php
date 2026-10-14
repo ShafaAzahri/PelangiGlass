@@ -127,10 +127,9 @@ class FilamentAdminTest extends TestCase
         $response = $this->actingAs($admin)->get('/admin/manage-about');
         $response->assertStatus(200);
         $response->assertSee('Tentang Kami');
-        $response->assertSee('Fasilitas Ruang Tunggu');
-        $response->assertSee('Free Coffee & Teh');
-        $response->assertSee('Keunggulan (Pilih Kami)');
-        $response->assertSee('Bersih & Presisi');
+        $response->assertSee('Sejarah & Metrik');
+        $response->assertSee('Visi Perusahaan');
+        $response->assertSee('Misi Perusahaan');
     }
 
     public function test_authenticated_admin_can_access_promo_resource_and_see_product_selection(): void
@@ -171,25 +170,7 @@ class FilamentAdminTest extends TestCase
         Setting::clearCache();
     }
 
-    public function test_admin_can_update_why_us_settings(): void
-    {
-        $admin = User::where('email', 'admin@pelangiglass.com')->first();
-        $this->assertNotNull($admin, 'Admin user should be seeded');
-
-        Livewire::actingAs($admin)
-            ->test(ManageAbout::class)
-            ->set('data.why_us_title', 'MENGAPA MEMILIH KAMI?')
-            ->call('save')
-            ->assertHasNoErrors();
-
-        $this->assertEquals('MENGAPA MEMILIH KAMI?', Setting::get('why_us_title'));
-
-        // Reset
-        Setting::set('why_us_title', 'KENAPA HARUS PILIH KAMI?', 'general');
-        Setting::clearCache();
-    }
-
-    public function test_settings_resource_includes_facilities_with_formatted_value(): void
+    public function test_settings_resource_includes_why_us_and_facilities_in_profil_bengkel(): void
     {
         $admin = User::where('email', 'admin@pelangiglass.com')->first();
         $this->assertNotNull($admin, 'Admin user should be seeded');
@@ -199,7 +180,10 @@ class FilamentAdminTest extends TestCase
             ->set('activeTab', 'general')
             ->assertSee('Fasilitas Ruang Tunggu Pelanggan')
             ->assertSee('Free Coffee')
-            ->assertDontSee('Waiting Room Facilities Title');
+            ->assertSee('Keunggulan Bengkel')
+            ->assertSee('Bersih & Presisi')
+            ->assertDontSee('Waiting Room Facilities Title')
+            ->assertDontSee('why_us_title');
     }
 
     public function test_promo_discount_calculator_computes_clean_promo_price(): void

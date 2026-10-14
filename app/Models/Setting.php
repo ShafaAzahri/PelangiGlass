@@ -100,6 +100,7 @@ class Setting extends Model
             'google_maps_embed' => 'Link Peta Google Maps',
             'years_experience' => 'Lama Pengalaman Workshop (Beranda & Tentang)',
             'waiting_room_facilities' => 'Fasilitas Ruang Tunggu Pelanggan',
+            'why_us_items' => 'Keunggulan Bengkel (Kenapa Pilih Kami)',
             default => ucwords(str_replace('_', ' ', $key)),
         };
     }
@@ -120,6 +121,7 @@ class Setting extends Model
             'google_maps_embed' => 'URL sematan (embed) peta lokasi workshop dari Google Maps',
             'years_experience' => 'Lama pengalaman bengkel melayani pelanggan (contoh: 30+). Otomatis sinkron di halaman Beranda dan Tentang Kami.',
             'waiting_room_facilities' => 'Judul dan daftar fasilitas ruang tunggu workshop yang tampil di halaman beranda',
+            'why_us_items' => 'Judul dan 5 kartu keunggulan nilai B-E-R-E-S dengan foto dan deskripsi di halaman beranda',
             default => 'Pengaturan konfigurasi website',
         };
     }
