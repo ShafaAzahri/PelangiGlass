@@ -51,6 +51,8 @@ storage/framework/sessions/*
 storage/framework/views/*
 !storage/framework/views/.gitignore
 storage/app/*
+!storage/app/public
+!storage/app/public/**
 !storage/app/.gitignore
 storage/inertia-devtools
 

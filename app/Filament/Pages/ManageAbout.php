@@ -6,10 +6,8 @@ use App\Models\Setting;
 use BackedEnum;
 use Filament\Actions\Action;
 use Filament\Forms\Components\Repeater;
-use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
-use Filament\Forms\Components\Toggle;
 use Filament\Notifications\Notification;
 use Filament\Pages\Page;
 use Filament\Schemas\Components\Actions;
@@ -93,16 +91,6 @@ class ManageAbout extends Page
         $rawMissions = $settings['about_missions'] ?? null;
         $missions = $rawMissions ? json_decode($rawMissions, true) : $defaultMissions;
 
-        $defaultFacilities = [
-            ['name' => 'Free Coffee & Teh', 'icon' => 'coffee', 'is_active' => true],
-            ['name' => 'Free Charging', 'icon' => 'charging', 'is_active' => true],
-            ['name' => 'Air Panas & Dingin', 'icon' => 'water', 'is_active' => true],
-            ['name' => 'TV LED Hiburan', 'icon' => 'tv', 'is_active' => true],
-            ['name' => 'Kipas Angin', 'icon' => 'fan', 'is_active' => true],
-        ];
-        $rawFacilities = $settings['waiting_room_facilities'] ?? null;
-        $facilities = $rawFacilities ? json_decode($rawFacilities, true) : $defaultFacilities;
-
         $this->form->fill([
             // Tab 1: Sejarah & Metrik
             'about_story_title' => $settings['about_story_title'] ?? 'Lebih dari '.($settings['years_experience'] ?? '30+').' Tahun Melayani Purwokerto',
@@ -112,10 +100,6 @@ class ManageAbout extends Page
             'years_experience' => $settings['years_experience'] ?? '30+',
             'about_stat_customers' => $settings['about_stat_customers'] ?? '10.000+',
             'about_stat_warranty' => $settings['about_stat_warranty'] ?? '100%',
-
-            // Tab 2: Fasilitas Ruang Tunggu
-            'waiting_room_facilities_title' => $settings['waiting_room_facilities_title'] ?? 'FASILITAS RUANG TUNGGU PELANGGAN',
-            'waiting_room_facilities' => is_array($facilities) ? $facilities : $defaultFacilities,
 
             // Tab 4: Visi Perusahaan
             'about_vision_title' => $settings['about_vision_title'] ?? 'Visi Kami',
@@ -181,90 +165,6 @@ class ManageAbout extends Page
                                                 ->placeholder('100%')
                                                 ->required(),
                                         ]),
-                                    ]),
-                            ]),
-
-                        // Tab 2: Fasilitas Ruang Tunggu
-                        Tab::make('Fasilitas Ruang Tunggu')
-                            ->icon(Heroicon::OutlinedSparkles)
-                            ->schema([
-                                Section::make('Judul Bagian Fasilitas')
-                                    ->description('Teks judul yang tampil di atas deretan kartu fasilitas beranda')
-                                    ->icon(Heroicon::OutlinedDocumentText)
-                                    ->schema([
-                                        TextInput::make('waiting_room_facilities_title')
-                                            ->label('Judul Bagian')
-                                            ->placeholder('FASILITAS RUANG TUNGGU PELANGGAN')
-                                            ->default('FASILITAS RUANG TUNGGU PELANGGAN')
-                                            ->required()
-                                            ->maxLength(150),
-                                    ]),
-
-                                Section::make('Daftar Fasilitas Pelanggan')
-                                    ->description('Kelola item fasilitas yang tersedia di ruang tunggu workshop Pelangi Glass. Fasilitas yang aktif akan langsung muncul di halaman beranda.')
-                                    ->icon(Heroicon::OutlinedSparkles)
-                                    ->schema([
-                                        Repeater::make('waiting_room_facilities')
-                                            ->label('Daftar Fasilitas')
-                                            ->addActionLabel('+ Tambah Fasilitas Baru')
-                                            ->itemLabel(function (array $state): ?string {
-                                                $name = $state['name'] ?? null;
-                                                if (! filled($name)) {
-                                                    return 'Fasilitas Baru';
-                                                }
-                                                $iconMap = [
-                                                    'coffee' => '☕',
-                                                    'charging' => '🔌',
-                                                    'water' => '🚰',
-                                                    'tv' => '📺',
-                                                    'fan' => '💨',
-                                                    'wifi' => '📶',
-                                                    'ac' => '❄️',
-                                                    'sofa' => '🛋️',
-                                                    'toilet' => '🚻',
-                                                    'parking' => '🅿️',
-                                                    'check' => '✓',
-                                                ];
-                                                $emoji = $iconMap[$state['icon'] ?? 'check'] ?? '✓';
-                                                $status = isset($state['is_active']) && ! $state['is_active'] ? ' (Nonaktif)' : '';
-
-                                                return "{$emoji} {$name}{$status}";
-                                            })
-                                            ->schema([
-                                                Grid::make(12)->schema([
-                                                    TextInput::make('name')
-                                                        ->label('Nama Fasilitas')
-                                                        ->placeholder('Contoh: Free Coffee & Teh')
-                                                        ->required()
-                                                        ->columnSpan(['default' => 12, 'md' => 6]),
-                                                    Select::make('icon')
-                                                        ->label('Pilihan Ikon')
-                                                        ->options([
-                                                            'coffee' => '☕ Kopi & Teh',
-                                                            'charging' => '🔌 Colokan / Charging',
-                                                            'water' => '🚰 Air Panas & Dingin',
-                                                            'tv' => '📺 TV LED Hiburan',
-                                                            'fan' => '💨 Kipas Angin',
-                                                            'wifi' => '📶 Free Wi-Fi',
-                                                            'ac' => '❄️ Ruangan Ber-AC',
-                                                            'sofa' => '🛋️ Sofa Nyaman',
-                                                            'toilet' => '🚻 Toilet Bersih',
-                                                            'parking' => '🅿️ Parkir Luas',
-                                                            'check' => '✓ Ceklis / Umum',
-                                                        ])
-                                                        ->default('check')
-                                                        ->required()
-                                                        ->columnSpan(['default' => 12, 'md' => 4]),
-                                                    Toggle::make('is_active')
-                                                        ->label('Tampilkan')
-                                                        ->default(true)
-                                                        ->columnSpan(['default' => 12, 'md' => 2]),
-                                                ]),
-                                            ])
-                                            ->defaultItems(5)
-                                            ->reorderable()
-                                            ->collapsible()
-                                            ->cloneable(),
                                     ]),
                             ]),
 
@@ -348,11 +248,7 @@ class ManageAbout extends Page
 
         foreach ($state as $key => $value) {
             $formattedValue = is_array($value) ? json_encode(array_values($value)) : (string) $value;
-            $group = in_array($key, [
-                'years_experience',
-                'waiting_room_facilities',
-                'waiting_room_facilities_title',
-            ]) ? 'general' : 'about';
+            $group = $key === 'years_experience' ? 'general' : 'about';
             Setting::set($key, $formattedValue, $group);
         }
         Setting::clearCache();

@@ -130,6 +130,7 @@ class FilamentAdminTest extends TestCase
         $response->assertSee('Sejarah & Metrik');
         $response->assertSee('Visi Perusahaan');
         $response->assertSee('Misi Perusahaan');
+        $response->assertDontSee('Fasilitas Ruang Tunggu');
     }
 
     public function test_authenticated_admin_can_access_promo_resource_and_see_product_selection(): void
@@ -152,22 +153,18 @@ class FilamentAdminTest extends TestCase
         $createRes->assertDontSee('Kode Kupon');
     }
 
-    public function test_admin_can_update_facilities_settings(): void
+    public function test_admin_can_update_about_story_title(): void
     {
         $admin = User::where('email', 'admin@pelangiglass.com')->first();
         $this->assertNotNull($admin, 'Admin user should be seeded');
 
         Livewire::actingAs($admin)
             ->test(ManageAbout::class)
-            ->set('data.waiting_room_facilities_title', 'FASILITAS BENGKEL PELANGI')
+            ->set('data.about_story_title', 'SEJARAH PELANGI GLASS BARU')
             ->call('save')
             ->assertHasNoErrors();
 
-        $this->assertEquals('FASILITAS BENGKEL PELANGI', Setting::get('waiting_room_facilities_title'));
-
-        // Reset to default
-        Setting::set('waiting_room_facilities_title', 'FASILITAS RUANG TUNGGU PELANGGAN', 'general');
-        Setting::clearCache();
+        $this->assertEquals('SEJARAH PELANGI GLASS BARU', Setting::get('about_story_title'));
     }
 
     public function test_settings_resource_includes_why_us_and_facilities_in_profil_bengkel(): void
