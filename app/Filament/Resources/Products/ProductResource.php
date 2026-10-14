@@ -81,7 +81,7 @@ class ProductResource extends Resource
                                 ->unique(ignoreRecord: true)
                                 ->maxLength(220),
                         ]),
-                        Grid::make(3)->schema([
+                        Grid::make(2)->schema([
                             Select::make('badge')
                                 ->label('Badge / Status')
                                 ->options(ProductBadge::class),
@@ -89,11 +89,6 @@ class ProductResource extends Resource
                                 ->label('Kesesuaian Mobil')
                                 ->placeholder('Contoh: Toyota Avanza / Semua Mobil')
                                 ->maxLength(255),
-                            TextInput::make('estimated_price')
-                                ->label('Harga Estimasi (Rp)')
-                                ->numeric()
-                                ->prefix('Rp')
-                                ->placeholder('Opsional (WA)'),
                         ]),
                         Textarea::make('short_description')
                             ->label('Deskripsi Singkat')
@@ -158,7 +153,7 @@ class ProductResource extends Resource
                             ->openable()
                             ->downloadable()
                             ->dehydrated(fn ($state) => filled($state))
-                            ->helperText('Rekomendasi ukuran: 800 x 600 piksel (rasio 4:3). Format yang didukung: JPG, JPEG, PNG, WebP. Ukuran file maksimal: 10 MB per foto.'),
+                            ->helperText('Foto tambahan produk (tampak samping, detail kemasan, dll). Foto ini otomatis tampil sebagai thumbnail galeri interaktif di bawah foto utama pada halaman detail produk.'),
                         Toggle::make('is_active')
                             ->label('Aktif / Tampilkan di Web')
                             ->default(true),
@@ -210,11 +205,6 @@ class ProductResource extends Resource
                 TextColumn::make('badge')
                     ->label('Badge')
                     ->badge(),
-                TextColumn::make('estimated_price')
-                    ->label('Harga')
-                    ->money('IDR', locale: 'id')
-                    ->placeholder('Tanya Estimasi')
-                    ->sortable(),
                 ToggleColumn::make('is_active')
                     ->label('Aktif'),
                 TextColumn::make('sort_order')

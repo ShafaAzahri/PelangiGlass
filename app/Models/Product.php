@@ -19,7 +19,7 @@ class Product extends Model
 
     protected array $fileFields = ['main_image', 'gallery_images'];
 
-    protected $appends = ['image_url'];
+    protected $appends = ['image_url', 'gallery_urls'];
 
     protected $fillable = [
         'category_id',
@@ -83,5 +83,35 @@ class Product extends Model
         }
 
         return '/storage/'.$cleanPath;
+    }
+
+    public function getGalleryUrlsAttribute(): array
+    {
+        $images = $this->gallery_images;
+        if (empty($images) || ! is_array($images)) {
+            return [];
+        }
+
+        $urls = [];
+        foreach ($images as $img) {
+            if (empty($img)) {
+                continue;
+            }
+            if (str_starts_with($img, 'http://') || str_starts_with($img, 'https://')) {
+                $urls[] = $img;
+
+                continue;
+            }
+            $cleanPath = ltrim($img, '/');
+            if (file_exists(public_path('storage/'.$cleanPath))) {
+                $urls[] = '/storage/'.$cleanPath;
+            } elseif (file_exists(public_path($cleanPath))) {
+                $urls[] = '/'.$cleanPath;
+            } else {
+                $urls[] = '/storage/'.$cleanPath;
+            }
+        }
+
+        return $urls;
     }
 }
