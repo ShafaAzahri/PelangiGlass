@@ -25,17 +25,19 @@ Route::get('/layanan/{slug}', [ServiceController::class, 'show']);
 // Leads Form Submission
 Route::post('/kontak', [InquiryController::class, 'store'])->middleware('throttle:5,1')->name('inquiries.store');
 
-// Admin CSV Import Templates
-Route::get('/admin/template/products-csv', function () {
-    return response(DataImportService::getProductCsvTemplate(), 200, [
-        'Content-Type' => 'text/csv; charset=UTF-8',
-        'Content-Disposition' => 'attachment; filename="template_import_produk.csv"',
-    ]);
-})->name('templates.products');
+// Admin CSV Import Templates (Protected)
+Route::middleware('auth')->prefix('admin/template')->group(function () {
+    Route::get('/products-csv', function () {
+        return response(DataImportService::getProductCsvTemplate(), 200, [
+            'Content-Type' => 'text/csv; charset=UTF-8',
+            'Content-Disposition' => 'attachment; filename="template_import_produk.csv"',
+        ]);
+    })->name('templates.products');
 
-Route::get('/admin/template/services-csv', function () {
-    return response(DataImportService::getServiceCsvTemplate(), 200, [
-        'Content-Type' => 'text/csv; charset=UTF-8',
-        'Content-Disposition' => 'attachment; filename="template_import_layanan.csv"',
-    ]);
-})->name('templates.services');
+    Route::get('/services-csv', function () {
+        return response(DataImportService::getServiceCsvTemplate(), 200, [
+            'Content-Type' => 'text/csv; charset=UTF-8',
+            'Content-Disposition' => 'attachment; filename="template_import_layanan.csv"',
+        ]);
+    })->name('templates.services');
+});

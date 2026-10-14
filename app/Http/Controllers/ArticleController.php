@@ -23,7 +23,7 @@ class ArticleController extends Controller
         }
 
         if ($request->filled('q')) {
-            $search = $request->q;
+            $search = str_replace(['\\', '%', '_'], ['\\\\', '\\%', '\\_'], trim($request->q));
             $query->where(function ($q) use ($search) {
                 $q->where('title', 'like', "%{$search}%")
                     ->orWhere('excerpt', 'like', "%{$search}%");

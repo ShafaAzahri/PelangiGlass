@@ -23,7 +23,7 @@ class ProductController extends Controller
         }
 
         if ($request->filled('q')) {
-            $search = $request->q;
+            $search = str_replace(['\\', '%', '_'], ['\\\\', '\\%', '\\_'], trim($request->q));
             $query->where(function ($q) use ($search) {
                 $q->where('name', 'like', "%{$search}%")
                     ->orWhere('vehicle_compatibility', 'like', "%{$search}%")

@@ -44,7 +44,7 @@ class HandleInertiaRequests extends Middleware
             'app' => [
                 'name' => config('app.name', 'Pelangi Glass'),
             ],
-            'settings' => fn () => Setting::all()->pluck('value', 'key'),
+            'settings' => fn () => Setting::allKeyed(),
             'flash' => [
                 'success' => fn () => $request->session()->get('success'),
                 'error' => fn () => $request->session()->get('error'),

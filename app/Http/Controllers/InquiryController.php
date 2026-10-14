@@ -4,11 +4,12 @@ namespace App\Http\Controllers;
 
 use App\Jobs\ProcessInquirySubmission;
 use App\Models\Setting;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 
 class InquiryController extends Controller
 {
-    public function store(Request $request)
+    public function store(Request $request): RedirectResponse
     {
         // Simple honeypot anti-spam
         if ($request->filled('website_hp_field')) {
@@ -26,6 +27,13 @@ class InquiryController extends Controller
             'message.required' => 'Pesan atau pertanyaan wajib diisi.',
         ]);
 
+        // Strict Sanitization
+        $validated['name'] = strip_tags(trim($validated['name']));
+        $validated['phone_number'] = strip_tags(trim($validated['phone_number']));
+        $validated['message'] = strip_tags(trim($validated['message']));
+        if (! empty($validated['email'])) {
+            $validated['email'] = filter_var(trim($validated['email']), FILTER_SANITIZE_EMAIL);
+        }
         // Dispatch queued job to process the inquiry and audit log in background
         ProcessInquirySubmission::dispatch(
             $validated,
