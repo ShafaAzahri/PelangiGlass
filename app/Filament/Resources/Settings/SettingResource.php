@@ -199,6 +199,19 @@ class SettingResource extends Resource
                     ->using(function (Setting $record, array $data): Setting {
                         if ($record->key === 'why_us_items') {
                             $rawItems = array_values($data['why_us_items'] ?? []);
+                            foreach ($rawItems as &$item) {
+                                if (! empty($item['img']) && ! str_starts_with($item['img'], 'http://') && ! str_starts_with($item['img'], 'https://')) {
+                                    $cleanPath = ltrim($item['img'], '/');
+                                    $fullPath = \Illuminate\Support\Facades\Storage::disk('public')->path($cleanPath);
+                                    if (file_exists($fullPath)) {
+                                        $newPath = \App\Services\ImageOptimizerService::convertToWebP($fullPath);
+                                        if ($newPath) {
+                                            $dir = dirname($cleanPath);
+                                            $item['img'] = ($dir !== '.' ? $dir.'/' : '').basename($newPath);
+                                        }
+                                    }
+                                }
+                            }
                             $record->update(['value' => json_encode($rawItems)]);
                             if (! empty($data['why_us_badge'])) {
                                 Setting::set('why_us_badge', (string) $data['why_us_badge'], 'general');
